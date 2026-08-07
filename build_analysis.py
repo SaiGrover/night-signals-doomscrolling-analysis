@@ -71,7 +71,8 @@ cells = [
         'axes.edgecolor': COLORS['grid'], 'axes.labelcolor': COLORS['ink'],
         'xtick.color': COLORS['muted'], 'ytick.color': COLORS['muted'],
         'text.color': COLORS['ink'], 'grid.color': COLORS['grid'],
-        'font.family': 'DejaVu Sans', 'axes.titleweight': 'bold',
+        'font.family': 'serif', 'font.serif': ['cmr10'], 'mathtext.fontset': 'cm',
+        'axes.formatter.use_mathtext': True, 'axes.titleweight': 'bold',
         'axes.titlesize': 15, 'axes.titlepad': 14,
     })
 

@@ -1,7 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import createPlotlyComponent from "react-plotly.js/factory";
+import Plotly from "plotly.js-dist-min";
+import type { Config, Data, Layout } from "plotly.js";
+import type { CSSProperties } from "react";
 
-type Route = "overview" | "analysis" | "exceptions" | "personas" | "methodology";
+const Plot = createPlotlyComponent(Plotly);
+
+type Route = "landing" | "overview" | "analysis" | "exceptions" | "personas" | "methodology";
 type ChartGroup = "Overview" | "Core" | "Mind" | "Protection" | "Demographics" | "Exceptions" | "Personas" | "Synthesis";
+type PlotSpec = { data: Data[]; layout: Partial<Layout> };
+const PlotSpecsContext = createContext<Record<string, PlotSpec>>({});
 
 const chartCards: Array<{
   file: string;
@@ -33,10 +41,11 @@ const nav: Array<{ id: Route; label: string; mark: string }> = [
   { id: "methodology", label: "Methodology", mark: "∑" },
 ];
 
-const pathFor = (route: Route) => route === "overview" ? "/" : `/${route}`;
+const pathFor = (route: Route) => route === "landing" ? "/" : `/${route}`;
 const routeFromPath = (): Route => {
   const value = window.location.pathname.replace(/^\//, "").split("/")[0];
-  return nav.some((item) => item.id === value) ? value as Route : "overview";
+  if (!value) return "landing";
+  return nav.some((item) => item.id === value) ? value as Route : "landing";
 };
 
 function Logo() {
@@ -69,10 +78,30 @@ function Topbar({ route }: { route: Route }) {
   return <header className="topbar">
     <div><span className="pulse" /> Live analysis <i>/</i> {nav.find((n) => n.id === route)?.label}</div>
     <div className="top-actions">
-      <a href="/methodology/sleep_doomscrolling_analysis.ipynb" download>Notebook ↓</a>
-      <a className="primary-action" href="/downloads/Sleep_Doomscrolling_Report.docx" download>Report ↓</a>
+      <a className="primary-action" href="/downloads/Sleep_Doomscrolling_Report.pdf" download>Report PDF ↓</a>
     </div>
   </header>;
+}
+
+function InteractiveChart({ file, title }: { file: string; title: string }) {
+  const specs = useContext(PlotSpecsContext);
+  const spec = specs[file];
+  if (!spec) return <div className="plot-loading">Loading interactive figure…</div>;
+  const axisDefaults = { gridcolor: "rgba(147,168,200,.12)", zerolinecolor: "rgba(147,168,200,.18)", tickfont: { color: "#93a8c8" }, title: { font: { color: "#c7d5e9" } } };
+  const layout: Partial<Layout> = {
+    ...spec.layout,
+    autosize: true,
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    font: { family: '"JetBrains Mono", monospace', color: "#aebed5", size: 10 },
+    margin: { l: 55, r: 24, t: 42, b: 52, ...spec.layout?.margin },
+    hoverlabel: { bgcolor: "#07111f", bordercolor: "#59d8e8", font: { color: "#fff", family: '"JetBrains Mono", monospace' } },
+  };
+  for (const key of ["xaxis", "xaxis2", "xaxis3", "xaxis4", "yaxis", "yaxis2", "yaxis3", "yaxis4"] as const) {
+    const existing = (spec.layout as Record<string, unknown>)?.[key] as Record<string, unknown> | undefined;
+    (layout as Record<string, unknown>)[key] = { ...axisDefaults, ...existing };
+  }
+  return <Plot data={spec.data} layout={layout as Layout} config={{ responsive: true, displaylogo: false, scrollZoom: false, modeBarButtonsToRemove: ["lasso2d", "select2d"] } as Partial<Config>} useResizeHandler style={{ width: "100%", height: "100%" }} aria-label={title} />;
 }
 
 function StatCard({ label, value, note, tone }: { label: string; value: string; note: string; tone: string }) {
@@ -91,9 +120,62 @@ function ChartCard({ chart, featured = false }: { chart: typeof chartCards[numbe
       <div><span className="section-label">{chart.kicker}</span><h3>{chart.title}</h3></div>
       <button onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? "Hide interpretation" : "Show interpretation"}>{open ? "−" : "+"}</button>
     </div>
-    <div className="chart-image"><img src={`/charts/${chart.file}`} alt={chart.title} loading={featured ? "eager" : "lazy"} /></div>
+    <div className="chart-image plot-frame"><InteractiveChart file={chart.file} title={chart.title} /></div>
     <div className={`chart-takeaway ${open ? "open" : ""}`}><span>Read this</span><p>{chart.takeaway}</p></div>
   </article>;
+}
+
+const landingLinks: Array<{ label: string; route: Route }> = [
+  { label: "Overview", route: "overview" },
+  { label: "Analysis", route: "analysis" },
+  { label: "Exceptions", route: "exceptions" },
+  { label: "Methodology", route: "methodology" },
+];
+
+function Landing({ go }: { go: (route: Route) => void }) {
+  const [open, setOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    document.body.classList.toggle("landing-menu-open", open);
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") { setOpen(false); toggleRef.current?.focus(); } };
+    const desktop = () => { if (window.innerWidth >= 901) setOpen(false); };
+    window.addEventListener("keydown", close); window.addEventListener("resize", desktop);
+    return () => { document.body.classList.remove("landing-menu-open"); window.removeEventListener("keydown", close); window.removeEventListener("resize", desktop); };
+  }, [open]);
+  const navigate = (route: Route) => { setOpen(false); go(route); };
+  return <section className="cinematic-hero">
+    <div className="cinematic-media">
+      <video autoPlay muted loop playsInline preload="auto" poster="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_132328_5f9029c8-218f-4489-82b6-29ff2849920e.png">
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_133255_956f653f-5d80-4b06-abd5-0f46c98b60fa.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div className="cinematic-scrim" />
+    <header className="cinematic-nav">
+      <a className="cinematic-logo" href="/" onClick={(e) => e.preventDefault()}>NIGHT SIGNALS</a>
+      <div className="cinematic-nav-right">
+        <nav className="cinematic-links" aria-label="Atlas navigation">{landingLinks.map((item) => <a key={item.route} href={pathFor(item.route)} onClick={(e) => { e.preventDefault(); navigate(item.route); }}>{item.label}</a>)}</nav>
+        <button className="cinematic-cta" onClick={() => navigate("overview")}>Enter atlas</button>
+        <button ref={toggleRef} className={`cinematic-toggle ${open ? "is-open" : ""}`} aria-expanded={open} aria-controls="mobileMenu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}><span /><span /><span /></button>
+      </div>
+    </header>
+    <div id="mobileMenu" className={`cinematic-menu ${open ? "is-open" : ""}`} role="dialog" aria-modal="true" aria-label="Site menu" aria-hidden={!open} {...(!open ? { inert: "" } : {})} onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
+      <div>{landingLinks.map((item, index) => <a style={{ "--i": index } as CSSProperties} key={item.route} href={pathFor(item.route)} onClick={(e) => { e.preventDefault(); navigate(item.route); }}>{item.label}</a>)}<button style={{ "--i": 4 } as CSSProperties} onClick={() => navigate("overview")}>Enter atlas</button></div>
+    </div>
+    <div className="cinematic-body">
+      <div className="cinematic-panel">
+        <span className="cinematic-chip">[ Evidence entry ]</span>
+        <h1>NIGHT<br />SIGNALS</h1>
+        <p className="cinematic-tagline">Your sleep ID to the signal behind the scroll.</p>
+        <div className="cinematic-form" aria-label="Enter the research atlas">
+          <div className="cinematic-datum">1,000 RESPONDENTS / 29 VARIABLES</div>
+          <button className="cinematic-button ghost" onClick={() => navigate("analysis")}>Proceed to analysis</button>
+          <button className="cinematic-button solid" onClick={() => navigate("methodology")}>Access methodology</button>
+        </div>
+        <button className="cinematic-referral" onClick={() => navigate("exceptions")}>Read the exceptions</button>
+      </div>
+    </div>
+    <footer className="cinematic-legal">Synthetic observational analysis. <a href="/methodology" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>Methodology</a> and <a href="/methodology#limitations" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>limitations</a>.</footer>
+  </section>;
 }
 
 function Overview({ go }: { go: (route: Route) => void }) {
@@ -195,7 +277,7 @@ function Methodology() {
     ["05", "Synthesize", "Correlation matrix plus five-fold cross-validated random forest."],
   ];
   return <section className="page-section methodology-page">
-    <div className="page-intro split-intro"><div><span className="section-label">REPRODUCIBLE / EXECUTED / AUDITABLE</span><h1>Methodology</h1><p>The analysis is shown, not hidden. Explore the workflow, synthetic-data checks, model boundary, and the executed notebook itself.</p></div><a className="download-tile" href="/methodology/sleep_doomscrolling_analysis.ipynb" download><span>IPYNB</span><b>Download notebook</b><small>Code + outputs + all figures</small></a></div>
+    <div className="page-intro"><span className="section-label">REPRODUCIBLE / EXECUTED / AUDITABLE</span><h1>Methodology</h1><p>The analysis is shown, not hidden. Explore the workflow, synthetic-data checks, model boundary, and the executed notebook itself.</p></div>
     <div className="method-grid">{steps.map(([n,t,d])=><article key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p></article>)}</div>
     <div className="sanity-panel"><div><span className="section-label">SYNTHETIC-DATA SANITY CHECK</span><h2>The data are unusually orderly.</h2><p>This does not prove how the file was produced. It does mean effect sizes should remain inside this dataset and causal language should stay out.</p></div><div className="sanity-metrics"><p><b>−0.893</b><span>sleep hours ↔ weekly debt</span></p><p><b>86%+</b><span>valid quality scores at 5/5</span></p><p><b>10</b><span>row spread across 3 target classes</span></p></div></div>
     <div className="method-boundaries"><article><span>Handled</span><p>Missingness, dtypes, IDs, duplicates, range checks, age buckets, feature leakage, class balance.</p></article><article><span>Not claimed</span><p>Causality, medical advice, population prevalence, cultural ranking, stable effects for tiny groups.</p></article></div>
@@ -207,16 +289,19 @@ function Methodology() {
 export default function App() {
   const [route, setRoute] = useState<Route>(routeFromPath());
   const [menu, setMenu] = useState(false);
+  const [plotSpecs, setPlotSpecs] = useState<Record<string, PlotSpec>>({});
   useEffect(() => {
     const onPop = () => setRoute(routeFromPath());
     window.addEventListener("popstate", onPop); return () => window.removeEventListener("popstate", onPop);
   }, []);
+  useEffect(() => { fetch("/data/plotly_charts.json").then((response) => response.json()).then(setPlotSpecs).catch(() => setPlotSpecs({})); }, []);
   const go = (next: Route) => { history.pushState({}, "", pathFor(next)); setRoute(next); setMenu(false); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const page = useMemo(() => ({ overview: <Overview go={go} />, analysis: <Analysis />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
-  return <div className={`app-shell ${menu ? "menu-open" : ""}`}>
+  const page = useMemo(() => ({ landing: <Landing go={go} />, overview: <Overview go={go} />, analysis: <Analysis />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
+  if (route === "landing") return <PlotSpecsContext.Provider value={plotSpecs}>{page}</PlotSpecsContext.Provider>;
+  return <PlotSpecsContext.Provider value={plotSpecs}><div className={`app-shell ${menu ? "menu-open" : ""}`}>
     <div className="ambient ambient-a" /><div className="ambient ambient-b" /><div className="grid-overlay" />
     <Sidebar route={route} onRoute={go} />
     <button className="mobile-menu" onClick={() => setMenu(!menu)} aria-label="Toggle navigation">{menu ? "×" : "☰"}</button>
     <main><Topbar route={route} /><div className="content">{page}</div><footer><Logo /><p>Observational synthetic-data analysis · 2026</p><div>{nav.map((n)=><a key={n.id} href={pathFor(n.id)} onClick={(e)=>{e.preventDefault();go(n.id)}}>{n.label}</a>)}</div></footer></main>
-  </div>;
+  </div></PlotSpecsContext.Provider>;
 }
