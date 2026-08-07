@@ -1,0 +1,42 @@
+{
+  "n": 1000,
+  "columns_total": 30,
+  "analytic_variables": 29,
+  "missing_cells_before": 220,
+  "doomscroller_rate": 0.476,
+  "poor_sleep_rate": 0.33,
+  "latency_gap_minutes": 10.561004554493554,
+  "sleep_debt_gap_hours": 1.4901869908268655,
+  "sleep_duration_gap_hours": -0.24751106549490043,
+  "screen_latency_r": 0.729464420495972,
+  "sleep_debt_hours_r": -0.8932909708524149,
+  "heavy_threshold": 66.0,
+  "heavy_n": 204,
+  "exception_n": 11,
+  "cv_balanced_accuracy": 0.6028520499108734,
+  "baseline_accuracy": 0.34,
+  "top_predictors": [
+    "doomscroller",
+    "number_of_night_wakeups",
+    "sleep_hours_per_night",
+    "weekly_sleep_debt_hours",
+    "sleep_latency_minutes",
+    "phone_checks_per_night",
+    "occupation_status",
+    "bedtime_screen_time_minutes"
+  ],
+  "persona_counts": {
+    "The Balanced Middle": 615,
+    "The Night Scroller": 204,
+    "The Disciplined Sleeper": 130,
+    "The Anxious News Seeker": 51
+  },
+  "missing_by_column": {
+    "caffeine_intake_mg_per_day": 50,
+    "exercise_minutes_per_day": 50,
+    "sleep_quality_score": 40,
+    "occupation_status": 30,
+    "primary_device_used_at_night": 30,
+    "bedtime_routine_type": 20
+  }
+}
