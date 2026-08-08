@@ -11,6 +11,21 @@ type ChartGroup = "Overview" | "Core" | "Mind" | "Protection" | "Demographics" |
 type PlotSpec = { data: Data[]; layout: Partial<Layout> };
 const PlotSpecsContext = createContext<Record<string, PlotSpec>>({});
 
+const plotHeights: Record<string, number> = {
+  "01_descriptive_overview.png": 620,
+  "02_hero_doomscroll_sleep.png": 520,
+  "03_doomscroller_comparison.png": 460,
+  "04_dose_response.png": 480,
+  "05_mental_health.png": 480,
+  "06_protective_habits.png": 560,
+  "07_exercise_gradient.png": 470,
+  "08_demographics.png": 570,
+  "10_exceptions.png": 490,
+  "11_personas.png": 440,
+  "12_correlation_heatmap.png": 630,
+  "13_feature_importance.png": 540,
+};
+
 const chartCards: Array<{
   file: string;
   number: string;
@@ -33,13 +48,22 @@ const chartCards: Array<{
   { file: "13_feature_importance.png", number: "12", group: "Synthesis", title: "What best predicts sleep-quality category?", kicker: "Cross-validated model", takeaway: "The doomscroller label leads, followed by wakeups, sleep duration, debt, and latency. The model predicts—it does not identify causes." },
 ];
 
-const nav: Array<{ id: Route; label: string; mark: string }> = [
-  { id: "overview", label: "Overview", mark: "◐" },
-  { id: "analysis", label: "All analysis", mark: "⌁" },
-  { id: "exceptions", label: "The Exceptions", mark: "↗" },
-  { id: "personas", label: "Personas", mark: "◎" },
-  { id: "methodology", label: "Methodology", mark: "∑" },
+const nav: Array<{ id: Route; label: string }> = [
+  { id: "overview", label: "Overview" },
+  { id: "analysis", label: "All analysis" },
+  { id: "exceptions", label: "The Exceptions" },
+  { id: "personas", label: "Personas" },
+  { id: "methodology", label: "Methodology" },
 ];
+
+function NavIcon({ route }: { route: Route }) {
+  const common = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
+  if (route === "overview") return <svg {...common}><path d="M4 12a8 8 0 1 0 16 0 8 8 0 1 0-16 0" /><path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none" opacity=".36" /></svg>;
+  if (route === "analysis") return <svg {...common}><path d="M4 17V9" /><path d="M10 17V5" /><path d="M16 17v-6" /><path d="M22 17V7" /><path d="M3 20h20" /></svg>;
+  if (route === "exceptions") return <svg {...common}><path d="M5 19 19 5" /><path d="M10 5h9v9" /><path d="M5 7v12h12" opacity=".45" /></svg>;
+  if (route === "personas") return <svg {...common}><circle cx="12" cy="8" r="3" /><path d="M5.5 19c.8-3.2 3-5 6.5-5s5.7 1.8 6.5 5" /><circle cx="12" cy="12" r="10" opacity=".38" /></svg>;
+  return <svg {...common}><path d="M6 5h12" /><path d="M6 19h12" /><path d="M8 5c0 4.4 8 4.6 8 9s-3 5-8 5" /><path d="M16 5c0 4.4-8 4.6-8 9" opacity=".5" /></svg>;
+}
 
 const pathFor = (route: Route) => route === "landing" ? "/" : `/${route}`;
 const routeFromPath = (): Route => {
@@ -61,7 +85,7 @@ function Sidebar({ route, onRoute }: { route: Route; onRoute: (route: Route) => 
     <p className="nav-eyebrow">Research atlas</p>
     <nav aria-label="Primary navigation">
       {nav.map((item) => <a key={item.id} href={pathFor(item.id)} className={route === item.id ? "active" : ""} onClick={(event) => { event.preventDefault(); onRoute(item.id); }}>
-        <span>{item.mark}</span>{item.label}
+        <span><NavIcon route={item.id} /></span>{item.label}
       </a>)}
     </nav>
     <div className="sidebar-status">
@@ -91,6 +115,8 @@ function InteractiveChart({ file, title }: { file: string; title: string }) {
   const layout: Partial<Layout> = {
     ...spec.layout,
     autosize: true,
+    width: undefined,
+    height: undefined,
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)",
     font: { family: '"JetBrains Mono", monospace', color: "#aebed5", size: 10 },
@@ -120,7 +146,7 @@ function ChartCard({ chart, featured = false }: { chart: typeof chartCards[numbe
       <div><span className="section-label">{chart.kicker}</span><h3>{chart.title}</h3></div>
       <button onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? "Hide interpretation" : "Show interpretation"}>{open ? "−" : "+"}</button>
     </div>
-    <div className="chart-image plot-frame"><InteractiveChart file={chart.file} title={chart.title} /></div>
+    <div className="chart-image plot-frame" style={{ "--plot-height": `${plotHeights[chart.file] ?? 520}px` } as CSSProperties}><InteractiveChart file={chart.file} title={chart.title} /></div>
     <div className={`chart-takeaway ${open ? "open" : ""}`}><span>Read this</span><p>{chart.takeaway}</p></div>
   </article>;
 }

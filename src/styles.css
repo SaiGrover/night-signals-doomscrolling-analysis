@@ -30,3 +30,13 @@ footer{border-top:1px solid var(--line);margin:30px 34px 0;padding:28px 0 36px;d
 .cinematic-legal{display:block;margin:0}
 @media(max-width:900px){.cinematic-nav-right{margin-left:auto;flex:0 0 44px}.cinematic-toggle{display:block;position:fixed;right:20px;top:20px;z-index:61;flex:0 0 44px;background:linear-gradient(#fff,#fff) center 22px/22px 1px no-repeat}.cinematic-toggle span{display:none}.cinematic-toggle:before,.cinematic-toggle:after{content:'';position:absolute;left:11px;top:16px;width:22px;height:1px;background:#fff;transition:transform .45s var(--ease-premium),top .45s var(--ease-premium)}.cinematic-toggle:after{top:28px}.cinematic-toggle.is-open{background:none}.cinematic-toggle.is-open:before{top:22px;transform:rotate(45deg)}.cinematic-toggle.is-open:after{top:22px;transform:rotate(-45deg)}}
 @media(max-width:720px){.cinematic-tagline{font-size:10px;letter-spacing:.1em;max-width:100%}.cinematic-legal{padding-left:20px;padding-right:20px}}
+
+/* Plotly sizing and navigation icon corrections */
+.analysis-grid{grid-template-columns:minmax(0,1fr);gap:22px}
+.analysis-grid .chart-card:nth-child(n){grid-column:auto}
+.plot-frame,.analysis-grid .plot-frame{height:var(--plot-height,520px);min-height:420px;overflow:hidden}
+.sidebar nav a span{width:22px;height:22px;display:grid;place-items:center;flex:0 0 22px;color:#7086a8;font-size:0}
+.sidebar nav a span svg{display:block;width:18px;height:18px}
+.sidebar nav a:hover span{color:#b9cae2}
+.sidebar nav a.active span{color:var(--cyan);filter:drop-shadow(0 0 6px rgba(89,216,232,.28))}
+@media(max-width:720px){.plot-frame,.analysis-grid .plot-frame{height:max(470px,var(--plot-height,520px));min-height:470px}}

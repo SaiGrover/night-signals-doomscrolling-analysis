@@ -2,7 +2,7 @@
 
 Night Signals is an evidence-led analysis of how late-night scrolling, negative-news consumption, and bedtime routines relate to sleep and mental wellbeing across 1,000 respondents. The project combines an executed notebook, a Computer Modern–typeset PDF report, and a cinematic React research atlas with interactive Plotly figures.
 
-![Nightly doomscrolling and sleep quality](public/charts/02_hero_doomscroll_sleep.png)
+![Nightly doomscrolling and sleep quality](outputs/figures/02_hero_doomscroll_sleep.png)
 
 ## What the analysis finds
 
@@ -41,19 +41,19 @@ The project treats this as a bedtime-disruption chain, not a morality tale. Expo
 | The Exceptions | Good-sleep heavy scrollers show more realized sleep and lower debt or latency. |
 | Synthesis | Behavioral exposure and sleep mechanics lead the predictor ranking. |
 
-![Doomscroller comparison](public/charts/03_doomscroller_comparison.png)
+![Doomscroller comparison](outputs/figures/03_doomscroller_comparison.png)
 
-![Protective routines](public/charts/06_protective_habits.png)
+![Protective routines](outputs/figures/06_protective_habits.png)
 
 ### The Exceptions
 
-![Heavy doomscrollers with good sleep](public/charts/10_exceptions.png)
+![Heavy doomscrollers with good sleep](outputs/figures/10_exceptions.png)
 
 Heavy exposure does not fully determine the outcome. The exception group is small and exploratory, but it redirects attention toward routines, realized sleep, and environmental friction.
 
 ### Personas
 
-![Persona profiles](public/charts/11_personas.png)
+![Persona profiles](outputs/figures/11_personas.png)
 
 | Persona | Defining pattern | First intervention lever |
 |---|---|---|
@@ -87,16 +87,17 @@ The website opens with a single-screen cinematic entry and continues into five r
 
 ```text
 night-signals-doomscrolling-analysis/
-├── assets/charts/                       # Computer Modern report/README figures
-├── sleep_doomscrolling_habits.csv       # Source dataset
-├── sleep_doomscrolling_analysis.ipynb   # Executed analysis notebook
-├── Sleep_Doomscrolling_Report.pdf       # Sole report export
-├── build_analysis.py                    # Notebook and static-chart builder
-├── build_web_data.py                    # Plotly specification builder
-├── build_report_pdf.py                  # Computer Modern PDF builder
-├── analysis_summary.json                # Reusable metrics
+├── data/
+│   └── sleep_doomscrolling_habits.csv   # Source dataset
+├── deliverables/
+│   └── Sleep_Doomscrolling_Report.pdf   # Sole report export
+├── notebooks/
+│   └── sleep_doomscrolling_analysis.ipynb
+├── outputs/
+│   ├── analysis_summary.json            # Final reusable metrics
+│   ├── figures/                         # Publication-ready chart exports
+│   └── tables/                          # Final analytical tables
 ├── public/
-│   ├── charts/                          # README/report chart copies
 │   ├── data/plotly_charts.json          # Website chart specifications
 │   ├── downloads/                       # PDF report
 │   └── methodology/                     # Notebook used by the viewer
@@ -109,6 +110,8 @@ night-signals-doomscrolling-analysis/
 └── README.md
 ```
 
+The repository intentionally contains final research artifacts and the deployable frontend only. One-off generation scripts and loose intermediate files are excluded from the published project.
+
 ## Methodology
 
 The workflow:
@@ -120,7 +123,7 @@ The workflow:
 5. Answers nine research questions using comparisons, quartiles, exception rules, and transparent personas.
 6. Synthesizes the evidence with a correlation heatmap and a stratified five-fold random forest.
 
-![Predictor ranking](public/charts/13_feature_importance.png)
+![Predictor ranking](outputs/figures/13_feature_importance.png)
 
 The outcome-adjacent `sleep_quality_score` is excluded from the classifier to reduce construct-overlap leakage.
 
