@@ -1,6 +1,6 @@
 # Night Signals — Sleep × Doomscrolling
 
-Night Signals is an evidence-led analysis of how late-night scrolling, negative-news consumption, and bedtime routines relate to sleep and mental wellbeing across 1,000 respondents. The project combines an executed notebook, a Computer Modern–typeset PDF report, and a cinematic React research atlas with interactive Plotly figures.
+Night Signals is an evidence-led analysis of how late-night scrolling, negative-news consumption, and bedtime routines relate to sleep and mental wellbeing across 1,000 respondents. The project combines separate executed analysis and predictive-modelling notebooks, a Computer Modern–typeset PDF report, and a cinematic React research atlas with interactive Plotly figures.
 
 ![Nightly doomscrolling and sleep quality](outputs/figures/02_hero_doomscroll_sleep.png)
 
@@ -11,7 +11,9 @@ Night Signals is an evidence-led analysis of how late-night scrolling, negative-
 - Anxiety, stress, and fatigue are highest where doomscrolling and negative-news consumption coexist.
 - Reading, meditation or journaling, phone distance, and exercise look more protective than night mode alone.
 - Only **11 of 204 heavy doomscrollers** still report good sleep—the project’s counter-narrative.
-- The predictive model reaches **60.3% balanced accuracy** against a **34% majority-class baseline**.
+- Five model families are compared with the same leakage-safe SMOTENC and nested-CV protocol.
+- Random Forest leads nested cross-validation at **60.3% balanced accuracy**, narrowly ahead of RBF SVM (**59.7%**) and Extra Trees (**59.3%**), against a **34% majority-class baseline**.
+- The ranking is based on nested cross-validation; the untouched holdout remains a final diagnostic rather than a model-selection shortcut.
 
 ## Analytical story
 
@@ -78,10 +80,10 @@ flowchart TD
 The website opens with a single-screen cinematic entry and continues into five research surfaces:
 
 - **Overview** — central thread, key metrics, and hero evidence.
-- **All analysis** — 12 responsive Plotly figures with filters, zoom, hover detail, and written interpretations.
+- **All analysis** — 13 responsive Plotly figures with filters, zoom, hover detail, and written interpretations.
 - **The Exceptions** — the good-sleep heavy-scroller counter-pattern.
 - **Personas** — three intervention-oriented respondent profiles.
-- **Methodology** — workflow, synthetic-data checks, model boundaries, and a read-only executed notebook viewer.
+- **Methodology** — workflow, synthetic-data checks, model boundaries, and switchable viewers for both executed notebooks.
 
 ## Repository map
 
@@ -121,9 +123,11 @@ The workflow:
 3. Creates Teens (15–19), 20s (20–29), and 30s+ age buckets.
 4. Tests for exact formulas, ceiling effects, balanced targets, and unusually strong correlations.
 5. Answers nine research questions using comparisons, quartiles, exception rules, and transparent personas.
-6. Synthesizes the evidence with a correlation heatmap and a stratified five-fold random forest.
+6. Compares Logistic Regression, Random Forest, Extra Trees, RBF SVM, and Histogram Gradient Boosting with leakage-safe `SMOTENC`, randomized tuning, nested stratified five-fold cross-validation, and an untouched holdout.
 
-![Predictor ranking](outputs/figures/13_feature_importance.png)
+![Model comparison](outputs/figures/13_model_comparison.png)
+
+![Predictor ranking](outputs/figures/14_feature_importance.png)
 
 The outcome-adjacent `sleep_quality_score` is excluded from the classifier to reduce construct-overlap leakage.
 

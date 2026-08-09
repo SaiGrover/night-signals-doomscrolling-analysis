@@ -1,0 +1,4 @@
+,Predicted Fair,Predicted Good,Predicted Poor
+Actual Fair,29,29,25
+Actual Good,21,59,5
+Actual Poor,18,13,51

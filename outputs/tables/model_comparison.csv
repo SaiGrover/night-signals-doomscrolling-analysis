@@ -1,0 +1,4 @@
+model,mean_balanced_accuracy,sd_balanced_accuracy
+Random forest (no SMOTE),0.6018419489007724,0.024166029303015583
+Random forest + SMOTE,0.6008912655971479,0.031070603306574553
+Tuned random forest + SMOTE,0.5959893048128342,0.02632787779266901
