@@ -180,7 +180,9 @@ function Landing({ go }: { go: (route: Route) => void }) {
   const navigate = (route: Route) => { setOpen(false); go(route); };
   return <section className="cinematic-hero">
     <div className="cinematic-media">
-      <img src="/assets/night-signals-hero.png" alt="A moonlit bedroom illuminated by a phone and abstract data signals" />
+      <video autoPlay muted loop playsInline preload="auto" poster="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_132328_5f9029c8-218f-4489-82b6-29ff2849920e.png">
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_133255_956f653f-5d80-4b06-abd5-0f46c98b60fa.mp4" type="video/mp4" />
+      </video>
     </div>
     <div className="cinematic-scrim" />
     <header className="cinematic-nav">
@@ -196,15 +198,15 @@ function Landing({ go }: { go: (route: Route) => void }) {
     </div>
     <div className="cinematic-body">
       <div className="cinematic-panel">
-        <span className="cinematic-chip">Evidence-led sleep intelligence</span>
-        <h1>WHEN THE FEED ENDS,<br /><em>THE SIGNAL REMAINS.</em></h1>
-        <p className="cinematic-tagline">A visual research atlas tracing how bedtime scrolling, emotional load, routines, and recovery move together.</p>
+        <span className="cinematic-chip">[ Evidence entry ]</span>
+        <h1>NIGHT<br />SIGNALS</h1>
+        <p className="cinematic-tagline">Your sleep ID to the signal behind the scroll.</p>
         <div className="cinematic-form" aria-label="Enter the research atlas">
-          <div className="cinematic-datum">1,000 respondents <i>·</i> 29 variables <i>·</i> 5 predictive models</div>
-          <button className="cinematic-button solid" onClick={() => navigate("overview")}>Enter the atlas <span>→</span></button>
-          <button className="cinematic-button ghost" onClick={() => navigate("modeling")}>Explore modelling</button>
+          <div className="cinematic-datum">1,000 RESPONDENTS / 29 VARIABLES</div>
+          <button className="cinematic-button ghost" onClick={() => navigate("analysis")}>Proceed to analysis</button>
+          <button className="cinematic-button solid" onClick={() => navigate("methodology")}>Access methodology</button>
         </div>
-        <button className="cinematic-referral" onClick={() => navigate("exceptions")}>Read the counter-pattern: 11 resilient heavy scrollers</button>
+        <button className="cinematic-referral" onClick={() => navigate("exceptions")}>Read the exceptions</button>
       </div>
     </div>
     <footer className="cinematic-legal">Synthetic observational analysis. <a href="/methodology" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>Methodology</a> and <a href="/methodology#limitations" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>limitations</a>.</footer>
@@ -213,15 +215,16 @@ function Landing({ go }: { go: (route: Route) => void }) {
 
 function Overview({ go }: { go: (route: Route) => void }) {
   return <>
-    <section className="hero">
+    <section className="hero hero-background">
+      <img className="hero-background-image" src="/assets/night-signals-hero.png" alt="" aria-hidden="true" />
+      <div className="hero-background-scrim" aria-hidden="true" />
       <div className="hero-copy">
         <span className="hero-kicker">NIGHT BEHAVIOR / SLEEP QUALITY / WELLBEING</span>
         <h1>The screen goes dark.<br /><em>The mind doesn’t.</em></h1>
         <p>An evidence-led atlas of how doomscrolling, negative news, and bedtime routines relate to sleep across 1,000 respondents.</p>
         <div className="hero-actions"><button onClick={() => go("analysis")}>Explore the evidence <span>→</span></button><button className="ghost" onClick={() => go("methodology")}>How we analyzed it</button></div>
       </div>
-      <div className="hero-orbit hero-editorial">
-        <img src="/assets/night-signals-hero.png" alt="Moonlit late-night phone use visual" />
+      <div className="hero-background-metrics" aria-label="Key findings">
         <div className="orbit-note one"><b>+10.6 min</b><span>sleep latency</span></div>
         <div className="orbit-note two"><b>47.6%</b><span>doomscrollers</span></div>
         <div className="orbit-note three"><b>11</b><span>exceptions</span></div>
