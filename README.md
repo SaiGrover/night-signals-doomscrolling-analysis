@@ -12,7 +12,9 @@ Night Signals is an evidence-led analysis of how late-night scrolling, negative-
 - Reading, meditation or journaling, phone distance, and exercise look more protective than night mode alone.
 - Only **11 of 204 heavy doomscrollers** still report good sleep—the project’s counter-narrative.
 - Five model families are compared with the same leakage-safe SMOTENC and nested-CV protocol.
+- For the actionable binary task (flagging **Poor** sleep versus all other outcomes), Extra Trees + SMOTE reaches **79.3% cross-validated accuracy**, **76.8% balanced accuracy**, and **84.9% ROC AUC**.
 - Random Forest leads nested cross-validation at **60.3% balanced accuracy**, narrowly ahead of RBF SVM (**59.7%**) and Extra Trees (**59.3%**), against a **34% majority-class baseline**.
+- The original three-class Good/Fair/Poor task is retained as a harder secondary benchmark, so its score is not presented as directly comparable with the binary risk model.
 - The ranking is based on nested cross-validation; the untouched holdout remains a final diagnostic rather than a model-selection shortcut.
 
 ## Analytical story

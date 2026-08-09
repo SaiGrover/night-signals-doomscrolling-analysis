@@ -28,5 +28,15 @@
     "keeps_phone_in_bedroom",
     "uses_night_mode",
     "consumes_negative_news_content"
-  ]
+  ],
+  "binary_selected_model": "Extra Trees + SMOTE",
+  "binary_cv_accuracy": 0.7929999999999999,
+  "binary_cv_balanced_accuracy": 0.7678652193577566,
+  "binary_cv_roc_auc": 0.8493668023518769,
+  "binary_holdout": {
+    "accuracy": 0.788,
+    "balanced_accuracy": 0.7655652550321045,
+    "roc_auc": 0.8473414616550032,
+    "f1": 0.6863905325443787
+  }
 }

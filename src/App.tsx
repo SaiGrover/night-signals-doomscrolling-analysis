@@ -25,6 +25,7 @@ const plotHeights: Record<string, number> = {
   "12_correlation_heatmap.png": 630,
   "13_model_comparison.png": 500,
   "14_feature_importance.png": 540,
+  "15_binary_risk_model.png": 500,
 };
 
 const chartCards: Array<{
@@ -34,20 +35,22 @@ const chartCards: Array<{
   title: string;
   kicker: string;
   takeaway: string;
+  significance: string;
 }> = [
-  { file: "01_descriptive_overview.png", number: "01", group: "Overview", title: "Who answered the survey?", kicker: "Sample composition", takeaway: "The sample is concentrated in the 20s and 30s+, with India and the United States the largest country groups. Full-time workers and students make up most respondents." },
-  { file: "02_hero_doomscroll_sleep.png", number: "02", group: "Core", title: "Heavier scrolling clusters around poorer sleep", kicker: "Hero relationship", takeaway: "Poor sleepers carry the highest median nightly doomscroll load. The overlap matters: exposure raises risk without making the outcome inevitable." },
-  { file: "03_doomscroller_comparison.png", number: "03", group: "Core", title: "A consistently harder night", kicker: "Doomscroller comparison", takeaway: "Doomscrollers average 10.6 extra minutes of latency, more wakeups, 1.5 more hours of weekly debt, and roughly 15 minutes less sleep per night." },
-  { file: "04_dose_response.png", number: "04", group: "Core", title: "The relationship is dose-shaped", kicker: "Screen-time quartiles", takeaway: "Each higher bedtime-screen quartile brings longer latency and more debt. The highest-exposure quartile also sleeps less and wakes more often." },
-  { file: "05_mental_health.png", number: "05", group: "Mind", title: "Doomscrolling and negative news stack up", kicker: "Mental wellbeing", takeaway: "Anxiety, stress, and fatigue are highest when doomscrolling and negative-news consumption coexist. Direction remains unresolved in cross-sectional data." },
-  { file: "06_protective_habits.png", number: "06", group: "Protection", title: "Routine beats a single screen setting", kicker: "Protective habits", takeaway: "Reading and meditation/journaling stand out more consistently than night mode alone. Environment and routine look more important than display settings." },
-  { file: "07_exercise_gradient.png", number: "07", group: "Protection", title: "Exercise helps, but is not a cure-all", kicker: "Movement gradient", takeaway: "More active respondents are somewhat more likely to report good sleep and lower fatigue, though the gradient is modest and not perfectly monotonic." },
-  { file: "08_demographics.png", number: "08", group: "Demographics", title: "Context, not destiny", kicker: "Age × occupation × country", takeaway: "Younger and student pockets are often elevated, but small cells and uneven country sample sizes make these descriptive signals rather than rankings." },
-  { file: "10_exceptions.png", number: "09", group: "Exceptions", title: "What separates resilient heavy scrollers?", kicker: "The counter-narrative", takeaway: "Only 11 of 204 heavy scrollers report good sleep. They realize more sleep and less debt or latency, with restorative routines appearing more often." },
-  { file: "11_personas.png", number: "10", group: "Personas", title: "Three patterns, three intervention needs", kicker: "Transparent personas", takeaway: "The Night Scroller is exposure-heavy, the Anxious News Seeker is emotion-heavy, and the Disciplined Sleeper is routine-protected." },
-  { file: "12_correlation_heatmap.png", number: "11", group: "Synthesis", title: "A coherent bedtime-disruption chain", kicker: "Correlation structure", takeaway: "Bedtime exposure connects to doomscroll sessions and latency; wakeups and short sleep accumulate into debt and fatigue." },
-  { file: "13_model_comparison.png", number: "12", group: "Synthesis", title: "Which model predicts sleep quality best?", kicker: "Five-model comparison", takeaway: "Random Forest leads nested cross-validation, narrowly ahead of RBF SVM and Extra Trees. Every candidate uses the same leakage-safe SMOTENC and tuning protocol." },
-  { file: "14_feature_importance.png", number: "13", group: "Synthesis", title: "What drives the selected model?", kicker: "Random Forest", takeaway: "Doomscrolling, wakeups, latency, and sleep duration lead held-out permutation importance. Predictive contribution does not establish causation." },
+  { file: "01_descriptive_overview.png", number: "01", group: "Overview", title: "Who answered the survey?", kicker: "Sample composition", takeaway: "The sample is concentrated in the 20s and 30s+, with India and the United States the largest country groups. Full-time workers and students make up most respondents.", significance: "This establishes who the findings describe and warns against treating uneven country or occupation groups as population estimates." },
+  { file: "02_hero_doomscroll_sleep.png", number: "02", group: "Core", title: "Heavier scrolling clusters around poorer sleep", kicker: "Hero relationship", takeaway: "Poor sleepers carry the highest median nightly doomscroll load. The overlap matters: exposure raises risk without making the outcome inevitable.", significance: "This is the central association in the study: doomscroll load separates sleep groups, but the overlap rules out a deterministic interpretation." },
+  { file: "03_doomscroller_comparison.png", number: "03", group: "Core", title: "A consistently harder night", kicker: "Doomscroller comparison", takeaway: "Doomscrollers average 10.6 extra minutes of latency, more wakeups, 1.5 more hours of weekly debt, and roughly 15 minutes less sleep per night.", significance: "Multiple sleep outcomes move together, making the pattern more credible than a difference observed in only one metric." },
+  { file: "04_dose_response.png", number: "04", group: "Core", title: "The relationship is dose-shaped", kicker: "Screen-time quartiles", takeaway: "Each higher bedtime-screen quartile brings longer latency and more debt. The highest-exposure quartile also sleeps less and wakes more often.", significance: "A graded exposure pattern carries more practical meaning than a binary label and suggests that incremental reductions may still matter." },
+  { file: "05_mental_health.png", number: "05", group: "Mind", title: "Doomscrolling and negative news stack up", kicker: "Mental wellbeing", takeaway: "Anxiety, stress, and fatigue are highest when doomscrolling and negative-news consumption coexist. Direction remains unresolved in cross-sectional data.", significance: "Content type and scrolling behavior may compound one another, but the chart cannot determine whether distress causes scrolling or follows it." },
+  { file: "06_protective_habits.png", number: "06", group: "Protection", title: "Routine beats a single screen setting", kicker: "Protective habits", takeaway: "Reading and meditation/journaling stand out more consistently than night mode alone. Environment and routine look more important than display settings.", significance: "Behavioral routines appear more actionable than cosmetic phone settings, making them stronger candidates for future intervention tests." },
+  { file: "07_exercise_gradient.png", number: "07", group: "Protection", title: "Exercise helps, but is not a cure-all", kicker: "Movement gradient", takeaway: "More active respondents are somewhat more likely to report good sleep and lower fatigue, though the gradient is modest and not perfectly monotonic.", significance: "Exercise looks supportive rather than sufficient; it should complement bedtime changes instead of being framed as a standalone fix." },
+  { file: "08_demographics.png", number: "08", group: "Demographics", title: "Context, not destiny", kicker: "Age × occupation × country", takeaway: "Younger and student pockets are often elevated, but small cells and uneven country sample sizes make these descriptive signals rather than rankings.", significance: "The figure helps identify contexts for tailored messaging, while small and uneven groups make cultural or demographic ranking inappropriate." },
+  { file: "10_exceptions.png", number: "09", group: "Exceptions", title: "What separates resilient heavy scrollers?", kicker: "The counter-narrative", takeaway: "Only 11 of 204 heavy scrollers report good sleep. They realize more sleep and less debt or latency, with restorative routines appearing more often.", significance: "Exceptions reveal possible protective mechanisms, but n=11 is too small for stable effect estimates or prescriptive conclusions." },
+  { file: "11_personas.png", number: "10", group: "Personas", title: "Three patterns, three intervention needs", kicker: "Transparent personas", takeaway: "The Night Scroller is exposure-heavy, the Anxious News Seeker is emotion-heavy, and the Disciplined Sleeper is routine-protected.", significance: "The personas translate evidence into different intervention levers without claiming that rule-based segments are diagnoses." },
+  { file: "12_correlation_heatmap.png", number: "11", group: "Synthesis", title: "A coherent bedtime-disruption chain", kicker: "Correlation structure", takeaway: "Bedtime exposure connects to doomscroll sessions and latency; wakeups and short sleep accumulate into debt and fatigue.", significance: "The correlation structure supports a coherent system-level story, while strong engineered relationships reinforce the synthetic-data caveat." },
+  { file: "13_model_comparison.png", number: "12", group: "Synthesis", title: "Which model predicts sleep quality best?", kicker: "Multi-model comparison", takeaway: "Tree ensembles, kernel models, boosting, and a linear baseline are evaluated under the same leakage-safe protocol.", significance: "Nested cross-validation measures the whole tuning process and prevents the model leaderboard from being chosen on one favorable split." },
+  { file: "14_feature_importance.png", number: "13", group: "Synthesis", title: "What drives the selected model?", kicker: "Selected model", takeaway: "Doomscrolling, wakeups, latency, and sleep duration lead held-out permutation importance.", significance: "Importance identifies useful predictive signals, not causes; correlated variables can share or mask one another's contribution." },
+  { file: "15_binary_risk_model.png", number: "14", group: "Synthesis", title: "Can we identify poor-sleep risk?", kicker: "Actionable binary model", takeaway: "The Extra Trees + SMOTE risk model reaches about 79.3% cross-validated accuracy, 76.8% balanced accuracy, and 84.9% ROC AUC when predicting Poor sleep versus not Poor sleep.", significance: "This narrower question is more actionable and reliably predictable than forcing noisy Good/Fair/Poor boundaries; it remains a distinct task, so its score is not directly comparable to three-class accuracy." },
 ];
 
 const nav: Array<{ id: Route; label: string }> = [
@@ -151,7 +154,8 @@ function ChartCard({ chart, featured = false }: { chart: typeof chartCards[numbe
       <button onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? "Hide interpretation" : "Show interpretation"}>{open ? "−" : "+"}</button>
     </div>
     <div className="chart-image plot-frame" style={{ "--plot-height": `${plotHeights[chart.file] ?? 520}px` } as CSSProperties}><InteractiveChart file={chart.file} title={chart.title} /></div>
-    <div className={`chart-takeaway ${open ? "open" : ""}`}><span>Read this</span><p>{chart.takeaway}</p></div>
+    <div className="chart-insight"><div><span>Interpretation</span><p>{chart.takeaway}</p></div><div><span>Why it matters</span><p>{chart.significance}</p></div></div>
+    <div className={`chart-takeaway ${open ? "open" : ""}`}><span>Analytical note</span><p>Use hover and zoom to inspect the values. Results describe this synthetic observational dataset and should not be read as causal or clinical evidence.</p></div>
   </article>;
 }
 
@@ -176,9 +180,7 @@ function Landing({ go }: { go: (route: Route) => void }) {
   const navigate = (route: Route) => { setOpen(false); go(route); };
   return <section className="cinematic-hero">
     <div className="cinematic-media">
-      <video autoPlay muted loop playsInline preload="auto" poster="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_132328_5f9029c8-218f-4489-82b6-29ff2849920e.png">
-        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_133255_956f653f-5d80-4b06-abd5-0f46c98b60fa.mp4" type="video/mp4" />
-      </video>
+      <img src="/assets/night-signals-hero.png" alt="A moonlit bedroom illuminated by a phone and abstract data signals" />
     </div>
     <div className="cinematic-scrim" />
     <header className="cinematic-nav">
@@ -194,15 +196,15 @@ function Landing({ go }: { go: (route: Route) => void }) {
     </div>
     <div className="cinematic-body">
       <div className="cinematic-panel">
-        <span className="cinematic-chip">[ Evidence entry ]</span>
-        <h1>NIGHT<br />SIGNALS</h1>
-        <p className="cinematic-tagline">Your sleep ID to the signal behind the scroll.</p>
+        <span className="cinematic-chip">Evidence-led sleep intelligence</span>
+        <h1>WHEN THE FEED ENDS,<br /><em>THE SIGNAL REMAINS.</em></h1>
+        <p className="cinematic-tagline">A visual research atlas tracing how bedtime scrolling, emotional load, routines, and recovery move together.</p>
         <div className="cinematic-form" aria-label="Enter the research atlas">
-          <div className="cinematic-datum">1,000 RESPONDENTS / 29 VARIABLES</div>
-          <button className="cinematic-button ghost" onClick={() => navigate("analysis")}>Proceed to analysis</button>
-          <button className="cinematic-button solid" onClick={() => navigate("methodology")}>Access methodology</button>
+          <div className="cinematic-datum">1,000 respondents <i>·</i> 29 variables <i>·</i> 5 predictive models</div>
+          <button className="cinematic-button solid" onClick={() => navigate("overview")}>Enter the atlas <span>→</span></button>
+          <button className="cinematic-button ghost" onClick={() => navigate("modeling")}>Explore modelling</button>
         </div>
-        <button className="cinematic-referral" onClick={() => navigate("exceptions")}>Read the exceptions</button>
+        <button className="cinematic-referral" onClick={() => navigate("exceptions")}>Read the counter-pattern: 11 resilient heavy scrollers</button>
       </div>
     </div>
     <footer className="cinematic-legal">Synthetic observational analysis. <a href="/methodology" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>Methodology</a> and <a href="/methodology#limitations" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>limitations</a>.</footer>
@@ -218,8 +220,8 @@ function Overview({ go }: { go: (route: Route) => void }) {
         <p>An evidence-led atlas of how doomscrolling, negative news, and bedtime routines relate to sleep across 1,000 respondents.</p>
         <div className="hero-actions"><button onClick={() => go("analysis")}>Explore the evidence <span>→</span></button><button className="ghost" onClick={() => go("methodology")}>How we analyzed it</button></div>
       </div>
-      <div className="hero-orbit" aria-hidden="true">
-        <div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="hero-moon" />
+      <div className="hero-orbit hero-editorial">
+        <img src="/assets/night-signals-hero.png" alt="Moonlit late-night phone use visual" />
         <div className="orbit-note one"><b>+10.6 min</b><span>sleep latency</span></div>
         <div className="orbit-note two"><b>47.6%</b><span>doomscrollers</span></div>
         <div className="orbit-note three"><b>11</b><span>exceptions</span></div>
@@ -229,13 +231,13 @@ function Overview({ go }: { go: (route: Route) => void }) {
       <StatCard label="Doomscrollers" value="47.6%" note="476 of 1,000 respondents" tone="cyan" />
       <StatCard label="Latency gap" value="+10.6 min" note="Doomscrollers vs others" tone="violet" />
       <StatCard label="Weekly debt gap" value="+1.5 h" note="Across the doomscroller label" tone="pink" />
-      <StatCard label="Model lift" value="60.3%" note="Balanced accuracy vs 34% baseline" tone="gold" />
+      <StatCard label="Poor-sleep risk model" value="79.3%" note="CV accuracy · 84.9% ROC AUC" tone="gold" />
     </section>
     <section className="story-grid">
       <div className="story-lead"><span className="section-label">THE CENTRAL THREAD</span><h2>A bedtime-disruption chain, not a morality tale.</h2><p>Exposure links to delayed sleep; delayed sleep links to wakeups and debt; debt leaves a daytime trace. The useful levers are friction, content boundaries, and routine.</p></div>
       {[{n:"01",t:"Exposure",d:"Bedtime screen time rises with sessions and latency."},{n:"02",t:"Arousal",d:"Negative news compounds anxiety, stress, and fatigue."},{n:"03",t:"Protection",d:"Reading, meditation, phone distance, and movement help."},{n:"04",t:"Exceptions",d:"A small group shows that exposure is risk, not destiny."}].map((x)=><div className="story-step" key={x.n}><span>{x.n}</span><b>{x.t}</b><p>{x.d}</p></div>)}
     </section>
-    <section className="section-block"><div className="section-heading"><div><span className="section-label">HERO EVIDENCE</span><h2>The relationship in one frame</h2></div><button className="text-button" onClick={() => go("analysis")}>All 13 figures →</button></div><ChartCard chart={chartCards[1]} featured /></section>
+    <section className="section-block"><div className="section-heading"><div><span className="section-label">HERO EVIDENCE</span><h2>The relationship in one frame</h2></div><button className="text-button" onClick={() => go("analysis")}>All 14 figures →</button></div><ChartCard chart={chartCards[1]} featured /></section>
   </>;
 }
 
@@ -244,7 +246,7 @@ function Analysis() {
   const [group, setGroup] = useState("All");
   const visible = group === "All" ? chartCards : chartCards.filter((c) => c.group === group);
   return <section className="page-section">
-    <div className="page-intro"><span className="section-label">13 FIGURES / 9 QUESTIONS</span><h1>The evidence atlas</h1><p>Every chart from the executed notebooks, grouped by the question it answers. Open each interpretation to keep the visual and its meaning together.</p></div>
+    <div className="page-intro"><span className="section-label">14 FIGURES / 9 QUESTIONS</span><h1>The evidence atlas</h1><p>Every chart from the executed notebooks, grouped by the question it answers. Each figure includes its interpretation, significance, and analytical boundary.</p></div>
     <div className="filter-row">{groups.map((item) => <button className={group === item ? "active" : ""} key={item} onClick={() => setGroup(item)}>{item}</button>)}</div>
     <div className="analysis-grid">{visible.map((chart) => <ChartCard key={chart.file} chart={chart} />)}</div>
   </section>;
@@ -260,12 +262,14 @@ const modelRows = [
 
 function Modeling() {
   return <section className="page-section modeling-page">
-    <div className="page-intro split-intro"><div><span className="section-label">SMOTENC / TUNING / NESTED CROSS-VALIDATION</span><h1>Predictive modelling</h1><p>Five classification families compete under the same leakage-safe preprocessing, resampling, and evaluation protocol. Selection uses nested cross-validation—not the most favorable holdout result.</p></div><div className="big-ratio"><b>60.3%</b><span>nested-CV balanced accuracy</span><small>Random Forest · selected model</small></div></div>
+    <div className="page-intro split-intro"><div><span className="section-label">SMOTENC / TUNING / CROSS-VALIDATION</span><h1>Predictive modelling</h1><p>The primary model now answers the actionable question: who is at risk of Poor sleep? The original three-class benchmark remains visible as a harder secondary task, with no target leakage or score inflation.</p></div><div className="big-ratio"><b>79.3%</b><span>cross-validated accuracy</span><small>Extra Trees + SMOTE · 84.9% ROC AUC</small></div></div>
+    <ChartCard chart={chartCards[13]} featured />
+    <div className="model-task-split"><article><span>Primary task</span><h3>Poor sleep risk</h3><b>79.3% accuracy</b><p>Binary screening: Poor versus not Poor. Selected on balanced accuracy and minority-class F1.</p></article><article><span>Secondary task</span><h3>Three sleep categories</h3><b>60.3% balanced accuracy</b><p>Good versus Fair versus Poor. Retained because it is more granular, but the Good/Fair boundary is noisy.</p></article><article><span>Leakage guard</span><h3>No shortcut variable</h3><b>Score excluded</b><p><code>sleep_quality_score</code> remains excluded because it directly encodes the outcome construct.</p></article></div>
     <div className="model-scorecard" role="table" aria-label="Model performance comparison">
       <div className="model-score-row model-score-head" role="row"><span>Model</span><span>Nested CV</span><span>Holdout</span><span>Status</span></div>
       {modelRows.map(([name,cv,holdout,status]) => <div className={`model-score-row ${status === "Selected" ? "selected" : ""}`} role="row" key={name}><b>{name}</b><span>{cv}</span><span>{holdout}</span><em>{status}</em></div>)}
     </div>
-    <div className="model-note"><b>Why SMOTE?</b><p>SMOTENC is fitted only inside training folds, after imputation and categorical encoding. The outcome classes are already close to balanced, so resampling is a controlled pipeline step—not a guaranteed performance boost.</p><a href="/methodology/sleep_doomscrolling_predictive_modeling.ipynb" download>Download executed modelling notebook ↓</a></div>
+    <div className="model-note"><b>Why SMOTE?</b><p>SMOTENC is fitted only inside training folds, after imputation and categorical encoding. The outcome classes are already close to balanced, so resampling is a controlled pipeline step—not a guaranteed performance boost.</p><span>Leakage-safe pipeline</span></div>
     <ChartCard chart={chartCards[11]} featured />
     <ChartCard chart={chartCards[12]} featured />
   </section>;
@@ -355,7 +359,7 @@ function Methodology() {
     <div className="method-grid">{steps.map(([n,t,d])=><article key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p></article>)}</div>
     <div className="sanity-panel"><div><span className="section-label">SYNTHETIC-DATA SANITY CHECK</span><h2>The data are unusually orderly.</h2><p>This does not prove how the file was produced. It does mean effect sizes should remain inside this dataset and causal language should stay out.</p></div><div className="sanity-metrics"><p><b>−0.893</b><span>sleep hours ↔ weekly debt</span></p><p><b>86%+</b><span>valid quality scores at 5/5</span></p><p><b>10</b><span>row spread across 3 target classes</span></p></div></div>
     <div className="method-boundaries"><article><span>Handled</span><p>Missingness, dtypes, IDs, duplicates, range checks, age buckets, feature leakage, class balance.</p></article><article><span>Not claimed</span><p>Causality, medical advice, population prevalence, cultural ranking, stable effects for tiny groups.</p></article></div>
-    <div className="section-heading"><div><span className="section-label">LIVE ARTIFACTS</span><h2>Executed notebook viewer</h2></div><div><a className="text-button" href="/methodology/sleep_doomscrolling_predictive_modeling.ipynb" download>Modelling notebook ↓</a><a className="text-button" href="/data/sleep_doomscrolling_habits.csv" download>Dataset ↓</a></div></div>
+    <div className="section-heading"><div><span className="section-label">LIVE ARTIFACTS</span><h2>Executed notebook viewer</h2></div><a className="text-button" href="/data/sleep_doomscrolling_habits.csv" download>Dataset ↓</a></div>
     <NotebookViewer />
   </section>;
 }
