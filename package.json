@@ -11,9 +11,10 @@
     "build": "vite build && node scripts/prerender_routes.mjs",
     "start": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "npm run typecheck && npm run test:unit && npm run test:model && npm run build",
+    "test": "npm run typecheck && npm run test:unit && npm run test:model && npm run test:charts && npm run build",
     "test:unit": "vitest run",
-    "test:model": "python scripts/test_model_artifact.py"
+    "test:model": "python scripts/test_model_artifact.py",
+    "test:charts": "node scripts/normalize_plot_specs.mjs --check"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

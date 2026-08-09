@@ -21,6 +21,7 @@ function rowsFor(trace: Data): AccessibleRow[] {
 
 export default function PlotRenderer({ spec, title }: { spec: PlotSpec; title: string }) {
   const [showTable, setShowTable] = useState(false);
+  const safeData = spec.data.map((trace) => trace.type === "scattergl" ? ({ ...trace, type: "scatter" } as Data) : trace);
   const axisDefaults = { gridcolor: "rgba(147,168,200,.12)", zerolinecolor: "rgba(147,168,200,.18)", tickfont: { color: "#aebed5", size: 11 }, title: { font: { color: "#d5deed" } } };
   const layout: Partial<Layout> = { ...spec.layout, autosize: true, width: undefined, height: undefined,
     paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
@@ -31,9 +32,9 @@ export default function PlotRenderer({ spec, title }: { spec: PlotSpec; title: s
     const existing = (spec.layout as Record<string, unknown>)?.[key] as Record<string, unknown> | undefined;
     (layout as Record<string, unknown>)[key] = { ...axisDefaults, ...existing };
   }
-  const rows = showTable ? spec.data.flatMap(rowsFor) : [];
+  const rows = showTable ? safeData.flatMap(rowsFor) : [];
   return <figure className="accessible-plot">
-    <Plot data={spec.data} layout={layout as Layout}
+    <Plot data={safeData} layout={layout as Layout}
       config={{ responsive: true, displaylogo: false, scrollZoom: false, modeBarButtonsToRemove: ["lasso2d", "select2d"] } as Partial<Config>}
       useResizeHandler style={{ width: "100%", height: "100%" }} aria-label={title} />
     <figcaption className="sr-only">{title}. Interactive visualization; an equivalent numeric table is available below.</figcaption>
