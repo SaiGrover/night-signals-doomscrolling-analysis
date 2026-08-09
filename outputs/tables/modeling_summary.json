@@ -1,0 +1,32 @@
+{
+  "selected_model": "Random Forest",
+  "nested_cv_balanced_accuracy": 0.6028512738428705,
+  "nested_cv_sd": 0.04619466076684738,
+  "holdout_balanced_accuracy": 0.5551554856441548,
+  "holdout_macro_f1": 0.5480938111936942,
+  "models_compared": [
+    "Random Forest",
+    "SVM (RBF)",
+    "Extra Trees",
+    "Logistic Regression",
+    "Histogram Gradient Boosting"
+  ],
+  "best_params": {
+    "model__n_estimators": 200,
+    "model__min_samples_leaf": 1,
+    "model__max_features": "log2",
+    "model__max_depth": null
+  },
+  "top_predictors": [
+    "doomscroller",
+    "number_of_night_wakeups",
+    "sleep_latency_minutes",
+    "gender",
+    "sleep_hours_per_night",
+    "occupation_status",
+    "phone_checks_per_night",
+    "keeps_phone_in_bedroom",
+    "uses_night_mode",
+    "consumes_negative_news_content"
+  ]
+}

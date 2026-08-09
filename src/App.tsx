@@ -23,7 +23,8 @@ const plotHeights: Record<string, number> = {
   "10_exceptions.png": 490,
   "11_personas.png": 440,
   "12_correlation_heatmap.png": 630,
-  "13_feature_importance.png": 540,
+  "13_model_comparison.png": 500,
+  "14_feature_importance.png": 540,
 };
 
 const chartCards: Array<{
@@ -45,7 +46,8 @@ const chartCards: Array<{
   { file: "10_exceptions.png", number: "09", group: "Exceptions", title: "What separates resilient heavy scrollers?", kicker: "The counter-narrative", takeaway: "Only 11 of 204 heavy scrollers report good sleep. They realize more sleep and less debt or latency, with restorative routines appearing more often." },
   { file: "11_personas.png", number: "10", group: "Personas", title: "Three patterns, three intervention needs", kicker: "Transparent personas", takeaway: "The Night Scroller is exposure-heavy, the Anxious News Seeker is emotion-heavy, and the Disciplined Sleeper is routine-protected." },
   { file: "12_correlation_heatmap.png", number: "11", group: "Synthesis", title: "A coherent bedtime-disruption chain", kicker: "Correlation structure", takeaway: "Bedtime exposure connects to doomscroll sessions and latency; wakeups and short sleep accumulate into debt and fatigue." },
-  { file: "13_feature_importance.png", number: "12", group: "Synthesis", title: "What best predicts sleep-quality category?", kicker: "Cross-validated model", takeaway: "The doomscroller label leads, followed by wakeups, sleep duration, debt, and latency. The model predicts—it does not identify causes." },
+  { file: "13_model_comparison.png", number: "12", group: "Synthesis", title: "Which model predicts sleep quality best?", kicker: "Five-model comparison", takeaway: "Random Forest leads nested cross-validation, narrowly ahead of RBF SVM and Extra Trees. Every candidate uses the same leakage-safe SMOTENC and tuning protocol." },
+  { file: "14_feature_importance.png", number: "13", group: "Synthesis", title: "What drives the selected model?", kicker: "Random Forest", takeaway: "Doomscrolling, wakeups, latency, and sleep duration lead held-out permutation importance. Predictive contribution does not establish causation." },
 ];
 
 const nav: Array<{ id: Route; label: string }> = [
@@ -184,7 +186,7 @@ function Landing({ go }: { go: (route: Route) => void }) {
         <button ref={toggleRef} className={`cinematic-toggle ${open ? "is-open" : ""}`} aria-expanded={open} aria-controls="mobileMenu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}><span /><span /><span /></button>
       </div>
     </header>
-    <div id="mobileMenu" className={`cinematic-menu ${open ? "is-open" : ""}`} role="dialog" aria-modal="true" aria-label="Site menu" aria-hidden={!open} {...(!open ? { inert: "" } : {})} onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
+    <div id="mobileMenu" className={`cinematic-menu ${open ? "is-open" : ""}`} role="dialog" aria-modal="true" aria-label="Site menu" aria-hidden={!open} inert={!open} onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
       <div>{landingLinks.map((item, index) => <a style={{ "--i": index } as CSSProperties} key={item.route} href={pathFor(item.route)} onClick={(e) => { e.preventDefault(); navigate(item.route); }}>{item.label}</a>)}<button style={{ "--i": 4 } as CSSProperties} onClick={() => navigate("overview")}>Enter atlas</button></div>
     </div>
     <div className="cinematic-body">
@@ -281,10 +283,16 @@ function NotebookViewer() {
   const [cells, setCells] = useState<NotebookCell[]>([]);
   const [showCode, setShowCode] = useState(true);
   const [limit, setLimit] = useState(12);
-  useEffect(() => { fetch("/methodology/sleep_doomscrolling_analysis.ipynb").then((r) => r.json()).then((n) => setCells(n.cells || [])).catch(() => setCells([])); }, []);
+  const [notebook, setNotebook] = useState<"analysis" | "modeling">("analysis");
+  const notebookFile = notebook === "analysis" ? "sleep_doomscrolling_analysis.ipynb" : "sleep_doomscrolling_predictive_modeling.ipynb";
+  useEffect(() => {
+    setCells([]); setLimit(12);
+    fetch(`/methodology/${notebookFile}`).then((r) => r.json()).then((n) => setCells(n.cells || [])).catch(() => setCells([]));
+  }, [notebookFile]);
   const visible = cells.filter((cell) => showCode || cell.cell_type !== "code").slice(0, limit);
   return <div className="notebook-shell">
-    <div className="notebook-bar"><div><i /><i /><i /><span>sleep_doomscrolling_analysis.ipynb</span></div><label><input type="checkbox" checked={showCode} onChange={(e) => setShowCode(e.target.checked)} /> Show code</label></div>
+    <div className="notebook-tabs"><button className={notebook === "analysis" ? "active" : ""} onClick={() => setNotebook("analysis")}>Exploratory analysis</button><button className={notebook === "modeling" ? "active" : ""} onClick={() => setNotebook("modeling")}>Predictive modelling</button></div>
+    <div className="notebook-bar"><div><i /><i /><i /><span>{notebookFile}</span></div><label><input type="checkbox" checked={showCode} onChange={(e) => setShowCode(e.target.checked)} /> Show code</label></div>
     <div className="notebook-cells">{visible.length ? visible.map((cell, index) => {
       const source = Array.isArray(cell.source) ? cell.source.join("") : cell.source;
       if (cell.cell_type === "markdown") return <div className="nb-cell markdown-cell" key={index}><div className="cell-rail">M</div><div>{source.split("\n").map((line, i) => line.startsWith("#") ? <h4 key={i}>{line.replace(/^#+\s*/, "")}</h4> : line.trim() ? <p key={i}>{line.replace(/\*\*/g, "")}</p> : null)}</div></div>;
@@ -300,14 +308,14 @@ function Methodology() {
     ["02", "Clean & bucket", "Median numeric imputation, Unknown categorical label, three age buckets."],
     ["03", "Stress-test realism", "Exact-formula checks, ceiling effects, balance checks, correlation scan."],
     ["04", "Compare & segment", "Groups, quartiles, exceptions, transparent persona rules."],
-    ["05", "Synthesize", "Correlation matrix plus five-fold cross-validated random forest."],
+    ["05", "Model & compare", "Five tuned classifiers, SMOTENC, nested five-fold CV, and an untouched holdout."],
   ];
   return <section className="page-section methodology-page">
     <div className="page-intro"><span className="section-label">REPRODUCIBLE / EXECUTED / AUDITABLE</span><h1>Methodology</h1><p>The analysis is shown, not hidden. Explore the workflow, synthetic-data checks, model boundary, and the executed notebook itself.</p></div>
     <div className="method-grid">{steps.map(([n,t,d])=><article key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p></article>)}</div>
     <div className="sanity-panel"><div><span className="section-label">SYNTHETIC-DATA SANITY CHECK</span><h2>The data are unusually orderly.</h2><p>This does not prove how the file was produced. It does mean effect sizes should remain inside this dataset and causal language should stay out.</p></div><div className="sanity-metrics"><p><b>−0.893</b><span>sleep hours ↔ weekly debt</span></p><p><b>86%+</b><span>valid quality scores at 5/5</span></p><p><b>10</b><span>row spread across 3 target classes</span></p></div></div>
     <div className="method-boundaries"><article><span>Handled</span><p>Missingness, dtypes, IDs, duplicates, range checks, age buckets, feature leakage, class balance.</p></article><article><span>Not claimed</span><p>Causality, medical advice, population prevalence, cultural ranking, stable effects for tiny groups.</p></article></div>
-    <div className="section-heading"><div><span className="section-label">LIVE ARTIFACT</span><h2>Executed notebook viewer</h2></div><a className="text-button" href="/data/sleep_doomscrolling_habits.csv" download>Dataset ↓</a></div>
+    <div className="section-heading"><div><span className="section-label">LIVE ARTIFACTS</span><h2>Executed notebook viewer</h2></div><div><a className="text-button" href="/methodology/sleep_doomscrolling_predictive_modeling.ipynb" download>Modelling notebook ↓</a><a className="text-button" href="/data/sleep_doomscrolling_habits.csv" download>Dataset ↓</a></div></div>
     <NotebookViewer />
   </section>;
 }
