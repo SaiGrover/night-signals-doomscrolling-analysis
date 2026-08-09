@@ -2,11 +2,12 @@ import { createContext, lazy, Suspense, useCallback, useContext, useEffect, useM
 import DOMPurify from "dompurify";
 import type { CSSProperties } from "react";
 import RiskDemo from "./components/RiskDemo";
+import ProblemStatement from "./components/ProblemStatement";
 import type { PlotSpec } from "./components/PlotRenderer";
 
 const PlotRenderer = lazy(() => import("./components/PlotRenderer"));
 
-type Route = "landing" | "overview" | "analysis" | "modeling" | "exceptions" | "personas" | "methodology";
+type Route = "landing" | "overview" | "problem" | "analysis" | "modeling" | "exceptions" | "personas" | "methodology";
 type ChartGroup = "Overview" | "Core" | "Mind" | "Protection" | "Demographics" | "Exceptions" | "Personas" | "Synthesis";
 const PlotSpecsContext = createContext<{ specs: Record<string, PlotSpec>; error: boolean; retry: () => void }>({ specs: {}, error: false, retry: () => undefined });
 
@@ -54,6 +55,7 @@ const chartCards: Array<{
 
 const nav: Array<{ id: Route; label: string }> = [
   { id: "overview", label: "Overview" },
+  { id: "problem", label: "Problem statement" },
   { id: "analysis", label: "All analysis" },
   { id: "modeling", label: "Modelling" },
   { id: "exceptions", label: "The Exceptions" },
@@ -64,6 +66,7 @@ const nav: Array<{ id: Route; label: string }> = [
 function NavIcon({ route }: { route: Route }) {
   const common = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
   if (route === "overview") return <svg {...common}><path d="M4 12a8 8 0 1 0 16 0 8 8 0 1 0-16 0" /><path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none" opacity=".36" /></svg>;
+  if (route === "problem") return <svg {...common}><path d="M5 4h14v16H5z" /><path d="M8 8h8M8 12h8M8 16h5" /><path d="M9 4V2h6v2" /></svg>;
   if (route === "analysis") return <svg {...common}><path d="M4 17V9" /><path d="M10 17V5" /><path d="M16 17v-6" /><path d="M22 17V7" /><path d="M3 20h20" /></svg>;
   if (route === "modeling") return <svg {...common}><path d="M4 18V6" /><path d="m4 12 5-4 4 3 7-6" /><path d="M16 5h4v4" /><path d="M3 20h18" /></svg>;
   if (route === "exceptions") return <svg {...common}><path d="M5 19 19 5" /><path d="M10 5h9v9" /><path d="M5 7v12h12" opacity=".45" /></svg>;
@@ -144,6 +147,7 @@ function ChartCard({ chart, featured = false }: { chart: typeof chartCards[numbe
 
 const landingLinks: Array<{ label: string; route: Route }> = [
   { label: "Overview", route: "overview" },
+  { label: "Problem", route: "problem" },
   { label: "Analysis", route: "analysis" },
   { label: "Modelling", route: "modeling" },
   { label: "Exceptions", route: "exceptions" },
@@ -373,15 +377,16 @@ export default function App() {
     fetch("/data/plotly_charts.json").then((response) => { if (!response.ok) throw new Error("Charts unavailable"); return response.json(); })
       .then(setPlotSpecs).catch(() => setPlotError(true));
   }, []);
-  useEffect(() => { if (!["landing", "methodology"].includes(route) && !Object.keys(plotSpecs).length) loadPlots(); }, [route, plotSpecs, loadPlots]);
+  useEffect(() => { if (!["landing", "problem", "methodology"].includes(route) && !Object.keys(plotSpecs).length) loadPlots(); }, [route, plotSpecs, loadPlots]);
   useEffect(() => {
     const label = route === "landing" ? "Night Signals" : `${nav.find((item) => item.id === route)?.label} · Night Signals`;
     document.title = label;
-    document.querySelector('meta[name="description"]')?.setAttribute("content", route === "modeling" ? "Leakage-safe pre-outcome sleep-risk modelling with nested validation, calibration, uncertainty and subgroup audits." : "Evidence-led analysis of doomscrolling, sleep, mental wellbeing and protective routines.");
+    const description = route === "modeling" ? "Leakage-safe pre-outcome sleep-risk modelling with nested validation, calibration, uncertainty and subgroup audits." : route === "problem" ? "A detailed problem statement for studying how doomscrolling, negative news, and bedtime routines relate to sleep." : "Evidence-led analysis of doomscrolling, sleep, mental wellbeing and protective routines.";
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
     if (route !== "landing") mainRef.current?.focus();
   }, [route]);
   const go = (next: Route) => { history.pushState({}, "", pathFor(next)); setRoute(next); setMenu(false); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const page = useMemo(() => ({ landing: <Landing go={go} />, overview: <Overview go={go} />, analysis: <Analysis />, modeling: <Modeling />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
+  const page = useMemo(() => ({ landing: <Landing go={go} />, overview: <Overview go={go} />, problem: <ProblemStatement />, analysis: <Analysis />, modeling: <Modeling />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
   const plotContext = { specs: plotSpecs, error: plotError, retry: loadPlots };
   if (route === "landing") return <PlotSpecsContext.Provider value={plotContext}>{page}</PlotSpecsContext.Provider>;
   return <PlotSpecsContext.Provider value={plotContext}><div className={`app-shell ${menu ? "menu-open" : ""}`}>

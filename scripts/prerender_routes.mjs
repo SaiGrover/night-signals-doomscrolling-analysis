@@ -4,6 +4,7 @@ import { join } from "node:path";
 const origin = "https://night-signals-doomscrolling-analysi.vercel.app";
 const pages = {
   overview: ["Overview · Night Signals", "Key findings on doomscrolling, sleep, mental wellbeing, and protective routines."],
+  problem: ["Problem Statement · Night Signals", "A detailed problem statement for studying how doomscrolling, negative news, and bedtime routines relate to sleep."],
   analysis: ["Evidence Atlas · Night Signals", "Fourteen interactive figures with interpretations, practical relevance, accessible tables, and analytical boundaries."],
   modeling: ["Predictive Modelling · Night Signals", "Leakage-safe pre-outcome modelling with nested validation, calibration, uncertainty, subgroup audits, and an untouched holdout."],
   exceptions: ["The Exceptions · Night Signals", "An exploratory look at the eleven high-exposure respondents who still report good sleep."],
