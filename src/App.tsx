@@ -1,15 +1,14 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import createPlotlyComponent from "react-plotly.js/factory";
-import Plotly from "plotly.js-dist-min";
-import type { Config, Data, Layout } from "plotly.js";
+import { createContext, lazy, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import DOMPurify from "dompurify";
 import type { CSSProperties } from "react";
+import RiskDemo from "./components/RiskDemo";
+import type { PlotSpec } from "./components/PlotRenderer";
 
-const Plot = createPlotlyComponent(Plotly);
+const PlotRenderer = lazy(() => import("./components/PlotRenderer"));
 
 type Route = "landing" | "overview" | "analysis" | "modeling" | "exceptions" | "personas" | "methodology";
 type ChartGroup = "Overview" | "Core" | "Mind" | "Protection" | "Demographics" | "Exceptions" | "Personas" | "Synthesis";
-type PlotSpec = { data: Data[]; layout: Partial<Layout> };
-const PlotSpecsContext = createContext<Record<string, PlotSpec>>({});
+const PlotSpecsContext = createContext<{ specs: Record<string, PlotSpec>; error: boolean; retry: () => void }>({ specs: {}, error: false, retry: () => undefined });
 
 const plotHeights: Record<string, number> = {
   "01_descriptive_overview.png": 620,
@@ -25,7 +24,7 @@ const plotHeights: Record<string, number> = {
   "12_correlation_heatmap.png": 630,
   "13_model_comparison.png": 500,
   "14_feature_importance.png": 540,
-  "15_binary_risk_model.png": 500,
+  "15_production_risk_model.png": 520,
 };
 
 const chartCards: Array<{
@@ -49,8 +48,8 @@ const chartCards: Array<{
   { file: "11_personas.png", number: "10", group: "Personas", title: "Three patterns, three intervention needs", kicker: "Transparent personas", takeaway: "The Night Scroller is exposure-heavy, the Anxious News Seeker is emotion-heavy, and the Disciplined Sleeper is routine-protected.", significance: "The personas translate evidence into different intervention levers without claiming that rule-based segments are diagnoses." },
   { file: "12_correlation_heatmap.png", number: "11", group: "Synthesis", title: "A coherent bedtime-disruption chain", kicker: "Correlation structure", takeaway: "Bedtime exposure connects to doomscroll sessions and latency; wakeups and short sleep accumulate into debt and fatigue.", significance: "The correlation structure supports a coherent system-level story, while strong engineered relationships reinforce the synthetic-data caveat." },
   { file: "13_model_comparison.png", number: "12", group: "Synthesis", title: "Which model predicts sleep quality best?", kicker: "Multi-model comparison", takeaway: "Tree ensembles, kernel models, boosting, and a linear baseline are evaluated under the same leakage-safe protocol.", significance: "Nested cross-validation measures the whole tuning process and prevents the model leaderboard from being chosen on one favorable split." },
-  { file: "14_feature_importance.png", number: "13", group: "Synthesis", title: "What drives the selected model?", kicker: "Selected model", takeaway: "Doomscrolling, wakeups, latency, and sleep duration lead held-out permutation importance.", significance: "Importance identifies useful predictive signals, not causes; correlated variables can share or mask one another's contribution." },
-  { file: "15_binary_risk_model.png", number: "14", group: "Synthesis", title: "Can we identify poor-sleep risk?", kicker: "Actionable binary model", takeaway: "The Extra Trees + SMOTE risk model reaches about 79.3% cross-validated accuracy, 76.8% balanced accuracy, and 84.9% ROC AUC when predicting Poor sleep versus not Poor sleep.", significance: "This narrower question is more actionable and reliably predictable than forcing noisy Good/Fair/Poor boundaries; it remains a distinct task, so its score is not directly comparable to three-class accuracy." },
+  { file: "14_feature_importance.png", number: "13", group: "Synthesis", title: "What drove the secondary three-class model?", kicker: "Secondary model · Random Forest", takeaway: "Doomscrolling, wakeups, latency, and sleep duration lead held-out permutation importance for the retained Good/Fair/Poor benchmark.", significance: "This chart does not explain the primary pre-outcome model. Importance identifies predictive signals, not causes; correlated variables can share or mask contribution." },
+  { file: "15_production_risk_model.png", number: "14", group: "Synthesis", title: "How well does the pre-outcome model generalize?", kicker: "Primary model · version 2.0", takeaway: "A calibrated, tuned Logistic Regression reaches 73.7% nested-CV balanced accuracy on development data and 77.5% on a 250-row holdout that remained untouched until final evaluation.", significance: "This is a pre-outcome screening demonstration: sleep duration, latency, wakeups, fatigue, debt, and quality score are excluded. The 67% majority baseline and uncertainty interval remain visible." },
 ];
 
 const nav: Array<{ id: Route; label: string }> = [
@@ -96,7 +95,7 @@ function Sidebar({ route, onRoute }: { route: Route; onRoute: (route: Route) => 
       </a>)}
     </nav>
     <div className="sidebar-status">
-      <i /><div><b>Dataset validated</b><small>1,000 rows · 29 variables</small></div>
+      <i /><div><b>Dataset audited</b><small>Synthetic · 1,000 rows</small></div>
     </div>
     <div className="sidebar-foot">
       <span>SYNTHETIC DATA</span>
@@ -107,7 +106,7 @@ function Sidebar({ route, onRoute }: { route: Route; onRoute: (route: Route) => 
 
 function Topbar({ route }: { route: Route }) {
   return <header className="topbar">
-    <div><span className="pulse" /> Live analysis <i>/</i> {nav.find((n) => n.id === route)?.label}</div>
+    <div><span className="pulse" /> Published analysis <i>/</i> {nav.find((n) => n.id === route)?.label}</div>
     <div className="top-actions">
       <a className="primary-action" href="/downloads/Sleep_Doomscrolling_Report.pdf" download>Report PDF ↓</a>
     </div>
@@ -115,26 +114,10 @@ function Topbar({ route }: { route: Route }) {
 }
 
 function InteractiveChart({ file, title }: { file: string; title: string }) {
-  const specs = useContext(PlotSpecsContext);
+  const { specs, error, retry } = useContext(PlotSpecsContext);
   const spec = specs[file];
-  if (!spec) return <div className="plot-loading">Loading interactive figure…</div>;
-  const axisDefaults = { gridcolor: "rgba(147,168,200,.12)", zerolinecolor: "rgba(147,168,200,.18)", tickfont: { color: "#93a8c8" }, title: { font: { color: "#c7d5e9" } } };
-  const layout: Partial<Layout> = {
-    ...spec.layout,
-    autosize: true,
-    width: undefined,
-    height: undefined,
-    paper_bgcolor: "rgba(0,0,0,0)",
-    plot_bgcolor: "rgba(0,0,0,0)",
-    font: { family: '"JetBrains Mono", monospace', color: "#aebed5", size: 10 },
-    margin: { l: 55, r: 24, t: 42, b: 52, ...spec.layout?.margin },
-    hoverlabel: { bgcolor: "#07111f", bordercolor: "#59d8e8", font: { color: "#fff", family: '"JetBrains Mono", monospace' } },
-  };
-  for (const key of ["xaxis", "xaxis2", "xaxis3", "xaxis4", "yaxis", "yaxis2", "yaxis3", "yaxis4"] as const) {
-    const existing = (spec.layout as Record<string, unknown>)?.[key] as Record<string, unknown> | undefined;
-    (layout as Record<string, unknown>)[key] = { ...axisDefaults, ...existing };
-  }
-  return <Plot data={spec.data} layout={layout as Layout} config={{ responsive: true, displaylogo: false, scrollZoom: false, modeBarButtonsToRemove: ["lasso2d", "select2d"] } as Partial<Config>} useResizeHandler style={{ width: "100%", height: "100%" }} aria-label={title} />;
+  if (!spec) return <div className="plot-loading">{error ? <><span>Interactive figure unavailable.</span><button onClick={retry}>Retry</button></> : "Loading interactive figure…"}</div>;
+  return <Suspense fallback={<div className="plot-loading">Loading chart renderer…</div>}><PlotRenderer spec={spec} title={title} /></Suspense>;
 }
 
 function StatCard({ label, value, note, tone }: { label: string; value: string; note: string; tone: string }) {
@@ -154,8 +137,8 @@ function ChartCard({ chart, featured = false }: { chart: typeof chartCards[numbe
       <button onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? "Hide interpretation" : "Show interpretation"}>{open ? "−" : "+"}</button>
     </div>
     <div className="chart-image plot-frame" style={{ "--plot-height": `${plotHeights[chart.file] ?? 520}px` } as CSSProperties}><InteractiveChart file={chart.file} title={chart.title} /></div>
-    <div className="chart-insight"><div><span>Interpretation</span><p>{chart.takeaway}</p></div><div><span>Why it matters</span><p>{chart.significance}</p></div></div>
-    <div className={`chart-takeaway ${open ? "open" : ""}`}><span>Analytical note</span><p>Use hover and zoom to inspect the values. Results describe this synthetic observational dataset and should not be read as causal or clinical evidence.</p></div>
+    <div className="chart-insight"><div><span>Interpretation</span><p>{chart.takeaway}</p></div><div><span>Practical relevance</span><p>{chart.significance}</p></div></div>
+    <div className={`chart-takeaway ${open ? "open" : ""}`}><span>Analytical boundary</span><p>{chart.file === "15_production_risk_model.png" ? "Bootstrap confidence intervals are reported for the untouched holdout. External validation remains incomplete." : "Descriptive synthetic-data estimate; inferential confidence intervals are not shown. Use hover for sample values and do not read the pattern as causal or population-representative."}</p></div>
   </article>;
 }
 
@@ -169,6 +152,8 @@ const landingLinks: Array<{ label: string; route: Route }> = [
 
 function Landing({ go }: { go: (route: Route) => void }) {
   const [open, setOpen] = useState(false);
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  const allowVideo = !saveData?.saveData && !["slow-2g", "2g"].includes(saveData?.effectiveType ?? "");
   const toggleRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     document.body.classList.toggle("landing-menu-open", open);
@@ -180,9 +165,9 @@ function Landing({ go }: { go: (route: Route) => void }) {
   const navigate = (route: Route) => { setOpen(false); go(route); };
   return <section className="cinematic-hero">
     <div className="cinematic-media">
-      <video autoPlay muted loop playsInline preload="auto" poster="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_132328_5f9029c8-218f-4489-82b6-29ff2849920e.png">
+      {allowVideo ? <video autoPlay muted loop playsInline preload="metadata" poster="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_132328_5f9029c8-218f-4489-82b6-29ff2849920e.png">
         <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_133255_956f653f-5d80-4b06-abd5-0f46c98b60fa.mp4" type="video/mp4" />
-      </video>
+      </video> : <img src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_132328_5f9029c8-218f-4489-82b6-29ff2849920e.png" alt="" />}
     </div>
     <div className="cinematic-scrim" />
     <header className="cinematic-nav">
@@ -234,7 +219,7 @@ function Overview({ go }: { go: (route: Route) => void }) {
       <StatCard label="Doomscrollers" value="47.6%" note="476 of 1,000 respondents" tone="cyan" />
       <StatCard label="Latency gap" value="+10.6 min" note="Doomscrollers vs others" tone="violet" />
       <StatCard label="Weekly debt gap" value="+1.5 h" note="Across the doomscroller label" tone="pink" />
-      <StatCard label="Poor-sleep risk model" value="79.3%" note="CV accuracy · 84.9% ROC AUC" tone="gold" />
+      <StatCard label="Pre-outcome model" value="73.7%" note="Nested-CV balanced accuracy · 67% baseline" tone="gold" />
     </section>
     <section className="story-grid">
       <div className="story-lead"><span className="section-label">THE CENTRAL THREAD</span><h2>A bedtime-disruption chain, not a morality tale.</h2><p>Exposure links to delayed sleep; delayed sleep links to wakeups and debt; debt leaves a daytime trace. The useful levers are friction, content boundaries, and routine.</p></div>
@@ -249,32 +234,33 @@ function Analysis() {
   const [group, setGroup] = useState("All");
   const visible = group === "All" ? chartCards : chartCards.filter((c) => c.group === group);
   return <section className="page-section">
-    <div className="page-intro"><span className="section-label">14 FIGURES / 9 QUESTIONS</span><h1>The evidence atlas</h1><p>Every chart from the executed notebooks, grouped by the question it answers. Each figure includes its interpretation, significance, and analytical boundary.</p></div>
-    <div className="filter-row">{groups.map((item) => <button className={group === item ? "active" : ""} key={item} onClick={() => setGroup(item)}>{item}</button>)}</div>
+    <div className="page-intro"><span className="section-label">14 FIGURES / 9 QUESTIONS</span><h1>The evidence atlas</h1><p>Every chart from the executed notebooks, grouped by the question it answers. Each figure includes interpretation, practical relevance, and an analytical boundary; inferential uncertainty is shown where available.</p></div>
+    <div className="filter-row" aria-label="Filter figures">{groups.map((item) => <button aria-pressed={group === item} className={group === item ? "active" : ""} key={item} onClick={() => setGroup(item)}>{item}</button>)}</div>
     <div className="analysis-grid">{visible.map((chart) => <ChartCard key={chart.file} chart={chart} />)}</div>
   </section>;
 }
 
 const modelRows = [
-  ["Random Forest", "60.3%", "55.5%", "Selected"],
-  ["RBF SVM", "59.7%", "56.7%", "Runner-up"],
-  ["Extra Trees", "59.3%", "58.4%", "Compared"],
-  ["Logistic Regression", "58.3%", "60.0%", "Compared"],
-  ["Histogram Gradient Boosting", "56.4%", "56.8%", "Compared"],
+  ["Logistic Regression", "73.7%", "77.5%", "Selected + calibrated"],
+  ["RBF SVM", "73.5%", "—", "Nested CV only"],
+  ["Random Forest", "73.0%", "—", "Nested CV only"],
+  ["Extra Trees", "72.5%", "—", "Nested CV only"],
 ];
 
 function Modeling() {
   return <section className="page-section modeling-page">
-    <div className="page-intro split-intro"><div><span className="section-label">SMOTENC / TUNING / CROSS-VALIDATION</span><h1>Predictive modelling</h1><p>The primary model now answers the actionable question: who is at risk of Poor sleep? The original three-class benchmark remains visible as a harder secondary task, with no target leakage or score inflation.</p></div><div className="big-ratio"><b>79.3%</b><span>cross-validated accuracy</span><small>Extra Trees + SMOTE · 84.9% ROC AUC</small></div></div>
+    <div className="page-intro split-intro"><div><span className="section-label">PRE-OUTCOME / NESTED CV / CALIBRATED</span><h1>Predictive modelling</h1><p>The primary model estimates Poor-sleep risk at bedtime using exposure and context only. Model selection happens on 750 development rows; the 250-row holdout is opened once. This remains synthetic-data research, not a clinical tool.</p></div><div className="big-ratio"><b>73.7%</b><span>nested-CV balanced accuracy</span><small>77.5% untouched holdout · 67% baseline</small></div></div>
     <ChartCard chart={chartCards[13]} featured />
-    <div className="model-task-split"><article><span>Primary task</span><h3>Poor sleep risk</h3><b>79.3% accuracy</b><p>Binary screening: Poor versus not Poor. Selected on balanced accuracy and minority-class F1.</p></article><article><span>Secondary task</span><h3>Three sleep categories</h3><b>60.3% balanced accuracy</b><p>Good versus Fair versus Poor. Retained because it is more granular, but the Good/Fair boundary is noisy.</p></article><article><span>Leakage guard</span><h3>No shortcut variable</h3><b>Score excluded</b><p><code>sleep_quality_score</code> remains excluded because it directly encodes the outcome construct.</p></article></div>
+    <div className="model-task-split"><article><span>Prediction moment</span><h3>Before sleep outcomes</h3><b>8 post-outcome fields excluded</b><p>No sleep duration, latency, wakeups, fatigue, debt, quality score, target, or respondent ID.</p></article><article><span>Uncertainty</span><h3>Bootstrap 95% CI</h3><b>71.8–82.8%</b><p>Balanced accuracy on the untouched holdout; ROC AUC 82.5% with a 77.0–87.6% interval.</p></article><article><span>Validation boundary</span><h3>Internal only</h3><b>External validation pending</b><p>A genuinely independent real-world dataset is required before deployment or clinical interpretation.</p></article></div>
     <div className="model-scorecard" role="table" aria-label="Model performance comparison">
       <div className="model-score-row model-score-head" role="row"><span>Model</span><span>Nested CV</span><span>Holdout</span><span>Status</span></div>
-      {modelRows.map(([name,cv,holdout,status]) => <div className={`model-score-row ${status === "Selected" ? "selected" : ""}`} role="row" key={name}><b>{name}</b><span>{cv}</span><span>{holdout}</span><em>{status}</em></div>)}
+      {modelRows.map(([name,cv,holdout,status]) => <div className={`model-score-row ${status.startsWith("Selected") ? "selected" : ""}`} role="row" key={name}><b>{name}</b><span>{cv}</span><span>{holdout}</span><em>{status}</em></div>)}
     </div>
-    <div className="model-note"><b>Why SMOTE?</b><p>SMOTENC is fitted only inside training folds, after imputation and categorical encoding. The outcome classes are already close to balanced, so resampling is a controlled pipeline step—not a guaranteed performance boost.</p><span>Leakage-safe pipeline</span></div>
+    <div className="model-note"><b>Decision policy</b><p>Probabilities are sigmoid-calibrated. The 32% threshold is selected from development-only out-of-fold predictions with false negatives weighted twice as heavily as false positives. Holdout PR-AUC is 72.0%; Brier score is 0.155.</p><span>Model v2.0</span></div>
+    <div className="model-audit-grid"><article><span>Gender sensitivity</span><b>78.9% / 76.9%</b><p>Female / male holdout groups; “prefer not to say” has only 16 rows and is too uncertain for a stable conclusion.</p></article><article><span>Weakest audited segment</span><b>Students · 54.5%</b><p>Sensitivity is lower for the 73-row student holdout subgroup. This is a deployment blocker, not a fairness certificate.</p></article><article><span>Governance artifacts</span><b>Versioned + auditable</b><p><a href="/data/model_registry.json">Model registry</a> · <a href="/data/prediction_schema.json">Input schema</a> · <a href="/data/subgroup_performance.csv">Subgroup CSV</a></p></article></div>
+    <RiskDemo />
     <ChartCard chart={chartCards[11]} featured />
-    <ChartCard chart={chartCards[12]} featured />
+    <div className="caveat-banner"><b>Secondary benchmark.</b> The original three-class Random Forest remains in the evidence atlas for comparison, but it is not the deployed primary model and its post-sleep feature importance is labelled separately.</div>
   </section>;
 }
 
@@ -321,7 +307,7 @@ function NotebookOutputView({ output }: { output: NotebookOutput }) {
   const jpeg = outputText(data["image/jpeg"]);
   if (png || jpeg) return <img className="nb-output-image" src={`data:image/${png ? "png" : "jpeg"};base64,${png || jpeg}`} alt="Notebook-generated visualization" />;
   const html = outputText(data["text/html"]);
-  if (html) return <div className="nb-output-html" dangerouslySetInnerHTML={{ __html: html }} />;
+  if (html) return <div className="nb-output-html" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html, { USE_PROFILES: { html: true } }) }} />;
   const plain = outputText(data["text/plain"]);
   return plain ? <pre className="nb-output-text">{plain}</pre> : null;
 }
@@ -331,16 +317,19 @@ function NotebookViewer() {
   const [showCode, setShowCode] = useState(true);
   const [limit, setLimit] = useState(12);
   const [notebook, setNotebook] = useState<"analysis" | "modeling">("analysis");
+  const [error, setError] = useState(false);
   const notebookFile = notebook === "analysis" ? "sleep_doomscrolling_analysis.ipynb" : "sleep_doomscrolling_predictive_modeling.ipynb";
-  useEffect(() => {
-    setCells([]); setLimit(12);
-    fetch(`/methodology/${notebookFile}`).then((r) => r.json()).then((n) => setCells(n.cells || [])).catch(() => setCells([]));
+  const loadNotebook = useCallback(() => {
+    setCells([]); setLimit(12); setError(false);
+    fetch(`/methodology/${notebookFile}`).then((r) => { if (!r.ok) throw new Error("Notebook unavailable"); return r.json(); })
+      .then((n) => setCells(n.cells || [])).catch(() => setError(true));
   }, [notebookFile]);
+  useEffect(loadNotebook, [loadNotebook]);
   const visible = cells.filter((cell) => showCode || cell.cell_type !== "code").slice(0, limit);
   return <div className="notebook-shell">
-    <div className="notebook-tabs"><button className={notebook === "analysis" ? "active" : ""} onClick={() => setNotebook("analysis")}>Exploratory analysis</button><button className={notebook === "modeling" ? "active" : ""} onClick={() => setNotebook("modeling")}>Predictive modelling</button></div>
+    <div className="notebook-tabs" role="tablist" aria-label="Executed notebooks"><button role="tab" aria-selected={notebook === "analysis"} className={notebook === "analysis" ? "active" : ""} onClick={() => setNotebook("analysis")}>Exploratory analysis</button><button role="tab" aria-selected={notebook === "modeling"} className={notebook === "modeling" ? "active" : ""} onClick={() => setNotebook("modeling")}>Predictive modelling</button></div>
     <div className="notebook-bar"><div><i /><i /><i /><span>{notebookFile}</span></div><label><input type="checkbox" checked={showCode} onChange={(e) => setShowCode(e.target.checked)} /> Show code</label></div>
-    <div className="notebook-cells">{visible.length ? visible.map((cell, index) => {
+    <div className="notebook-cells">{error ? <div className="notebook-loading">Notebook unavailable. <button onClick={loadNotebook}>Retry</button></div> : visible.length ? visible.map((cell, index) => {
       const source = Array.isArray(cell.source) ? cell.source.join("") : cell.source;
       if (cell.cell_type === "markdown") return <div className="nb-cell markdown-cell" key={index}><div className="cell-rail">M</div><div>{source.split("\n").map((line, i) => line.startsWith("#") ? <h4 key={i}>{line.replace(/^#+\s*/, "")}</h4> : line.trim() ? <p key={i}>{line.replace(/\*\*/g, "")}</p> : null)}</div></div>;
       return <div className="nb-cell code-cell" key={index}><div className="cell-rail">[{cell.execution_count ?? " "}]</div><div className="nb-code-body"><pre className="nb-source">{source}</pre>{cell.outputs?.length ? <div className="nb-outputs">{cell.outputs.map((output, outputIndex) => <NotebookOutputView output={output} key={outputIndex} />)}</div> : null}</div></div>;
@@ -355,7 +344,7 @@ function Methodology() {
     ["02", "Clean & bucket", "Median numeric imputation, Unknown categorical label, three age buckets."],
     ["03", "Stress-test realism", "Exact-formula checks, ceiling effects, balance checks, correlation scan."],
     ["04", "Compare & segment", "Groups, quartiles, exceptions, transparent persona rules."],
-    ["05", "Model & compare", "Five tuned classifiers, SMOTENC, nested five-fold CV, and an untouched holdout."],
+    ["05", "Model & compare", "Pre-outcome features, tuned candidates, nested CV, calibration, subgroup audit, and one untouched holdout."],
   ];
   return <section className="page-section methodology-page">
     <div className="page-intro"><span className="section-label">REPRODUCIBLE / EXECUTED / AUDITABLE</span><h1>Methodology</h1><p>The analysis is shown, not hidden. Explore the workflow, synthetic-data checks, model boundary, and the executed notebook itself.</p></div>
@@ -371,22 +360,38 @@ export default function App() {
   const [route, setRoute] = useState<Route>(routeFromPath());
   const [menu, setMenu] = useState(false);
   const [plotSpecs, setPlotSpecs] = useState<Record<string, PlotSpec>>({});
+  const [plotError, setPlotError] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  const allowBackgroundVideo = !connection?.saveData && !["slow-2g", "2g"].includes(connection?.effectiveType ?? "");
   useEffect(() => {
     const onPop = () => setRoute(routeFromPath());
     window.addEventListener("popstate", onPop); return () => window.removeEventListener("popstate", onPop);
   }, []);
-  useEffect(() => { fetch("/data/plotly_charts.json").then((response) => response.json()).then(setPlotSpecs).catch(() => setPlotSpecs({})); }, []);
+  const loadPlots = useCallback(() => {
+    setPlotError(false);
+    fetch("/data/plotly_charts.json").then((response) => { if (!response.ok) throw new Error("Charts unavailable"); return response.json(); })
+      .then(setPlotSpecs).catch(() => setPlotError(true));
+  }, []);
+  useEffect(() => { if (!["landing", "methodology"].includes(route) && !Object.keys(plotSpecs).length) loadPlots(); }, [route, plotSpecs, loadPlots]);
+  useEffect(() => {
+    const label = route === "landing" ? "Night Signals" : `${nav.find((item) => item.id === route)?.label} · Night Signals`;
+    document.title = label;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", route === "modeling" ? "Leakage-safe pre-outcome sleep-risk modelling with nested validation, calibration, uncertainty and subgroup audits." : "Evidence-led analysis of doomscrolling, sleep, mental wellbeing and protective routines.");
+    if (route !== "landing") mainRef.current?.focus();
+  }, [route]);
   const go = (next: Route) => { history.pushState({}, "", pathFor(next)); setRoute(next); setMenu(false); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const page = useMemo(() => ({ landing: <Landing go={go} />, overview: <Overview go={go} />, analysis: <Analysis />, modeling: <Modeling />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
-  if (route === "landing") return <PlotSpecsContext.Provider value={plotSpecs}>{page}</PlotSpecsContext.Provider>;
-  return <PlotSpecsContext.Provider value={plotSpecs}><div className={`app-shell ${menu ? "menu-open" : ""}`}>
-    <video className="app-background-video" autoPlay muted loop playsInline preload="metadata" aria-hidden="true">
+  const plotContext = { specs: plotSpecs, error: plotError, retry: loadPlots };
+  if (route === "landing") return <PlotSpecsContext.Provider value={plotContext}>{page}</PlotSpecsContext.Provider>;
+  return <PlotSpecsContext.Provider value={plotContext}><div className={`app-shell ${menu ? "menu-open" : ""}`}>
+    {allowBackgroundVideo && <video className="app-background-video" autoPlay muted loop playsInline preload="none" aria-hidden="true">
       <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_133255_956f653f-5d80-4b06-abd5-0f46c98b60fa.mp4" type="video/mp4" />
-    </video>
+    </video>}
     <div className="app-background-scrim" aria-hidden="true" />
     <div className="ambient ambient-a" /><div className="ambient ambient-b" /><div className="grid-overlay" />
     <Sidebar route={route} onRoute={go} />
     <button className="mobile-menu" onClick={() => setMenu(!menu)} aria-label="Toggle navigation">{menu ? "×" : "☰"}</button>
-    <main><Topbar route={route} /><div className="content">{page}</div><footer><Logo /><p>Observational synthetic-data analysis · 2026</p><div>{nav.map((n)=><a key={n.id} href={pathFor(n.id)} onClick={(e)=>{e.preventDefault();go(n.id)}}>{n.label}</a>)}</div></footer></main>
+    <main ref={mainRef} tabIndex={-1}><Topbar route={route} /><div className="content">{page}</div><footer><Logo /><p>Observational synthetic-data analysis · 2026</p><div>{nav.map((n)=><a key={n.id} href={pathFor(n.id)} onClick={(e)=>{e.preventDefault();go(n.id)}}>{n.label}</a>)}</div></footer></main>
   </div></PlotSpecsContext.Provider>;
 }

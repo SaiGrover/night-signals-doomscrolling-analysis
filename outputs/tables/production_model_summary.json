@@ -1,0 +1,72 @@
+{
+  "model_version": "2.0.0",
+  "selected_model": "Logistic Regression",
+  "prediction_moment": "At bedtime, before sleep outcomes occur",
+  "development_rows": 750,
+  "untouched_holdout_rows": 250,
+  "positive_prevalence": 0.33,
+  "majority_baseline_accuracy": 0.6699999999999999,
+  "nested_cv": {
+    "model": "Logistic Regression",
+    "accuracy": 0.7453333333333333,
+    "balanced_accuracy": 0.7369145281875127,
+    "roc_auc": 0.7944071448777531,
+    "pr_auc": 0.7044834700012844,
+    "f1": 0.6487563734292706,
+    "balanced_accuracy_sd": 0.040623289978324484,
+    "brier": 0.1809499731769943
+  },
+  "decision_threshold": 0.32,
+  "false_negative_cost": 2,
+  "holdout": {
+    "accuracy": 0.78,
+    "balanced_accuracy": 0.77472765312748,
+    "roc_auc": 0.824687973450689,
+    "pr_auc": 0.7199587009107032,
+    "f1": 0.6961325966850829,
+    "precision": 0.6428571428571429,
+    "sensitivity": 0.7590361445783133,
+    "specificity": 0.7904191616766467,
+    "brier": 0.1550584354342904,
+    "false_negatives": 20,
+    "false_positives": 35
+  },
+  "holdout_95_ci": {
+    "balanced_accuracy": {
+      "low": 0.7183025506790669,
+      "high": 0.8279068011358625
+    },
+    "roc_auc": {
+      "low": 0.7701927062532844,
+      "high": 0.8758143861158921
+    },
+    "pr_auc": {
+      "low": 0.6159867630355339,
+      "high": 0.812988968282294
+    },
+    "brier": {
+      "low": 0.13129966260304374,
+      "high": 0.17969507458476439
+    },
+    "sensitivity": {
+      "low": 0.6666666666666666,
+      "high": 0.8488372093023255
+    },
+    "specificity": {
+      "low": 0.7207656926406926,
+      "high": 0.850014367816092
+    }
+  },
+  "external_validation": "Not performed \u2014 independent real-world data required",
+  "excluded_post_outcome_features": [
+    "daytime_fatigue_score",
+    "number_of_night_wakeups",
+    "respondent_id",
+    "sleep_hours_per_night",
+    "sleep_latency_minutes",
+    "sleep_quality_category",
+    "sleep_quality_score",
+    "weekly_sleep_debt_hours"
+  ],
+  "artifact_sha256": "8c585a2b396b451c3f5bd0bc8975973a9eb388d3fc4c46e60cf2d938c92a3924"
+}

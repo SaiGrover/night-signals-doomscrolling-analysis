@@ -11,11 +11,12 @@ Night Signals is an evidence-led analysis of how late-night scrolling, negative-
 - Anxiety, stress, and fatigue are highest where doomscrolling and negative-news consumption coexist.
 - Reading, meditation or journaling, phone distance, and exercise look more protective than night mode alone.
 - Only **11 of 204 heavy doomscrollers** still report good sleep—the project’s counter-narrative.
-- Five model families are compared with the same leakage-safe SMOTENC and nested-CV protocol.
-- For the actionable binary task (flagging **Poor** sleep versus all other outcomes), Extra Trees + SMOTE reaches **79.3% cross-validated accuracy**, **76.8% balanced accuracy**, and **84.9% ROC AUC**.
+- Four model families are tuned and compared with nested cross-validation on a 750-row development partition.
+- The primary pre-outcome model reaches **73.7% nested-CV balanced accuracy** and **77.5% on a genuinely untouched 250-row holdout**, against a **67% majority baseline**.
+- The model is calibrated, reports PR AUC, Brier score, threshold costs, bootstrap intervals, subgroup diagnostics, and a versioned model card.
 - Random Forest leads nested cross-validation at **60.3% balanced accuracy**, narrowly ahead of RBF SVM (**59.7%**) and Extra Trees (**59.3%**), against a **34% majority-class baseline**.
 - The original three-class Good/Fair/Poor task is retained as a harder secondary benchmark, so its score is not presented as directly comparable with the binary risk model.
-- The ranking is based on nested cross-validation; the untouched holdout remains a final diagnostic rather than a model-selection shortcut.
+- The final holdout is split before candidate comparison and opened once; external validation remains explicitly incomplete.
 
 ## Analytical story
 
@@ -125,7 +126,8 @@ The workflow:
 3. Creates Teens (15–19), 20s (20–29), and 30s+ age buckets.
 4. Tests for exact formulas, ceiling effects, balanced targets, and unusually strong correlations.
 5. Answers nine research questions using comparisons, quartiles, exception rules, and transparent personas.
-6. Compares Logistic Regression, Random Forest, Extra Trees, RBF SVM, and Histogram Gradient Boosting with leakage-safe `SMOTENC`, randomized tuning, nested stratified five-fold cross-validation, and an untouched holdout.
+6. Retains the original three-class SMOTENC experiment as a clearly labelled secondary benchmark.
+7. For the primary pre-outcome task, creates the 750/250 development/holdout split first, one-hot encodes nominal categories, tunes four candidate families only within nested development folds, calibrates the winner, selects its threshold from development-only out-of-fold predictions, and opens the holdout once.
 
 ![Model comparison](outputs/figures/13_model_comparison.png)
 

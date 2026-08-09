@@ -1,0 +1,25 @@
+{
+  "active": "2.0.0",
+  "models": [
+    {
+      "version": "2.0.0",
+      "status": "internal-validation-only",
+      "artifact_sha256": "8c585a2b396b451c3f5bd0bc8975973a9eb388d3fc4c46e60cf2d938c92a3924",
+      "metrics": {
+        "accuracy": 0.78,
+        "balanced_accuracy": 0.77472765312748,
+        "roc_auc": 0.824687973450689,
+        "pr_auc": 0.7199587009107032,
+        "f1": 0.6961325966850829,
+        "precision": 0.6428571428571429,
+        "sensitivity": 0.7590361445783133,
+        "specificity": 0.7904191616766467,
+        "brier": 0.1550584354342904,
+        "false_negatives": 20,
+        "false_positives": 35
+      },
+      "trained_on": "synthetic survey; n=750 development",
+      "external_validation": false
+    }
+  ]
+}

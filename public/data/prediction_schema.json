@@ -1,0 +1,273 @@
+{
+  "version": "2.0.0",
+  "features": [
+    "age",
+    "bedtime_screen_time_minutes",
+    "total_daily_screen_time_hours",
+    "doomscroll_sessions_per_night",
+    "avg_doomscroll_session_minutes",
+    "caffeine_intake_mg_per_day",
+    "anxiety_score",
+    "stress_score",
+    "number_of_news_apps_used",
+    "phone_checks_per_night",
+    "exercise_minutes_per_day",
+    "days_since_last_digital_detox",
+    "gender",
+    "occupation_status",
+    "country_region",
+    "primary_device_used_at_night",
+    "bedtime_routine_type",
+    "uses_night_mode",
+    "keeps_phone_in_bedroom",
+    "consumes_negative_news_content",
+    "uses_sleep_tracking_app",
+    "doomscroller"
+  ],
+  "defaults": {
+    "age": 27.0,
+    "bedtime_screen_time_minutes": 44.0,
+    "total_daily_screen_time_hours": 3.3449999999999998,
+    "doomscroll_sessions_per_night": 2.0,
+    "avg_doomscroll_session_minutes": 22.6,
+    "caffeine_intake_mg_per_day": 102.0,
+    "anxiety_score": 5.0,
+    "stress_score": 6.0,
+    "number_of_news_apps_used": 1.0,
+    "phone_checks_per_night": 2.0,
+    "exercise_minutes_per_day": 54.0,
+    "days_since_last_digital_detox": 32.0,
+    "gender": "Male",
+    "occupation_status": "Employed Full-time",
+    "country_region": "India",
+    "primary_device_used_at_night": "Smartphone",
+    "bedtime_routine_type": "Scrolling Social Media",
+    "uses_night_mode": "No",
+    "keeps_phone_in_bedroom": "Yes",
+    "consumes_negative_news_content": "No",
+    "uses_sleep_tracking_app": "No",
+    "doomscroller": "No"
+  },
+  "ranges": {
+    "age": {
+      "min": 15.0,
+      "max": 54.0
+    },
+    "bedtime_screen_time_minutes": {
+      "min": 1.0,
+      "max": 225.0
+    },
+    "total_daily_screen_time_hours": {
+      "min": 1.0,
+      "max": 12.95
+    },
+    "doomscroll_sessions_per_night": {
+      "min": 0.0,
+      "max": 10.0
+    },
+    "avg_doomscroll_session_minutes": {
+      "min": 1.0,
+      "max": 90.0
+    },
+    "caffeine_intake_mg_per_day": {
+      "min": 3.0,
+      "max": 600.0
+    },
+    "anxiety_score": {
+      "min": 1.0,
+      "max": 10.0
+    },
+    "stress_score": {
+      "min": 1.0,
+      "max": 10.0
+    },
+    "number_of_news_apps_used": {
+      "min": 0.0,
+      "max": 7.0
+    },
+    "phone_checks_per_night": {
+      "min": 0.0,
+      "max": 9.0
+    },
+    "exercise_minutes_per_day": {
+      "min": 0.0,
+      "max": 124.0
+    },
+    "days_since_last_digital_detox": {
+      "min": 0.0,
+      "max": 276.0
+    }
+  },
+  "categories": {
+    "gender": [
+      "Female",
+      "Male",
+      "Prefer not to say"
+    ],
+    "occupation_status": [
+      "Employed Full-time",
+      "Employed Part-time",
+      "Student",
+      "Unemployed"
+    ],
+    "country_region": [
+      "Australia",
+      "Brazil",
+      "Canada",
+      "Germany",
+      "India",
+      "Nigeria",
+      "Philippines",
+      "UAE",
+      "United Kingdom",
+      "United States"
+    ],
+    "primary_device_used_at_night": [
+      "Laptop",
+      "Smartphone",
+      "TV",
+      "Tablet"
+    ],
+    "bedtime_routine_type": [
+      "Meditation/Journaling",
+      "No Fixed Routine",
+      "Reading",
+      "Scrolling Social Media",
+      "Watching Videos"
+    ],
+    "uses_night_mode": [
+      "No",
+      "Yes"
+    ],
+    "keeps_phone_in_bedroom": [
+      "No",
+      "Yes"
+    ],
+    "consumes_negative_news_content": [
+      "No",
+      "Yes"
+    ],
+    "uses_sleep_tracking_app": [
+      "No",
+      "Yes"
+    ],
+    "doomscroller": [
+      "No",
+      "Yes"
+    ]
+  },
+  "drift_baseline": {
+    "numeric": {
+      "age": {
+        "mean": 27.309,
+        "sd": 7.495311781286933
+      },
+      "bedtime_screen_time_minutes": {
+        "mean": 50.111,
+        "sd": 31.328136413312734
+      },
+      "total_daily_screen_time_hours": {
+        "mean": 3.66467,
+        "sd": 1.9237549543079089
+      },
+      "doomscroll_sessions_per_night": {
+        "mean": 2.037,
+        "sd": 1.5862367878558192
+      },
+      "avg_doomscroll_session_minutes": {
+        "mean": 24.924799999999998,
+        "sd": 12.487105860557632
+      },
+      "caffeine_intake_mg_per_day": {
+        "mean": 120.75263157894737,
+        "sd": 81.9784781724963
+      },
+      "anxiety_score": {
+        "mean": 4.644,
+        "sd": 1.792338270661115
+      },
+      "stress_score": {
+        "mean": 6.147,
+        "sd": 1.8923456269857186
+      },
+      "number_of_news_apps_used": {
+        "mean": 1.371,
+        "sd": 1.1776016923161012
+      },
+      "phone_checks_per_night": {
+        "mean": 2.479,
+        "sd": 1.5887363164109654
+      },
+      "exercise_minutes_per_day": {
+        "mean": 53.282105263157895,
+        "sd": 21.158850151058193
+      },
+      "days_since_last_digital_detox": {
+        "mean": 41.58,
+        "sd": 39.1543696752312
+      }
+    },
+    "categorical": {
+      "gender": {
+        "Male": 0.497,
+        "Female": 0.45,
+        "Prefer not to say": 0.053
+      },
+      "occupation_status": {
+        "Employed Full-time": 0.373,
+        "Student": 0.346,
+        "Employed Part-time": 0.14,
+        "Unemployed": 0.111,
+        "nan": 0.03
+      },
+      "country_region": {
+        "India": 0.27,
+        "United States": 0.185,
+        "United Kingdom": 0.099,
+        "Philippines": 0.081,
+        "Canada": 0.081,
+        "Australia": 0.063,
+        "Germany": 0.061,
+        "Nigeria": 0.061,
+        "Brazil": 0.053,
+        "UAE": 0.046
+      },
+      "primary_device_used_at_night": {
+        "Smartphone": 0.701,
+        "Laptop": 0.124,
+        "Tablet": 0.09,
+        "TV": 0.055,
+        "nan": 0.03
+      },
+      "bedtime_routine_type": {
+        "Scrolling Social Media": 0.375,
+        "Watching Videos": 0.184,
+        "Reading": 0.157,
+        "No Fixed Routine": 0.156,
+        "Meditation/Journaling": 0.108,
+        "nan": 0.02
+      },
+      "uses_night_mode": {
+        "No": 0.576,
+        "Yes": 0.424
+      },
+      "keeps_phone_in_bedroom": {
+        "Yes": 0.754,
+        "No": 0.246
+      },
+      "consumes_negative_news_content": {
+        "No": 0.538,
+        "Yes": 0.462
+      },
+      "uses_sleep_tracking_app": {
+        "No": 0.691,
+        "Yes": 0.309
+      },
+      "doomscroller": {
+        "No": 0.524,
+        "Yes": 0.476
+      }
+    },
+    "policy": "Warn when a numeric input is more than 3 training standard deviations from the mean or a category was unseen. Aggregate production monitoring still requires a persistent event store."
+  }
+}
