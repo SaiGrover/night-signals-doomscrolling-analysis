@@ -33,4 +33,4 @@ This model is not medical advice, is not externally validated, and must not be u
 
 ## Artifacts
 
-The registry, schema, summary, subgroup audit, comparison table, and artifact SHA-256 are versioned in `public/data` and `outputs/tables`. Joblib files must only be loaded from trusted builds.
+The registry, schema, summary, subgroup audit, comparison table, and artifact SHA-256 are versioned in `public/data` and `outputs/tables`. Joblib is retained only as a trusted reproducibility artifact; the inference API serves an equivalent portable JSON representation whose predictions are regression-tested against scikit-learn.

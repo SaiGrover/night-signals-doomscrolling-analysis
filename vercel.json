@@ -1,7 +1,7 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "functions": { "api/*.py": { "memory": 1024, "maxDuration": 30, "includeFiles": "outputs/models/poor_sleep_preoutcome_model.joblib", "excludeFiles": "{notebooks/**,public/**,outputs/figures/**,outputs/tables/**,data/**,src/**,dist/**,.github/**}" } },
+  "functions": { "api/*.js": { "memory": 512, "maxDuration": 10, "includeFiles": "outputs/models/poor_sleep_preoutcome_model.json" } },
   "headers": [{ "source": "/(.*)", "headers": [
     { "key": "X-Content-Type-Options", "value": "nosniff" },
     { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },

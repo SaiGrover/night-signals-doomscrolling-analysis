@@ -14,6 +14,7 @@ Night Signals is an evidence-led analysis of how late-night scrolling, negative-
 - Four model families are tuned and compared with nested cross-validation on a 750-row development partition.
 - The primary pre-outcome model reaches **73.7% nested-CV balanced accuracy** and **77.5% on a genuinely untouched 250-row holdout**, against a **67% majority baseline**.
 - The model is calibrated, reports PR AUC, Brier score, threshold costs, bootstrap intervals, subgroup diagnostics, and a versioned model card.
+- Production inference uses a small, portable JSON export regression-tested against the trusted scikit-learn artifact, avoiding Python-version-sensitive Joblib serving.
 - Random Forest leads nested cross-validation at **60.3% balanced accuracy**, narrowly ahead of RBF SVM (**59.7%**) and Extra Trees (**59.3%**), against a **34% majority-class baseline**.
 - The original three-class Good/Fair/Poor task is retained as a harder secondary benchmark, so its score is not presented as directly comparable with the binary risk model.
 - The final holdout is split before candidate comparison and opened once; external validation remains explicitly incomplete.

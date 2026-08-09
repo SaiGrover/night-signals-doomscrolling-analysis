@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 
 import joblib
+from export_portable_model import export_bundle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -195,6 +196,7 @@ def main():
     joblib.dump({"model": calibrated, "threshold": threshold, "features": features,
                  "defaults": defaults, "ranges": ranges, "categories": categories,
                  "drift_baseline": drift_baseline, "version": version}, artifact, compress=3)
+    export_bundle(joblib.load(artifact), MODELS / "poor_sleep_preoutcome_model.json")
     digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
     summary = {"model_version": version, "selected_model": selected_name,
                "prediction_moment": "At bedtime, before sleep outcomes occur",
