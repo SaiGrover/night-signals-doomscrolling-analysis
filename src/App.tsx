@@ -6,7 +6,7 @@ import type { CSSProperties } from "react";
 
 const Plot = createPlotlyComponent(Plotly);
 
-type Route = "landing" | "overview" | "analysis" | "exceptions" | "personas" | "methodology";
+type Route = "landing" | "overview" | "analysis" | "modeling" | "exceptions" | "personas" | "methodology";
 type ChartGroup = "Overview" | "Core" | "Mind" | "Protection" | "Demographics" | "Exceptions" | "Personas" | "Synthesis";
 type PlotSpec = { data: Data[]; layout: Partial<Layout> };
 const PlotSpecsContext = createContext<Record<string, PlotSpec>>({});
@@ -53,6 +53,7 @@ const chartCards: Array<{
 const nav: Array<{ id: Route; label: string }> = [
   { id: "overview", label: "Overview" },
   { id: "analysis", label: "All analysis" },
+  { id: "modeling", label: "Modelling" },
   { id: "exceptions", label: "The Exceptions" },
   { id: "personas", label: "Personas" },
   { id: "methodology", label: "Methodology" },
@@ -62,6 +63,7 @@ function NavIcon({ route }: { route: Route }) {
   const common = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
   if (route === "overview") return <svg {...common}><path d="M4 12a8 8 0 1 0 16 0 8 8 0 1 0-16 0" /><path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none" opacity=".36" /></svg>;
   if (route === "analysis") return <svg {...common}><path d="M4 17V9" /><path d="M10 17V5" /><path d="M16 17v-6" /><path d="M22 17V7" /><path d="M3 20h20" /></svg>;
+  if (route === "modeling") return <svg {...common}><path d="M4 18V6" /><path d="m4 12 5-4 4 3 7-6" /><path d="M16 5h4v4" /><path d="M3 20h18" /></svg>;
   if (route === "exceptions") return <svg {...common}><path d="M5 19 19 5" /><path d="M10 5h9v9" /><path d="M5 7v12h12" opacity=".45" /></svg>;
   if (route === "personas") return <svg {...common}><circle cx="12" cy="8" r="3" /><path d="M5.5 19c.8-3.2 3-5 6.5-5s5.7 1.8 6.5 5" /><circle cx="12" cy="12" r="10" opacity=".38" /></svg>;
   return <svg {...common}><path d="M6 5h12" /><path d="M6 19h12" /><path d="M8 5c0 4.4 8 4.6 8 9s-3 5-8 5" /><path d="M16 5c0 4.4-8 4.6-8 9" opacity=".5" /></svg>;
@@ -156,6 +158,7 @@ function ChartCard({ chart, featured = false }: { chart: typeof chartCards[numbe
 const landingLinks: Array<{ label: string; route: Route }> = [
   { label: "Overview", route: "overview" },
   { label: "Analysis", route: "analysis" },
+  { label: "Modelling", route: "modeling" },
   { label: "Exceptions", route: "exceptions" },
   { label: "Methodology", route: "methodology" },
 ];
@@ -187,7 +190,7 @@ function Landing({ go }: { go: (route: Route) => void }) {
       </div>
     </header>
     <div id="mobileMenu" className={`cinematic-menu ${open ? "is-open" : ""}`} role="dialog" aria-modal="true" aria-label="Site menu" aria-hidden={!open} inert={!open} onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
-      <div>{landingLinks.map((item, index) => <a style={{ "--i": index } as CSSProperties} key={item.route} href={pathFor(item.route)} onClick={(e) => { e.preventDefault(); navigate(item.route); }}>{item.label}</a>)}<button style={{ "--i": 4 } as CSSProperties} onClick={() => navigate("overview")}>Enter atlas</button></div>
+      <div>{landingLinks.map((item, index) => <a style={{ "--i": index } as CSSProperties} key={item.route} href={pathFor(item.route)} onClick={(e) => { e.preventDefault(); navigate(item.route); }}>{item.label}</a>)}<button style={{ "--i": landingLinks.length } as CSSProperties} onClick={() => navigate("overview")}>Enter atlas</button></div>
     </div>
     <div className="cinematic-body">
       <div className="cinematic-panel">
@@ -232,7 +235,7 @@ function Overview({ go }: { go: (route: Route) => void }) {
       <div className="story-lead"><span className="section-label">THE CENTRAL THREAD</span><h2>A bedtime-disruption chain, not a morality tale.</h2><p>Exposure links to delayed sleep; delayed sleep links to wakeups and debt; debt leaves a daytime trace. The useful levers are friction, content boundaries, and routine.</p></div>
       {[{n:"01",t:"Exposure",d:"Bedtime screen time rises with sessions and latency."},{n:"02",t:"Arousal",d:"Negative news compounds anxiety, stress, and fatigue."},{n:"03",t:"Protection",d:"Reading, meditation, phone distance, and movement help."},{n:"04",t:"Exceptions",d:"A small group shows that exposure is risk, not destiny."}].map((x)=><div className="story-step" key={x.n}><span>{x.n}</span><b>{x.t}</b><p>{x.d}</p></div>)}
     </section>
-    <section className="section-block"><div className="section-heading"><div><span className="section-label">HERO EVIDENCE</span><h2>The relationship in one frame</h2></div><button className="text-button" onClick={() => go("analysis")}>All 12 figures →</button></div><ChartCard chart={chartCards[1]} featured /></section>
+    <section className="section-block"><div className="section-heading"><div><span className="section-label">HERO EVIDENCE</span><h2>The relationship in one frame</h2></div><button className="text-button" onClick={() => go("analysis")}>All 13 figures →</button></div><ChartCard chart={chartCards[1]} featured /></section>
   </>;
 }
 
@@ -241,9 +244,30 @@ function Analysis() {
   const [group, setGroup] = useState("All");
   const visible = group === "All" ? chartCards : chartCards.filter((c) => c.group === group);
   return <section className="page-section">
-    <div className="page-intro"><span className="section-label">12 FIGURES / 9 QUESTIONS</span><h1>The evidence atlas</h1><p>Every chart from the executed notebook, grouped by the question it answers. Open each interpretation to keep the visual and its meaning together.</p></div>
+    <div className="page-intro"><span className="section-label">13 FIGURES / 9 QUESTIONS</span><h1>The evidence atlas</h1><p>Every chart from the executed notebooks, grouped by the question it answers. Open each interpretation to keep the visual and its meaning together.</p></div>
     <div className="filter-row">{groups.map((item) => <button className={group === item ? "active" : ""} key={item} onClick={() => setGroup(item)}>{item}</button>)}</div>
     <div className="analysis-grid">{visible.map((chart) => <ChartCard key={chart.file} chart={chart} />)}</div>
+  </section>;
+}
+
+const modelRows = [
+  ["Random Forest", "60.3%", "55.5%", "Selected"],
+  ["RBF SVM", "59.7%", "56.7%", "Runner-up"],
+  ["Extra Trees", "59.3%", "58.4%", "Compared"],
+  ["Logistic Regression", "58.3%", "60.0%", "Compared"],
+  ["Histogram Gradient Boosting", "56.4%", "56.8%", "Compared"],
+];
+
+function Modeling() {
+  return <section className="page-section modeling-page">
+    <div className="page-intro split-intro"><div><span className="section-label">SMOTENC / TUNING / NESTED CROSS-VALIDATION</span><h1>Predictive modelling</h1><p>Five classification families compete under the same leakage-safe preprocessing, resampling, and evaluation protocol. Selection uses nested cross-validation—not the most favorable holdout result.</p></div><div className="big-ratio"><b>60.3%</b><span>nested-CV balanced accuracy</span><small>Random Forest · selected model</small></div></div>
+    <div className="model-scorecard" role="table" aria-label="Model performance comparison">
+      <div className="model-score-row model-score-head" role="row"><span>Model</span><span>Nested CV</span><span>Holdout</span><span>Status</span></div>
+      {modelRows.map(([name,cv,holdout,status]) => <div className={`model-score-row ${status === "Selected" ? "selected" : ""}`} role="row" key={name}><b>{name}</b><span>{cv}</span><span>{holdout}</span><em>{status}</em></div>)}
+    </div>
+    <div className="model-note"><b>Why SMOTE?</b><p>SMOTENC is fitted only inside training folds, after imputation and categorical encoding. The outcome classes are already close to balanced, so resampling is a controlled pipeline step—not a guaranteed performance boost.</p><a href="/methodology/sleep_doomscrolling_predictive_modeling.ipynb" download>Download executed modelling notebook ↓</a></div>
+    <ChartCard chart={chartCards[11]} featured />
+    <ChartCard chart={chartCards[12]} featured />
   </section>;
 }
 
@@ -277,7 +301,23 @@ function Personas() {
   </section>;
 }
 
-type NotebookCell = { cell_type: "markdown" | "code" | string; source: string | string[]; execution_count?: number | null; outputs?: Array<{ output_type: string; text?: string | string[]; data?: Record<string, string | string[]> }> };
+type NotebookOutput = { output_type: string; text?: string | string[]; data?: Record<string, string | string[]>; ename?: string; evalue?: string; traceback?: string[] };
+type NotebookCell = { cell_type: "markdown" | "code" | string; source: string | string[]; execution_count?: number | null; outputs?: NotebookOutput[] };
+
+const outputText = (value?: string | string[]) => Array.isArray(value) ? value.join("") : value ?? "";
+
+function NotebookOutputView({ output }: { output: NotebookOutput }) {
+  if (output.output_type === "stream") return <pre className="nb-output-text">{outputText(output.text)}</pre>;
+  if (output.output_type === "error") return <pre className="nb-output-error">{output.ename}: {output.evalue}{output.traceback?.length ? `\n${output.traceback.join("\n")}` : ""}</pre>;
+  const data = output.data ?? {};
+  const png = outputText(data["image/png"]);
+  const jpeg = outputText(data["image/jpeg"]);
+  if (png || jpeg) return <img className="nb-output-image" src={`data:image/${png ? "png" : "jpeg"};base64,${png || jpeg}`} alt="Notebook-generated visualization" />;
+  const html = outputText(data["text/html"]);
+  if (html) return <div className="nb-output-html" dangerouslySetInnerHTML={{ __html: html }} />;
+  const plain = outputText(data["text/plain"]);
+  return plain ? <pre className="nb-output-text">{plain}</pre> : null;
+}
 
 function NotebookViewer() {
   const [cells, setCells] = useState<NotebookCell[]>([]);
@@ -296,7 +336,7 @@ function NotebookViewer() {
     <div className="notebook-cells">{visible.length ? visible.map((cell, index) => {
       const source = Array.isArray(cell.source) ? cell.source.join("") : cell.source;
       if (cell.cell_type === "markdown") return <div className="nb-cell markdown-cell" key={index}><div className="cell-rail">M</div><div>{source.split("\n").map((line, i) => line.startsWith("#") ? <h4 key={i}>{line.replace(/^#+\s*/, "")}</h4> : line.trim() ? <p key={i}>{line.replace(/\*\*/g, "")}</p> : null)}</div></div>;
-      return <div className="nb-cell code-cell" key={index}><div className="cell-rail">[{cell.execution_count ?? " "}]</div><pre>{source}</pre></div>;
+      return <div className="nb-cell code-cell" key={index}><div className="cell-rail">[{cell.execution_count ?? " "}]</div><div className="nb-code-body"><pre className="nb-source">{source}</pre>{cell.outputs?.length ? <div className="nb-outputs">{cell.outputs.map((output, outputIndex) => <NotebookOutputView output={output} key={outputIndex} />)}</div> : null}</div></div>;
     }) : <div className="notebook-loading">Loading executed notebook…</div>}</div>
     {limit < cells.length && <button className="load-more" onClick={() => setLimit(limit + 12)}>Load 12 more cells</button>}
   </div>;
@@ -330,7 +370,7 @@ export default function App() {
   }, []);
   useEffect(() => { fetch("/data/plotly_charts.json").then((response) => response.json()).then(setPlotSpecs).catch(() => setPlotSpecs({})); }, []);
   const go = (next: Route) => { history.pushState({}, "", pathFor(next)); setRoute(next); setMenu(false); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const page = useMemo(() => ({ landing: <Landing go={go} />, overview: <Overview go={go} />, analysis: <Analysis />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
+  const page = useMemo(() => ({ landing: <Landing go={go} />, overview: <Overview go={go} />, analysis: <Analysis />, modeling: <Modeling />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
   if (route === "landing") return <PlotSpecsContext.Provider value={plotSpecs}>{page}</PlotSpecsContext.Provider>;
   return <PlotSpecsContext.Provider value={plotSpecs}><div className={`app-shell ${menu ? "menu-open" : ""}`}>
     <div className="ambient ambient-a" /><div className="ambient ambient-b" /><div className="grid-overlay" />
