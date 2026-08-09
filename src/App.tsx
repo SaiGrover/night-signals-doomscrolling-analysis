@@ -380,6 +380,10 @@ export default function App() {
   const page = useMemo(() => ({ landing: <Landing go={go} />, overview: <Overview go={go} />, analysis: <Analysis />, modeling: <Modeling />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
   if (route === "landing") return <PlotSpecsContext.Provider value={plotSpecs}>{page}</PlotSpecsContext.Provider>;
   return <PlotSpecsContext.Provider value={plotSpecs}><div className={`app-shell ${menu ? "menu-open" : ""}`}>
+    <video className="app-background-video" autoPlay muted loop playsInline preload="metadata" aria-hidden="true">
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260806_133255_956f653f-5d80-4b06-abd5-0f46c98b60fa.mp4" type="video/mp4" />
+    </video>
+    <div className="app-background-scrim" aria-hidden="true" />
     <div className="ambient ambient-a" /><div className="ambient ambient-b" /><div className="grid-overlay" />
     <Sidebar route={route} onRoute={go} />
     <button className="mobile-menu" onClick={() => setMenu(!menu)} aria-label="Toggle navigation">{menu ? "×" : "☰"}</button>
