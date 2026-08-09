@@ -1,159 +1,316 @@
 # Night Signals — Sleep × Doomscrolling
 
-Night Signals is an evidence-led analysis of how late-night scrolling, negative-news consumption, and bedtime routines relate to sleep and mental wellbeing across 1,000 respondents. The project combines separate executed analysis and predictive-modelling notebooks, a Computer Modern–typeset PDF report, and a cinematic React research atlas with interactive Plotly figures.
+<p align="center">
+  <img src="public/assets/night-signals-hero.png" alt="Night Signals: a person using a phone in bed while a network of night-time signals moves across the room" width="100%" />
+</p>
 
-![Nightly doomscrolling and sleep quality](outputs/figures/02_hero_doomscroll_sleep.png)
+<p align="center">
+  <strong>An evidence-led study of how doomscrolling, negative-news exposure, and bedtime routines relate to sleep and mental wellbeing.</strong>
+</p>
 
-## What the analysis finds
+<p align="center">
+  <a href="https://night-signals-doomscrolling-analysi.vercel.app">Explore the research atlas</a> ·
+  <a href="deliverables/Sleep_Doomscrolling_Report.pdf">Read the report</a> ·
+  <a href="notebooks/sleep_doomscrolling_analysis.ipynb">Analysis notebook</a> ·
+  <a href="notebooks/sleep_doomscrolling_predictive_modeling.ipynb">Modelling notebook</a>
+</p>
 
-- Doomscrollers average **10.6 additional minutes of sleep latency**.
-- They carry **1.5 more hours of weekly sleep debt** and sleep about **15 minutes less per night**.
-- Anxiety, stress, and fatigue are highest where doomscrolling and negative-news consumption coexist.
-- Reading, meditation or journaling, phone distance, and exercise look more protective than night mode alone.
-- Only **11 of 204 heavy doomscrollers** still report good sleep—the project’s counter-narrative.
-- Four model families are tuned and compared with nested cross-validation on a 750-row development partition.
-- The primary pre-outcome model reaches **73.7% nested-CV balanced accuracy** and **77.5% on a genuinely untouched 250-row holdout**, against a **67% majority baseline**.
-- The model is calibrated, reports PR AUC, Brier score, threshold costs, bootstrap intervals, subgroup diagnostics, and a versioned model card.
-- Production inference uses a small, portable JSON export regression-tested against the trusted scikit-learn artifact, avoiding Python-version-sensitive Joblib serving.
-- Random Forest leads nested cross-validation at **60.3% balanced accuracy**, narrowly ahead of RBF SVM (**59.7%**) and Extra Trees (**59.3%**), against a **34% majority-class baseline**.
-- The original three-class Good/Fair/Poor task is retained as a harder secondary benchmark, so its score is not presented as directly comparable with the binary risk model.
-- The final holdout is split before candidate comparison and opened once; external validation remains explicitly incomplete.
+## Project overview
 
-## Analytical story
+Night Signals studies the tension between always-on digital information and the finite human need for rest. It asks a more useful question than “are phones bad for sleep?”: **how do exposure intensity, content, emotional state, and protective routines combine around sleep outcomes—and which signals are available early enough to support prevention?**
+
+The project brings together:
+
+- an audited synthetic survey of **1,000 respondents** and **29 analytic variables**;
+- two fully executed Jupyter notebooks for descriptive analysis and predictive modelling;
+- **14 publication-ready figures** with interpretation, practical relevance, and analytical boundaries;
+- an interactive React research atlas with accessible Plotly charts;
+- a leakage-safe pre-outcome risk model with nested cross-validation, calibration, uncertainty intervals, and subgroup diagnostics;
+- a typeset PDF report and versioned analytical artifacts.
+
+This is an educational data-science project. It does not claim that doomscrolling causes poor sleep, estimate population prevalence, or provide medical advice.
+
+## The problem
+
+Bedtime should be a period of decreasing stimulation. Infinite feeds remove stopping cues, repeated checking fragments attention, and emotionally charged news can sustain alertness when the mind needs to disengage. The result may appear across the whole night: delayed sleep onset, shorter realized sleep, more awakenings, accumulated sleep debt, and next-day fatigue.
+
+The analytical problem is therefore:
+
+> We lack a clear, evidence-led account of how doomscrolling intensity, negative-news exposure, and bedtime routines combine around sleep—and which modifiable behaviours may reduce risk without treating screen use as destiny.
+
+### Research questions
+
+1. How do bedtime screen time and doomscroll intensity relate to sleep quality?
+2. Which sleep outcomes change most clearly with heavier exposure?
+3. Do anxiety, stress, and negative-news consumption compound the pattern?
+4. Which routines and environmental choices appear protective?
+5. Does the relationship follow a dose-shaped gradient?
+6. Which demographic or occupational contexts require cautious interpretation?
+7. What distinguishes heavy scrollers who still report good sleep?
+8. Can transparent personas translate evidence into different intervention needs?
+9. Can poor-sleep risk be estimated **before** sleep outcomes are known?
+
+## The analytical story
+
+Night Signals frames the evidence as a reinforcing bedtime-disruption chain rather than a morality tale.
 
 ```mermaid
 flowchart LR
-    A["Bedtime exposure"] --> B["Longer sleep latency"]
-    B --> C["More wakeups"]
-    C --> D["Shorter sleep"]
-    D --> E["Weekly sleep debt"]
-    E --> F["Daytime fatigue"]
-    G["Negative news"] --> H["Anxiety and stress"]
-    H --> B
-    I["Restorative routine"] -. "softens" .-> B
-    J["Phone outside bedroom"] -. "adds friction" .-> A
+    A["Infinite feeds and repeated checks"] --> B["Sustained attention"]
+    N["Negative-news exposure"] --> C["Emotional arousal"]
+    B --> D["Longer sleep latency"]
+    C --> D
+    D --> E["Shorter or fragmented sleep"]
+    E --> F["Weekly sleep debt"]
+    F --> G["Daytime fatigue and distress"]
+    G -. "may reinforce" .-> A
+    R["Restorative routines"] -. "may soften" .-> D
+    P["Phone distance and friction"] -. "may reduce" .-> A
 ```
 
-The project treats this as a bedtime-disruption chain, not a morality tale. Exposure is a risk signal; environment, content, and routine shape whether that risk becomes an outcome.
+The arrows describe a hypothesis supported by patterns in this synthetic dataset. They are **not** causal estimates.
 
-## Evidence atlas
+## Dataset
 
-| Theme | Main result |
-|---|---|
-| Core relationship | Latency, wakeups, debt, duration, and fatigue move consistently in the harder-sleep direction. |
-| Mental wellbeing | Doomscrolling and negative news stack up around the highest distress averages. |
-| Protective habits | Reading and meditation or journaling outperform social scrolling; night mode alone is weak. |
-| Demographics | Younger and student pockets are elevated, but breakdowns are descriptive rather than rankings. |
-| The Exceptions | Good-sleep heavy scrollers show more realized sleep and lower debt or latency. |
-| Synthesis | Behavioral exposure and sleep mechanics lead the predictor ranking. |
+The source is a synthetic, cross-sectional survey containing 1,000 rows. It combines behaviour, context, self-reported wellbeing, sleep outcomes, and protective habits.
 
-![Doomscroller comparison](outputs/figures/03_doomscroller_comparison.png)
-
-![Protective routines](outputs/figures/06_protective_habits.png)
-
-### The Exceptions
-
-![Heavy doomscrollers with good sleep](outputs/figures/10_exceptions.png)
-
-Heavy exposure does not fully determine the outcome. The exception group is small and exploratory, but it redirects attention toward routines, realized sleep, and environmental friction.
-
-### Personas
-
-![Persona profiles](outputs/figures/11_personas.png)
-
-| Persona | Defining pattern | First intervention lever |
+| Variable family | Examples | Role in the study |
 |---|---|---|
-| The Night Scroller | Self-identified doomscroller in the top bedtime-exposure quartile | Environmental friction |
-| The Anxious News Seeker | Negative-news consumption with high anxiety and stress | Content boundaries |
-| The Disciplined Sleeper | Lower exposure with reading or meditation or journaling | Routine maintenance |
+| Demographics | Age, gender, occupation, country/region | Context and subgroup description |
+| Digital exposure | Daily screen time, bedtime screen time, phone checks | Exposure intensity |
+| Doomscroll behaviour | Sessions per night, average session length, doomscroller label | Core behavioural signal |
+| Content and wellbeing | Negative news, anxiety, stress | Emotional context |
+| Sleep outcomes | Duration, latency, awakenings, debt, fatigue, quality | Outcomes and descriptive consequences |
+| Protective behaviour | Reading, meditation/journaling, exercise, digital detox | Potential protective signals |
+| Environment | Phone in bedroom, device, night mode, tracking app | Modifiable context |
 
-## Project architecture
+### Data-quality audit
+
+The workflow checks respondent IDs, duplicates, missingness, dtypes, valid ranges, target balance, exact formulas, ceiling effects, and unusually strong correlations. Missing categorical values are represented explicitly; numeric imputation occurs inside the relevant analytical or modelling pipeline.
+
+Several patterns indicate a generator-shaped dataset:
+
+- **220 missing cells** are distributed across six variables;
+- sleep hours and weekly sleep debt correlate at approximately **−0.893**;
+- more than **86%** of valid sleep-quality scores sit at the 5/5 ceiling;
+- only ten respondents separate the three sleep-quality classes.
+
+These properties make the data useful for demonstrating a complete workflow, but unsuitable for population or clinical claims.
+
+## Analysis workflow
 
 ```mermaid
 flowchart TD
-    DATA["Survey CSV\n1,000 respondents × 29 analytic variables"] --> PIPE["Analysis pipeline\ncleaning + validation + synthetic-data audit"]
-    PIPE --> NB["Executed notebook"]
-    PIPE --> JSON["Plotly chart specifications"]
-    PIPE --> PNG["Computer Modern chart exports"]
-    JSON --> WEB["Interactive research atlas"]
-    NB --> METHOD["Read-only methodology viewer"]
-    PNG --> PDF["Computer Modern PDF report"]
-    WEB --> VERCEL["Vercel platform"]
+    CSV["Synthetic survey CSV<br/>1,000 rows"] --> AUDIT["Data audit<br/>IDs · missingness · ranges · structure"]
+    AUDIT --> PREP["Analysis preparation<br/>labels · buckets · derived exposure measures"]
+    PREP --> EDA["Descriptive analysis<br/>groups · gradients · correlations"]
+    PREP --> EXC["Exception analysis<br/>heavy exposure + good sleep"]
+    PREP --> PERSONA["Transparent personas<br/>rule-based segments"]
+    PREP --> MODEL["Predictive modelling<br/>pre-outcome + secondary benchmark"]
+    EDA --> FIG["14 interpreted figures"]
+    EXC --> FIG
+    PERSONA --> FIG
+    MODEL --> FIG
+    FIG --> ATLAS["Interactive evidence atlas"]
+    FIG --> REPORT["PDF research report"]
 ```
 
-The website opens with a single-screen cinematic entry and continues into five research surfaces:
+The project keeps descriptive questions, exception discovery, persona construction, and predictive modelling distinct. This prevents a model score from replacing the broader research question.
 
-- **Overview** — central thread, key metrics, and hero evidence.
-- **All analysis** — 13 responsive Plotly figures with filters, zoom, hover detail, and written interpretations.
-- **The Exceptions** — the good-sleep heavy-scroller counter-pattern.
-- **Personas** — three intervention-oriented respondent profiles.
-- **Methodology** — workflow, synthetic-data checks, model boundaries, and switchable viewers for both executed notebooks.
+## Main findings
 
-## Repository map
+### 1. Heavier scrolling clusters around poorer sleep
+
+![Distribution of nightly doomscrolling load by sleep-quality group](outputs/figures/02_hero_doomscroll_sleep.png)
+
+Poor sleepers carry the highest median nightly doomscroll load. The distributions still overlap substantially, which matters: exposure is associated with risk but does not make an outcome inevitable.
+
+### 2. The difference appears across multiple sleep outcomes
+
+![Comparison of sleep outcomes for doomscrollers and other respondents](outputs/figures/03_doomscroller_comparison.png)
+
+In this dataset, doomscrollers average:
+
+- **10.6 additional minutes** of sleep latency;
+- **1.5 additional hours** of weekly sleep debt;
+- approximately **15 fewer minutes** of sleep per night;
+- more awakenings and higher daytime fatigue.
+
+The consistency across outcomes is more informative than any single metric.
+
+### 3. The relationship is dose-shaped
+
+![Sleep outcomes across bedtime screen-time quartiles](outputs/figures/04_dose_response.png)
+
+Higher bedtime-screen quartiles generally show longer latency and more sleep debt. A gradient is practically useful because it suggests that improvement need not require an all-or-nothing digital detox.
+
+### 4. Negative news and doomscrolling stack up
+
+![Mental wellbeing by doomscrolling and negative-news exposure](outputs/figures/05_mental_health.png)
+
+Anxiety, stress, and fatigue are highest where doomscrolling and negative-news consumption coexist. Because the data is cross-sectional, the direction remains unresolved: distress may promote scrolling, follow it, or participate in a feedback loop.
+
+### 5. Routine appears more useful than a display setting
+
+![Protective bedtime habits](outputs/figures/06_protective_habits.png)
+
+Reading and meditation/journaling are more consistently associated with better sleep than night mode alone. Exercise and phone distance also look supportive. These are intervention hypotheses, not proven treatments.
+
+### 6. Exceptions prevent a deterministic conclusion
+
+![Heavy doomscrollers who still report good sleep](outputs/figures/10_exceptions.png)
+
+Only **11 of 204** heavy scrollers report good sleep. This group realizes more sleep and less debt or latency, with restorative routines appearing more often. The sample is too small for stable effect estimates, but it redirects attention toward protective mechanisms.
+
+### 7. Personas translate evidence into different needs
+
+![Transparent respondent personas](outputs/figures/11_personas.png)
+
+| Persona | Pattern | Most relevant design lever |
+|---|---|---|
+| The Night Scroller | High bedtime exposure and repeated sessions | Environmental friction and stopping cues |
+| The Anxious News Seeker | Negative-news consumption with elevated distress | Content boundaries and emotional decompression |
+| The Disciplined Sleeper | Lower exposure with restorative routines | Routine maintenance |
+
+Personas are transparent rule-based design tools, not diagnoses or hidden clusters.
+
+## Predictive modelling
+
+The project deliberately retains two different prediction tasks. Their scores are **not directly comparable**.
+
+| Task | Target | Purpose | Validation result |
+|---|---|---|---|
+| Primary model | Poor vs not-poor sleep | Pre-outcome bedtime screening demonstration | 73.7% nested-CV balanced accuracy; 77.5% untouched holdout |
+| Secondary benchmark | Good vs fair vs poor sleep | Harder three-class research comparison | ≈60% nested-CV balanced accuracy |
+
+### Primary pre-outcome model
+
+The primary task asks what can be estimated at bedtime, before the night’s outcome is observed. It excludes respondent ID, sleep duration, latency, awakenings, weekly sleep debt, daytime fatigue, sleep-quality score, and the target label.
+
+```mermaid
+flowchart TD
+    ALL["1,000 rows"] -->|"split before comparison"| DEV["Development set<br/>750 rows"]
+    ALL --> HOLD["Locked holdout<br/>250 rows"]
+    DEV --> OUTER["Outer cross-validation<br/>unbiased development estimates"]
+    OUTER --> INNER["Inner cross-validation<br/>hyperparameter search"]
+    INNER --> CAND["Logistic Regression · RBF SVM<br/>Random Forest · Extra Trees"]
+    CAND --> SELECT["Select Logistic Regression"]
+    SELECT --> CAL["Sigmoid calibration"]
+    CAL --> THRESH["Threshold selected from<br/>development-only OOF predictions"]
+    THRESH --> FINAL["Fit final development model"]
+    HOLD --> ONCE["Open once for final evaluation"]
+    FINAL --> ONCE
+    ONCE --> AUDIT["Bootstrap uncertainty<br/>calibration · subgroup audit"]
+```
+
+Nominal categories are one-hot encoded. All preprocessing and tuning occur inside the appropriate folds. False negatives receive twice the cost of false positives when selecting the development-only threshold.
+
+### Model comparison
+
+![Nested cross-validation comparison of candidate models](outputs/figures/13_model_comparison.png)
+
+| Candidate | Nested-CV balanced accuracy | Status |
+|---|---:|---|
+| Logistic Regression | **73.7%** | Selected and calibrated |
+| RBF SVM | 73.5% | Development comparison only |
+| Random Forest | 73.0% | Development comparison only |
+| Extra Trees | 72.5% | Development comparison only |
+
+### Final evaluation
+
+![Primary pre-outcome model evaluation](outputs/figures/15_production_risk_model.png)
+
+| Metric | Untouched holdout result |
+|---|---:|
+| Balanced accuracy | **77.5%** |
+| Bootstrap 95% interval | 71.8–82.8% |
+| ROC AUC | 82.5% |
+| PR AUC | 72.0% |
+| Sensitivity | 75.9% |
+| Specificity | 79.0% |
+| Brier score | 0.155 |
+| Decision threshold | 0.32 |
+
+The binary majority baseline is **67%**, so the model should be understood as a measured improvement over a strong baseline—not as a 77.5-point gain. External validation has not been performed.
+
+### Secondary three-class benchmark
+
+The Good/Fair/Poor benchmark uses a fold-contained SMOTENC pipeline and nested tuning. It is retained because it demonstrates a harder multiclass problem and shows why accuracy cannot be compared across different targets, class structures, and baselines. Its feature-importance figure explains the secondary Random Forest only, not the primary Logistic Regression.
+
+## Research atlas
+
+The website turns the notebooks and artifacts into seven connected research surfaces:
+
+| Page | Purpose |
+|---|---|
+| Overview | Central narrative, key indicators, and hero evidence |
+| Problem statement | Detailed context, stakeholders, research questions, scope, and boundaries |
+| All analysis | Fourteen interactive figures with accessible data tables and interpretations |
+| Modelling | Candidate comparison, validation design, uncertainty, fairness audit, and risk demo |
+| The Exceptions | Counter-pattern among high-exposure respondents with good sleep |
+| Personas | Transparent intervention-oriented profiles |
+| Methodology | Executed notebook outputs, audit logic, and reproducibility details |
+
+The visual system moves from a cinematic night-time entry into a quieter editorial atlas. The shared image language, typography, subdued motion, and midnight palette keep the landing and research pages part of the same project.
+
+## Project structure
 
 ```text
 night-signals-doomscrolling-analysis/
 ├── data/
-│   └── sleep_doomscrolling_habits.csv   # Source dataset
-├── deliverables/
-│   └── Sleep_Doomscrolling_Report.pdf   # Sole report export
+│   └── sleep_doomscrolling_habits.csv
 ├── notebooks/
-│   └── sleep_doomscrolling_analysis.ipynb
+│   ├── sleep_doomscrolling_analysis.ipynb
+│   └── sleep_doomscrolling_predictive_modeling.ipynb
 ├── outputs/
-│   ├── analysis_summary.json            # Final reusable metrics
-│   ├── figures/                         # Publication-ready chart exports
-│   └── tables/                          # Final analytical tables
+│   ├── figures/                 # Publication-ready evidence
+│   ├── tables/                  # Model, persona, and audit tables
+│   ├── models/                  # Versioned reproducibility artifacts
+│   └── analysis_summary.json
+├── deliverables/
+│   └── Sleep_Doomscrolling_Report.pdf
 ├── public/
-│   ├── data/plotly_charts.json          # Website chart specifications
-│   ├── downloads/                       # PDF report
-│   └── methodology/                     # Notebook used by the viewer
+│   ├── assets/                  # Atlas imagery
+│   ├── data/                    # Chart specs, schema, registry, subgroup audit
+│   └── methodology/             # Notebook data shown by the atlas
 ├── src/
-│   ├── App.tsx                          # Routes, Plotly figures, and notebook viewer
-│   ├── main.tsx                         # React entry point
-│   └── styles.css                       # Cinematic + research-atlas visual system
-├── index.html
-├── vercel.json
+│   ├── components/              # Problem page, charts, and risk interface
+│   ├── App.tsx                  # Research routes and page composition
+│   └── styles.css               # Visual system and responsive layouts
+├── MODEL_CARD.md
+├── EXTERNAL_VALIDATION.md
 └── README.md
 ```
 
-The repository intentionally contains final research artifacts and the deployable frontend only. One-off generation scripts and loose intermediate files are excluded from the published project.
+## Reproducible research artifacts
 
-## Methodology
+The repository contains the evidence needed to inspect the project rather than only screenshots of results:
 
-The workflow:
+- [descriptive analysis notebook](notebooks/sleep_doomscrolling_analysis.ipynb);
+- [predictive-modelling notebook](notebooks/sleep_doomscrolling_predictive_modeling.ipynb);
+- [model card](MODEL_CARD.md);
+- [external-validation protocol](EXTERNAL_VALIDATION.md);
+- [model registry](public/data/model_registry.json);
+- [prediction input schema](public/data/prediction_schema.json);
+- [subgroup performance audit](public/data/subgroup_performance.csv);
+- [final PDF report](deliverables/Sleep_Doomscrolling_Report.pdf).
 
-1. Validates IDs, duplicates, dtypes, missingness, and plausible ranges.
-2. Labels missing categorical values `Unknown` and median-imputes numeric values in the analysis frame.
-3. Creates Teens (15–19), 20s (20–29), and 30s+ age buckets.
-4. Tests for exact formulas, ceiling effects, balanced targets, and unusually strong correlations.
-5. Answers nine research questions using comparisons, quartiles, exception rules, and transparent personas.
-6. Retains the original three-class SMOTENC experiment as a clearly labelled secondary benchmark.
-7. For the primary pre-outcome task, creates the 750/250 development/holdout split first, one-hot encodes nominal categories, tunes four candidate families only within nested development folds, calibrates the winner, selects its threshold from development-only out-of-fold predictions, and opens the holdout once.
+## Limitations
 
-![Model comparison](outputs/figures/13_model_comparison.png)
-
-![Predictor ranking](outputs/figures/14_feature_importance.png)
-
-The outcome-adjacent `sleep_quality_score` is excluded from the classifier to reduce construct-overlap leakage.
-
-## Synthetic-data caveat
-
-The dataset is unusually orderly: sleep hours and weekly debt correlate at approximately **−0.893**, more than **86%** of valid sleep-quality scores are **5/5**, and only ten respondents separate the three target classes. These signals are consistent with synthetic or simulation-assisted data, so the project uses descriptive, non-causal language and does not generalize rates to a wider population.
-
-## Visual system
-
-The landing page adapts the supplied cinematic black-and-white composition to Night Signals: full-bleed motion, sharp translucent controls, Sora display type, JetBrains Mono interface copy, and a responsive circular mobile menu. The research atlas shifts into a midnight evidence palette while preserving the same typographic discipline.
-
-| Token | Color | Use |
-|---|---|---|
-| Pure black | `#000000` | Cinematic entry |
-| Midnight | `#07111F` | Research background |
-| Moonlight cyan | `#59D8E8` | Primary signal and focus |
-| Sleep blue | `#6F8CFF` | Structural emphasis |
-| Alert pink | `#EF83BB` | Disruption and risk |
-| Dawn gold | `#EFC36B` | Caveats and content load |
-| Rest mint | `#64D6AD` | Protective habits |
+1. **Synthetic data:** models may recover generator rules rather than generalizable human behaviour.
+2. **Cross-sectional design:** temporal order and causality cannot be established.
+3. **Self-report:** behaviour, wellbeing, and sleep measures may contain measurement error.
+4. **Ceiling effects:** sleep-quality scores have limited variation.
+5. **Small subgroups:** exception and subgroup estimates can be unstable.
+6. **Internal validation only:** no independent, temporal, geographic, prospective, or clinical cohort has been tested.
+7. **Screening, not diagnosis:** the model is an educational pre-outcome demonstration and must not drive medical, employment, insurance, or automated decisions about people.
 
 ## Responsible interpretation
 
-Night Signals is not medical advice and does not claim causality. Country and gender comparisons are descriptive only; small subgroup findings remain exploratory; and personas are design tools rather than diagnoses.
+Night Signals supports three defensible conclusions:
+
+- bedtime exposure is associated with a coherent cluster of harder-sleep outcomes in this dataset;
+- content, environment, and routine appear to matter alongside total screen time;
+- predictive performance is promising enough to motivate independent validation, but not enough to justify real-world clinical use.
+
+The most important result is not that every screen causes poor sleep. It is that **risk is patterned, protective context matters, and better questions produce more useful interventions than blame.**
