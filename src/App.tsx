@@ -356,9 +356,11 @@ function NotebookViewer() {
   const [cells, setCells] = useState<NotebookCell[]>([]);
   const [showCode, setShowCode] = useState(true);
   const [limit, setLimit] = useState(12);
-  const [notebook, setNotebook] = useState<"analysis" | "modeling">("analysis");
+  const [notebook, setNotebook] = useState<"analysis" | "modeling" | "external">("analysis");
   const [error, setError] = useState(false);
-  const notebookFile = notebook === "analysis" ? "sleep_doomscrolling_analysis.ipynb" : "sleep_doomscrolling_predictive_modeling.ipynb";
+  const notebookFile = notebook === "analysis" ? "sleep_doomscrolling_analysis.ipynb"
+    : notebook === "modeling" ? "sleep_doomscrolling_predictive_modeling.ipynb"
+    : "external_evidence.ipynb";
   const loadNotebook = useCallback(() => {
     setCells([]); setLimit(12); setError(false);
     fetch(`/methodology/${notebookFile}`).then((r) => { if (!r.ok) throw new Error("Notebook unavailable"); return r.json(); })
@@ -367,7 +369,7 @@ function NotebookViewer() {
   useEffect(loadNotebook, [loadNotebook]);
   const visible = cells.filter((cell) => showCode || cell.cell_type !== "code").slice(0, limit);
   return <div className="notebook-shell">
-    <div className="notebook-tabs" role="tablist" aria-label="Executed notebooks"><button role="tab" aria-selected={notebook === "analysis"} className={notebook === "analysis" ? "active" : ""} onClick={() => setNotebook("analysis")}>Exploratory analysis</button><button role="tab" aria-selected={notebook === "modeling"} className={notebook === "modeling" ? "active" : ""} onClick={() => setNotebook("modeling")}>Predictive modelling</button></div>
+    <div className="notebook-tabs" role="tablist" aria-label="Executed notebooks"><button role="tab" aria-selected={notebook === "analysis"} className={notebook === "analysis" ? "active" : ""} onClick={() => setNotebook("analysis")}>Exploratory analysis</button><button role="tab" aria-selected={notebook === "modeling"} className={notebook === "modeling" ? "active" : ""} onClick={() => setNotebook("modeling")}>Predictive modelling</button><button role="tab" aria-selected={notebook === "external"} className={notebook === "external" ? "active" : ""} onClick={() => setNotebook("external")}>External evidence</button></div>
     <div className="notebook-bar"><div><i /><i /><i /><span>{notebookFile}</span></div><label><input type="checkbox" checked={showCode} onChange={(e) => setShowCode(e.target.checked)} /> Show code</label></div>
     <div className="notebook-cells">{error ? <div className="notebook-loading">Notebook unavailable. <button onClick={loadNotebook}>Retry</button></div> : visible.length ? visible.map((cell, index) => {
       const source = Array.isArray(cell.source) ? cell.source.join("") : cell.source;

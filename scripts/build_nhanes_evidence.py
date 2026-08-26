@@ -10,8 +10,10 @@ Run from the repository root:  python scripts/build_nhanes_evidence.py
 Outputs (consumed by the Research Atlas Evidence Synthesis page):
   public/data/nhanes_summary.json
   outputs/tables/nhanes_*.csv
-  outputs/figures/16_nhanes_evidence.png
-  public/assets/16_nhanes_evidence.png
+  outputs/figures/16_nhanes_evidence.png (embedded into the external-evidence notebook)
+
+The atlas Evidence Synthesis page renders the interactive Plotly specs stored under
+the "charts" key of nhanes_summary.json, not a static image.
 """
 from __future__ import annotations
 
@@ -143,10 +145,46 @@ def build() -> dict:
         "active_groups": act_rows, "sedentary_quartiles": sed_rows,
         "spearman_sedentary_vs_sleep": round(float(sed["sedentary_min"].corr(sed["sleep_hours"], method="spearman")), 3)}
 
+    summary["charts"] = _chart_specs(bp_tbl, pd.DataFrame(cats), pd.DataFrame(sed_rows))
     _figures(bp_tbl, pd.DataFrame(cats), pd.DataFrame(sed_rows))
     for target in (PUBLIC / "nhanes_summary.json", TABLES / "nhanes_summary.json"):
         target.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return summary
+
+
+def _chart_specs(bp_tbl, bmi_tbl, sed_tbl) -> dict:
+    """Interactive Plotly specs ({data, layout}) rendered by the Research Atlas.
+
+    Matches the convention in public/data/plotly_charts.json; PlotRenderer applies
+    the shared colorway, fonts, hover styling, and axis defaults on top.
+    """
+    groups = bp_tbl["sleep_group"].tolist()
+    bmi_min = float(bmi_tbl["mean_sleep_hours"].min()) - 0.35
+    sed_min = float(sed_tbl["mean_sleep_hours"].min()) - 0.35
+    return {
+        "bp": {"data": [
+            {"type": "bar", "name": "Systolic", "x": groups, "y": bp_tbl["mean_systolic"].tolist(),
+             "marker": {"color": "#6f789f"}, "hovertemplate": "%{x}<br>Systolic %{y:.1f} mmHg<extra></extra>"},
+            {"type": "bar", "name": "Diastolic", "x": groups, "y": bp_tbl["mean_diastolic"].tolist(),
+             "marker": {"color": "#aa788c"}, "hovertemplate": "%{x}<br>Diastolic %{y:.1f} mmHg<extra></extra>"}],
+            "layout": {"height": 380, "barmode": "group", "margin": {"l": 58, "r": 20, "t": 20, "b": 50},
+                       "xaxis": {"title": "Usual sleep group"}, "yaxis": {"title": "Blood pressure (mmHg)"},
+                       "legend": {"orientation": "h", "y": 1.14}}},
+        "bmi": {"data": [
+            {"type": "bar", "name": "Mean sleep", "x": bmi_tbl["bmi_category"].tolist(),
+             "y": bmi_tbl["mean_sleep_hours"].tolist(), "marker": {"color": "#74a08f"},
+             "hovertemplate": "%{x}<br>%{y:.2f} h mean sleep<extra></extra>"}],
+            "layout": {"height": 380, "margin": {"l": 58, "r": 20, "t": 20, "b": 50},
+                       "xaxis": {"title": "BMI category"},
+                       "yaxis": {"title": "Mean sleep (hours)", "range": [round(bmi_min, 2), 8.05]}}},
+        "sedentary": {"data": [
+            {"type": "bar", "name": "Mean sleep", "x": sed_tbl["sedentary_quartile"].tolist(),
+             "y": sed_tbl["mean_sleep_hours"].tolist(), "marker": {"color": "#a68e62"},
+             "hovertemplate": "%{x}<br>%{y:.2f} h mean sleep<extra></extra>"}],
+            "layout": {"height": 380, "margin": {"l": 58, "r": 20, "t": 20, "b": 50},
+                       "xaxis": {"title": "Sedentary-time quartile"},
+                       "yaxis": {"title": "Mean sleep (hours)", "range": [round(sed_min, 2), 7.95]}}},
+    }
 
 
 def _figures(bp_tbl, bmi_tbl, sed_tbl) -> None:
@@ -174,7 +212,6 @@ def _figures(bp_tbl, bmi_tbl, sed_tbl) -> None:
                  color=ink, fontweight="bold")
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.savefig(FIGS / "16_nhanes_evidence.png", dpi=130)
-    fig.savefig(ASSETS / "16_nhanes_evidence.png", dpi=130)
     plt.close(fig)
 
 

@@ -12,8 +12,10 @@ Run from the repository root:  python scripts/build_physionet_evidence.py
 Outputs (consumed by the Research Atlas Evidence Synthesis page):
   public/data/physionet_summary.json
   outputs/tables/physionet_*.csv
-  outputs/figures/17_physionet_evidence.png
-  public/assets/17_physionet_evidence.png
+  outputs/figures/17_physionet_evidence.png (embedded into the external-evidence notebook)
+
+The atlas Evidence Synthesis page renders the interactive Plotly specs stored under
+the "charts" key of physionet_summary.json, not a static image.
 """
 from __future__ import annotations
 
@@ -127,10 +129,40 @@ def build() -> dict:
                "note": "Objective physiology, associations only; no causal or clinical claims; "
                        "tri-axial acceleration is available in the source and summarised here via "
                        "wearable heart-rate dynamics to keep the analytical footprint light."}
+    summary["charts"] = _chart_specs(by_stage, comp, subj)
     for target in (PUBLIC / "physionet_summary.json", TABLES / "physionet_summary.json"):
         target.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     _figure(by_stage, comp, subj)
     return summary
+
+
+def _chart_specs(by_stage, comp, subj) -> dict:
+    """Interactive Plotly specs ({data, layout}) rendered by the Research Atlas,
+    matching public/data/plotly_charts.json; PlotRenderer applies shared styling."""
+    stages = by_stage["stage_name"].tolist()
+    comp_means = [round(float(comp[s].mean()), 2) for s in stages]
+    return {
+        "hr_stage": {"data": [
+            {"type": "bar", "name": "Mean HR", "x": stages, "y": by_stage["mean_hr"].tolist(),
+             "error_y": {"type": "data", "array": by_stage["mean_hr_variability"].tolist(), "visible": True,
+                         "color": "rgba(170,160,181,.5)"},
+             "marker": {"color": "#6f789f"}, "hovertemplate": "%{x}<br>%{y:.1f} bpm<extra></extra>"}],
+            "layout": {"height": 380, "margin": {"l": 58, "r": 20, "t": 20, "b": 55},
+                       "xaxis": {"title": "Sleep stage"}, "yaxis": {"title": "Heart rate (bpm)"}}},
+        "stage_comp": {"data": [
+            {"type": "bar", "name": "Composition", "x": stages, "y": comp_means, "marker": {"color": "#8d7baa"},
+             "hovertemplate": "%{x}<br>%{y:.1f}% of scored epochs<extra></extra>"}],
+            "layout": {"height": 380, "margin": {"l": 58, "r": 20, "t": 20, "b": 55},
+                       "xaxis": {"title": "Sleep stage"}, "yaxis": {"title": "% of scored epochs"}}},
+        "awakenings": {"data": [
+            {"type": "scatter", "mode": "markers", "name": "Subject",
+             "x": subj["recording_hours"].tolist(), "y": subj["awakenings_after_onset"].tolist(),
+             "marker": {"color": "#74a08f", "size": 9},
+             "hovertemplate": "%{x:.1f} h scored<br>%{y} awakenings<extra></extra>"}],
+            "layout": {"height": 380, "margin": {"l": 55, "r": 20, "t": 20, "b": 52},
+                       "xaxis": {"title": "Hours scored (per subject)"},
+                       "yaxis": {"title": "Awakenings after onset"}}},
+    }
 
 
 def _figure(by_stage, comp, subj) -> None:
@@ -152,7 +184,6 @@ def _figure(by_stage, comp, subj) -> None:
                  color=ink, fontweight="bold")
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.savefig(FIGS / "17_physionet_evidence.png", dpi=130)
-    fig.savefig(ASSETS / "17_physionet_evidence.png", dpi=130)
     plt.close(fig)
 
 

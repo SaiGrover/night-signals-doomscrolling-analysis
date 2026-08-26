@@ -1,8 +1,14 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import type { CSSProperties } from "react";
+import type { PlotSpec } from "./PlotRenderer";
 
-// Layer B (NHANES) and Layer C (PhysioNet) are computed by build_nhanes.py and
-// build_physionet.py and published to /data/*.json. This page renders those
-// completed independent-evidence results (synopsis Sections 4.12, 7.5, RQ5).
+// Layer B (NHANES) and Layer C (PhysioNet) are computed by build_nhanes_evidence.py
+// and build_physionet_evidence.py and published to /data/*.json. This page renders
+// those completed independent-evidence results (synopsis Sections 4.12, 7.5, RQ5).
+// Charts are interactive Plotly specs rendered by the shared PlotRenderer, matching
+// the convention used across the rest of the atlas (public/data/plotly_charts.json).
+
+const PlotRenderer = lazy(() => import("./PlotRenderer"));
 
 interface NhanesSummary {
   cycle: string;
@@ -21,6 +27,7 @@ interface NhanesSummary {
     active_groups: { activity_group: string; n: number; mean_sleep_hours: number }[];
     spearman_sedentary_vs_sleep: number;
   };
+  charts: Record<string, PlotSpec>;
 }
 
 interface PhysioSummary {
@@ -30,6 +37,18 @@ interface PhysioSummary {
   median_awakenings_after_onset: number;
   hr_by_stage: { stage_name: string; mean_hr: number; mean_hr_variability: number }[];
   mean_stage_composition_pct: Record<string, number>;
+  charts: Record<string, PlotSpec>;
+}
+
+function EvidenceChart({ spec, title, caption }: { spec?: PlotSpec; title: string; caption: string }) {
+  return <figure className="evidence-chart">
+    <div className="chart-image plot-frame" style={{ "--plot-height": "380px" } as CSSProperties}>
+      {spec
+        ? <Suspense fallback={<div className="plot-loading">Loading chart renderer…</div>}><PlotRenderer spec={spec} title={title} /></Suspense>
+        : <div className="plot-loading">Loading interactive figure…</div>}
+    </div>
+    <figcaption>{caption}</figcaption>
+  </figure>;
 }
 
 const evidenceLayers = [
@@ -112,7 +131,12 @@ export default function EvidenceSynthesis() {
           <div className="evidence-mini-head" role="row"><span>BMI category</span><span>n</span><span>Mean sleep (h)</span></div>
           {nhanes.B2_sleep_by_bmi.categories.map((c) => <div className="evidence-mini-row" role="row" key={c.bmi_category}><b>{c.bmi_category}</b><span>{c.n.toLocaleString()}</span><span>{c.mean_sleep_hours.toFixed(2)}</span></div>)}
         </div>
-        <figure className="evidence-figure"><img src="/assets/16_nhanes_evidence.png" alt="NHANES: blood pressure by sleep group, sleep by BMI category, and sleep by sedentary-time quartile" loading="lazy" /><figcaption>NHANES 2021-2023 — associations only. Full tables: <a href="/data/nhanes_summary.json">nhanes_summary.json</a>.</figcaption></figure>
+        <div className="evidence-charts">
+          <EvidenceChart spec={nhanes.charts?.bp} title="NHANES blood pressure by usual sleep group" caption="B1 · Blood pressure by sleep group" />
+          <EvidenceChart spec={nhanes.charts?.bmi} title="NHANES mean usual sleep by BMI category" caption="B2 · Usual sleep by BMI category" />
+          <EvidenceChart spec={nhanes.charts?.sedentary} title="NHANES mean sleep by sedentary-time quartile" caption="B3 · Sleep by sedentary-time quartile" />
+        </div>
+        <p className="evidence-source">NHANES 2021-2023 — associations only. Full tables: <a href="/data/nhanes_summary.json">nhanes_summary.json</a>.</p>
       </> : <p className="plot-loading">Loading NHANES evidence…</p>}
     </section>
 
@@ -129,7 +153,12 @@ export default function EvidenceSynthesis() {
           <div className="evidence-mini-head" role="row"><span>Sleep stage</span><span>Mean HR (bpm)</span><span>HR variability</span></div>
           {physio.hr_by_stage.map((s) => <div className="evidence-mini-row" role="row" key={s.stage_name}><b>{s.stage_name}</b><span>{s.mean_hr.toFixed(1)}</span><span>{s.mean_hr_variability.toFixed(2)}</span></div>)}
         </div>
-        <figure className="evidence-figure"><img src="/assets/17_physionet_evidence.png" alt="PhysioNet: heart rate by sleep stage, sleep-stage composition, and awakenings vs recording length" loading="lazy" /><figcaption>PhysioNet Sleep-Accel — objective physiology, associations only. Full tables: <a href="/data/physionet_summary.json">physionet_summary.json</a>.</figcaption></figure>
+        <div className="evidence-charts">
+          <EvidenceChart spec={physio.charts?.hr_stage} title="PhysioNet mean heart rate by sleep stage" caption="C1 · Mean heart rate by sleep stage" />
+          <EvidenceChart spec={physio.charts?.stage_comp} title="PhysioNet mean sleep-stage composition" caption="C2 · Mean sleep-stage composition" />
+          <EvidenceChart spec={physio.charts?.awakenings} title="PhysioNet awakenings vs recording length" caption="C3 · Awakenings vs hours scored" />
+        </div>
+        <p className="evidence-source">PhysioNet Sleep-Accel — objective physiology, associations only. Full tables: <a href="/data/physionet_summary.json">physionet_summary.json</a>.</p>
       </> : <p className="plot-loading">Loading PhysioNet evidence…</p>}
     </section>
 
