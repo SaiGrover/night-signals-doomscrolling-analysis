@@ -159,22 +159,22 @@ def main():
     importance.to_csv(TABLES / "production_feature_importance.csv", index=False)
 
     fig, axes = plt.subplots(1, 3, figsize=(16, 5.2))
-    axes[0].barh(comparison.model[::-1], comparison.balanced_accuracy[::-1], color="#b99aff")
-    axes[0].axvline(.5, color="#888", ls="--"); axes[0].set(xlim=(0, 1), title="Nested CV on development data", xlabel="Balanced accuracy")
+    axes[0].barh(comparison.model[::-1], comparison.balanced_accuracy[::-1], color="#8d7baa")
+    axes[0].axvline(.5, color="#776f83", ls="--"); axes[0].set(xlim=(0, 1), title="Nested CV on development data", xlabel="Balanced accuracy")
     observed, predicted = calibration_curve(y_holdout, holdout_probability, n_bins=7, strategy="quantile")
-    axes[1].plot([0, 1], [0, 1], "--", color="#888"); axes[1].plot(predicted, observed, "o-", color="#56d0df")
+    axes[1].plot([0, 1], [0, 1], "--", color="#776f83"); axes[1].plot(predicted, observed, "o-", color="#7f9eaa")
     axes[1].set(xlim=(0, 1), ylim=(0, 1), title="Untouched-holdout calibration", xlabel="Predicted risk", ylabel="Observed rate")
     top = importance.head(10).sort_values("importance")
-    axes[2].barh(top.feature, top.importance, xerr=top.sd, color="#7bd4b8")
+    axes[2].barh(top.feature, top.importance, xerr=top.sd, color="#74a08f")
     axes[2].set_title("Primary-model permutation importance")
     fig.tight_layout(); fig.savefig(FIGURES / "15_production_risk_model.png", dpi=170, bbox_inches="tight"); plt.close(fig)
     plot_path = ROOT / "public/data/plotly_charts.json"
     plot_specs = json.loads(plot_path.read_text(encoding="utf-8-sig"))
     plot_specs["15_production_risk_model.png"] = {
         "data": [
-            {"type": "bar", "name": "Balanced accuracy", "x": comparison.model.tolist(), "y": comparison.balanced_accuracy.tolist(), "marker": {"color": "#b99aff"}},
-            {"type": "bar", "name": "ROC AUC", "x": comparison.model.tolist(), "y": comparison.roc_auc.tolist(), "marker": {"color": "#56d0df"}},
-            {"type": "bar", "name": "PR AUC", "x": comparison.model.tolist(), "y": comparison.pr_auc.tolist(), "marker": {"color": "#7bd4b8"}},
+            {"type": "bar", "name": "Balanced accuracy", "x": comparison.model.tolist(), "y": comparison.balanced_accuracy.tolist(), "marker": {"color": "#8d7baa"}},
+            {"type": "bar", "name": "ROC AUC", "x": comparison.model.tolist(), "y": comparison.roc_auc.tolist(), "marker": {"color": "#7f9eaa"}},
+            {"type": "bar", "name": "PR AUC", "x": comparison.model.tolist(), "y": comparison.pr_auc.tolist(), "marker": {"color": "#74a08f"}},
         ],
         "layout": {"barmode": "group", "title": {"text": "Development-only nested cross-validation"},
                    "yaxis": {"range": [0, 1], "title": {"text": "Cross-validated score"}},

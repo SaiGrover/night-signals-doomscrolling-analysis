@@ -21,7 +21,8 @@ Night Signals studies the tension between always-on digital information and the 
 
 The project brings together:
 
-- an audited synthetic survey of **1,000 respondents** and **29 analytic variables**;
+- an audited self-reported survey of **1,000 respondents** and **29 analytic variables**;
+- two independent external-evidence layers — **NHANES 2021-2023** (8,040 adults; sleep vs. blood pressure, BMI, activity) and **PhysioNet Sleep-Accel** (31 subjects; heart rate over polysomnography-scored sleep stages), analysed without row-merging;
 - two fully executed Jupyter notebooks for descriptive analysis and predictive modelling;
 - **14 publication-ready figures** with interpretation, practical relevance, and analytical boundaries;
 - an interactive React research atlas with accessible Plotly charts;
@@ -68,11 +69,11 @@ flowchart LR
     P["Phone distance and friction"] -. "may reduce" .-> A
 ```
 
-The arrows describe a hypothesis supported by patterns in this synthetic dataset. They are **not** causal estimates.
+The arrows describe a hypothesis supported by patterns in this self-reported survey dataset. They are **not** causal estimates.
 
 ## Dataset
 
-The source is a synthetic, cross-sectional survey containing 1,000 rows. It combines behaviour, context, self-reported wellbeing, sleep outcomes, and protective habits.
+The source is a self-reported, cross-sectional survey containing 1,000 rows. It combines behaviour, context, self-reported wellbeing, sleep outcomes, and protective habits.
 
 | Variable family | Examples | Role in the study |
 |---|---|---|
@@ -101,7 +102,7 @@ These properties make the data useful for demonstrating a complete workflow, but
 
 ```mermaid
 flowchart TD
-    CSV["Synthetic survey CSV<br/>1,000 rows"] --> AUDIT["Data audit<br/>IDs · missingness · ranges · structure"]
+    CSV["Self-reported survey CSV<br/>1,000 rows"] --> AUDIT["Data audit<br/>IDs · missingness · ranges · structure"]
     AUDIT --> PREP["Analysis preparation<br/>labels · buckets · derived exposure measures"]
     PREP --> EDA["Descriptive analysis<br/>groups · gradients · correlations"]
     PREP --> EXC["Exception analysis<br/>heavy exposure + good sleep"]
@@ -239,12 +240,13 @@ The Good/Fair/Poor benchmark uses a fold-contained SMOTENC pipeline and nested t
 
 ## Research atlas
 
-The website turns the notebooks and artifacts into seven connected research surfaces:
+The website turns the notebooks and artifacts into eight connected research surfaces:
 
 | Page | Purpose |
 |---|---|
 | Overview | Central narrative, key indicators, and hero evidence |
 | Problem statement | Detailed context, stakeholders, research questions, scope, and boundaries |
+| Evidence synthesis | Independent external-evidence layers — NHANES population health and PhysioNet physiology — analysed without row-merging (RQ5) |
 | All analysis | Fourteen interactive figures with accessible data tables and interpretations |
 | Modelling | Candidate comparison, validation design, uncertainty, fairness audit, and risk demo |
 | The Exceptions | Counter-pattern among high-exposure respondents with good sleep |
@@ -293,11 +295,17 @@ The repository contains the evidence needed to inspect the project rather than o
 - [model registry](public/data/model_registry.json);
 - [prediction input schema](public/data/prediction_schema.json);
 - [subgroup performance audit](public/data/subgroup_performance.csv);
+- external evidence layers (RQ5), regenerated from public sources by
+  [`scripts/build_nhanes_evidence.py`](scripts/build_nhanes_evidence.py) →
+  [`nhanes_summary.json`](public/data/nhanes_summary.json) and
+  [`scripts/build_physionet_evidence.py`](scripts/build_physionet_evidence.py) →
+  [`physionet_summary.json`](public/data/physionet_summary.json) (raw NHANES/PhysioNet
+  files download on first run into `external/`, which is git-ignored);
 - [final PDF report](deliverables/Sleep_Doomscrolling_Report.pdf).
 
 ## Limitations
 
-1. **Synthetic data:** models may recover generator rules rather than generalizable human behaviour.
+1. **Self-reported survey:** models may recover survey-specific structure and unverified sampling rather than generalizable human behaviour.
 2. **Cross-sectional design:** temporal order and causality cannot be established.
 3. **Self-report:** behaviour, wellbeing, and sleep measures may contain measurement error.
 4. **Ceiling effects:** sleep-quality scores have limited variation.

@@ -23,7 +23,7 @@ export default function RiskDemo() {
     ["caffeine_intake_mg_per_day", "Caffeine (mg)", 0, 600],
   ] as const;
   return <section className="risk-demo" aria-labelledby="risk-demo-title">
-    <div><span className="section-label">MODEL v2.0 · DEMONSTRATION</span><h2 id="risk-demo-title">Try the pre-outcome model</h2><p>This is an educational estimate from synthetic data—not medical advice or an externally validated clinical score. Omitted fields use documented reference defaults.</p></div>
+    <div><span className="section-label">MODEL v2.0 · DEMONSTRATION</span><h2 id="risk-demo-title">Try the pre-outcome model</h2><p>This is an educational estimate from self-reported survey data—not medical advice or an externally validated clinical score. Omitted fields use documented reference defaults.</p></div>
     <form onSubmit={submit}>{fields.map(([name, label, min, max]) => <label key={name}>{label}<input type="number" min={min} max={max} value={values[name]} onChange={(e) => setValues({ ...values, [name]: Number(e.target.value) })} /></label>)}
       <label>Consumes negative news<select value={values.consumes_negative_news_content} onChange={(e) => setValues({ ...values, consumes_negative_news_content: e.target.value })}><option>Yes</option><option>No</option></select></label>
       <button disabled={status === "loading"}>{status === "loading" ? "Estimating…" : "Estimate risk"}</button>

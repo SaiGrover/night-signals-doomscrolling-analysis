@@ -22,12 +22,13 @@ function rowsFor(trace: Data): AccessibleRow[] {
 export default function PlotRenderer({ spec, title }: { spec: PlotSpec; title: string }) {
   const [showTable, setShowTable] = useState(false);
   const safeData = spec.data.map((trace) => trace.type === "scattergl" ? ({ ...trace, type: "scatter" } as Data) : trace);
-  const axisDefaults = { gridcolor: "rgba(147,168,200,.12)", zerolinecolor: "rgba(147,168,200,.18)", tickfont: { color: "#aebed5", size: 11 }, title: { font: { color: "#d5deed" } } };
+  const axisDefaults = { gridcolor: "rgba(170,160,181,.1)", zerolinecolor: "rgba(170,160,181,.16)", tickfont: { color: "#aaa0b5", size: 11 }, title: { font: { color: "#d8d0df" } } };
   const layout: Partial<Layout> = { ...spec.layout, autosize: true, width: undefined, height: undefined,
     paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
-    font: { family: '"JetBrains Mono", monospace', color: "#b8c6d9", size: 11 },
+    colorway: ["#7f9eaa", "#8d7baa", "#aa788c", "#a68e62", "#74a08f", "#6f789f", "#9a82a0"],
+    font: { family: '"JetBrains Mono", monospace', color: "#aaa0b5", size: 11 },
     margin: { l: 55, r: 24, t: 42, b: 52, ...spec.layout?.margin },
-    hoverlabel: { bgcolor: "#07111f", bordercolor: "#59d8e8", font: { color: "#fff", family: '"JetBrains Mono", monospace' } } };
+    hoverlabel: { bgcolor: "#090616", bordercolor: "#7f9eaa", font: { color: "#fff", family: '"JetBrains Mono", monospace' } } };
   for (const key of ["xaxis", "xaxis2", "xaxis3", "xaxis4", "yaxis", "yaxis2", "yaxis3", "yaxis4"] as const) {
     const existing = (spec.layout as Record<string, unknown>)?.[key] as Record<string, unknown> | undefined;
     (layout as Record<string, unknown>)[key] = { ...axisDefaults, ...existing };

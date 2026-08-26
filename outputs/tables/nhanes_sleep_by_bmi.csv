@@ -1,0 +1,5 @@
+bmi_category,n,mean_sleep_hours,sd_sleep_hours
+Underweight,116,7.888,1.79
+Normal,1659,7.795,1.511
+Overweight,1925,7.757,1.523
+Obese,2474,7.634,1.679

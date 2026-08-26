@@ -12,6 +12,13 @@ const stakeholders = [
   ["Wellbeing teams", "Need defensible screening evidence and explicit safeguards before considering any real-world intervention."],
 ];
 
+const auditChecks = [
+  ["Missingness", "220 missing cells across six variables; handled explicitly before analysis."],
+  ["Identity", "Respondent IDs and duplicate rows checked before modelling or grouping."],
+  ["Ranges", "Age, minutes, sleep hours, scores, and category levels screened for invalid values."],
+  ["Structure", "Ceiling effects, target balance, exact formulas, and unusually strong correlations flagged."],
+];
+
 export default function ProblemStatement() {
   return <section className="page-section problem-page">
     <header className="problem-hero">
@@ -30,7 +37,7 @@ export default function ProblemStatement() {
 
     <div className="problem-thesis">
       <span>Formal problem statement</span>
-      <p>We lack a clear, evidence-led account of how doomscrolling intensity, negative-news exposure, and bedtime routines combine around sleep—and which modifiable behaviours may reduce risk without treating screen use as destiny. This project organizes those relationships into a transparent descriptive and predictive framework while preserving the limits of synthetic, cross-sectional data.</p>
+      <p>We lack a clear, evidence-led account of how doomscrolling intensity, negative-news exposure, and bedtime routines combine around sleep—and which modifiable behaviours may reduce risk without treating screen use as destiny. This project organizes those relationships into a transparent descriptive and predictive framework while preserving the limits of self-reported, cross-sectional survey data.</p>
     </div>
 
     <section className="problem-context" aria-labelledby="why-title">
@@ -53,6 +60,24 @@ export default function ProblemStatement() {
       </div>
     </section>
 
+    <section className="problem-audit" aria-labelledby="audit-title">
+      <div className="problem-section-heading"><span className="section-label">DATASET RELIABILITY AUDIT</span><h2 id="audit-title">The data is useful, but unusually orderly.</h2><p>The Kaggle Sleep &amp; Doomscrolling Habits dataset is treated as a self-reported cross-sectional survey with only partially documented provenance. The audit is part of the story because model performance can reflect the survey's structure and unverified sampling as much as generalisable behaviour.</p></div>
+      <div className="problem-audit-grid">
+        {auditChecks.map(([label, copy]) => <article key={label}><b>{label}</b><p>{copy}</p></article>)}
+      </div>
+    </section>
+
+    <section className="problem-dag-section" aria-labelledby="dag-title">
+      <div className="problem-section-heading"><span className="section-label">CAUSAL BOUNDARY</span><h2 id="dag-title">Confounding is expected, not accidental.</h2><p>The analysis describes associations. Stress, routine, age, occupation, and baseline health can influence both scrolling and sleep, so the platform avoids causal claims.</p></div>
+      <div className="problem-dag" aria-label="Simplified causal diagram">
+        <div className="dag-node confounder">Stress / anxiety</div>
+        <div className="dag-node exposure">Digital exposure</div>
+        <div className="dag-node mediator">Sleep routine</div>
+        <div className="dag-node outcome">Sleep outcome</div>
+        <div className="dag-node context">Age / work / country</div>
+      </div>
+    </section>
+
     <section className="problem-questions" aria-labelledby="questions-title">
       <div className="problem-section-heading"><span className="section-label">WHAT THE STUDY ASKS</span><h2 id="questions-title">Four questions turn concern into analysis.</h2></div>
       <div className="problem-question-grid">
@@ -70,11 +95,11 @@ export default function ProblemStatement() {
     <section className="problem-scope" aria-labelledby="scope-title">
       <div className="problem-section-heading"><span className="section-label">SCOPE &amp; BOUNDARIES</span><h2 id="scope-title">What this project is—and is not.</h2></div>
       <div className="problem-scope-grid">
-        <article className="in-scope"><span>IN SCOPE</span><ul><li>Describe patterns across 1,000 synthetic respondents</li><li>Compare exposure, sleep, wellbeing, and protective routines</li><li>Test a pre-outcome screening model under leakage-safe validation</li><li>Surface uncertainty, exceptions, and subgroup weaknesses</li></ul></article>
+        <article className="in-scope"><span>IN SCOPE</span><ul><li>Describe patterns across 1,000 survey respondents</li><li>Compare exposure, sleep, wellbeing, and protective routines</li><li>Test a pre-outcome screening model under leakage-safe validation</li><li>Surface uncertainty, exceptions, and subgroup weaknesses</li></ul></article>
         <article className="out-scope"><span>OUT OF SCOPE</span><ul><li>Prove that doomscrolling causes poor sleep</li><li>Diagnose a sleep or mental-health condition</li><li>Claim population prevalence or clinical utility</li><li>Deploy the model without independent real-world validation</li></ul></article>
       </div>
     </section>
 
-    <aside className="problem-boundary"><span>ANALYTICAL BOUNDARY</span><p>The dataset is synthetic and cross-sectional. Findings describe its engineered sample; they are hypotheses for real-world validation, not medical advice, causal estimates, or evidence that any individual will experience the same outcome.</p></aside>
+    <aside className="problem-boundary"><span>ANALYTICAL BOUNDARY</span><p>The dataset is self-reported and cross-sectional. Findings describe this survey sample; they are hypotheses for real-world validation, not medical advice, causal estimates, or evidence that any individual will experience the same outcome.</p></aside>
   </section>;
 }

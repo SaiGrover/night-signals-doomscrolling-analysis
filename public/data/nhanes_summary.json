@@ -1,0 +1,80 @@
+{
+  "dataset": "NHANES",
+  "cycle": "August 2021-2023 (NHANES L cycle)",
+  "role": "Secondary, independent population-health evidence (not linked to primary respondents)",
+  "analytic_adults": 8040,
+  "note": "Cross-sectional survey; associations only, no causal or clinical claims.",
+  "B1_sleep_blood_pressure": {
+    "systolic_diff_short_minus_adequate": 1.2,
+    "systolic_p": 0.03616377181267482,
+    "systolic_cohens_d": 0.067,
+    "diastolic_diff_short_minus_adequate": 1.75,
+    "diastolic_p": 1.4203356517518845e-06
+  },
+  "B2_sleep_by_bmi": {
+    "spearman_bmi_vs_sleep": -0.05,
+    "categories": [
+      {
+        "bmi_category": "Underweight",
+        "n": 116,
+        "mean_sleep_hours": 7.888,
+        "sd_sleep_hours": 1.79
+      },
+      {
+        "bmi_category": "Normal",
+        "n": 1659,
+        "mean_sleep_hours": 7.795,
+        "sd_sleep_hours": 1.511
+      },
+      {
+        "bmi_category": "Overweight",
+        "n": 1925,
+        "mean_sleep_hours": 7.757,
+        "sd_sleep_hours": 1.523
+      },
+      {
+        "bmi_category": "Obese",
+        "n": 2474,
+        "mean_sleep_hours": 7.634,
+        "sd_sleep_hours": 1.679
+      }
+    ]
+  },
+  "B3_sleep_by_activity": {
+    "active_groups": [
+      {
+        "activity_group": "Below activity floor (<30 min/day)",
+        "n": 2250,
+        "mean_sleep_hours": 7.901
+      },
+      {
+        "activity_group": "Meets activity (>=30 min/day)",
+        "n": 5790,
+        "mean_sleep_hours": 7.68
+      }
+    ],
+    "sedentary_quartiles": [
+      {
+        "sedentary_quartile": "Q1 (least)",
+        "n": 2058,
+        "mean_sleep_hours": 7.669
+      },
+      {
+        "sedentary_quartile": "Q2",
+        "n": 2023,
+        "mean_sleep_hours": 7.777
+      },
+      {
+        "sedentary_quartile": "Q3",
+        "n": 2190,
+        "mean_sleep_hours": 7.793
+      },
+      {
+        "sedentary_quartile": "Q4 (most)",
+        "n": 1701,
+        "mean_sleep_hours": 7.689
+      }
+    ],
+    "spearman_sedentary_vs_sleep": -0.005
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "dataset": "PhysioNet Sleep-Accel (Walch et al., 2019)",
+  "role": "Physiological evidence layer (Apple Watch HR vs PSG sleep stages); not linked to survey respondents",
+  "subjects_analysed": 31,
+  "total_scored_epochs": 26417,
+  "hr_by_stage": [
+    {
+      "stage_name": "Wake",
+      "subjects": 31,
+      "mean_hr": 67.8,
+      "mean_hr_variability": 8.0
+    },
+    {
+      "stage_name": "N1 (light)",
+      "subjects": 31,
+      "mean_hr": 66.5,
+      "mean_hr_variability": 7.66
+    },
+    {
+      "stage_name": "N2",
+      "subjects": 31,
+      "mean_hr": 63.8,
+      "mean_hr_variability": 4.26
+    },
+    {
+      "stage_name": "N3 (deep)",
+      "subjects": 30,
+      "mean_hr": 66.0,
+      "mean_hr_variability": 2.66
+    },
+    {
+      "stage_name": "REM",
+      "subjects": 30,
+      "mean_hr": 66.7,
+      "mean_hr_variability": 5.1
+    }
+  ],
+  "wake_minus_deep_hr": 1.8,
+  "mean_stage_composition_pct": {
+    "Wake": 9.39,
+    "N1 (light)": 6.86,
+    "N2": 48.41,
+    "N3 (deep)": 13.63,
+    "REM": 21.71
+  },
+  "median_awakenings_after_onset": 12,
+  "note": "Objective physiology, associations only; no causal or clinical claims; tri-axial acceleration is available in the source and summarised here via wearable heart-rate dynamics to keep the analytical footprint light."
+}

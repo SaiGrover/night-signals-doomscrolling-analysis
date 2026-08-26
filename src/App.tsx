@@ -3,11 +3,12 @@ import DOMPurify from "dompurify";
 import type { CSSProperties } from "react";
 import RiskDemo from "./components/RiskDemo";
 import ProblemStatement from "./components/ProblemStatement";
+import EvidenceSynthesis from "./components/EvidenceSynthesis";
 import type { PlotSpec } from "./components/PlotRenderer";
 
 const PlotRenderer = lazy(() => import("./components/PlotRenderer"));
 
-type Route = "landing" | "overview" | "problem" | "analysis" | "modeling" | "exceptions" | "personas" | "methodology";
+type Route = "landing" | "overview" | "problem" | "evidence" | "analysis" | "modeling" | "exceptions" | "personas" | "methodology";
 type ChartGroup = "Overview" | "Core" | "Mind" | "Protection" | "Demographics" | "Exceptions" | "Personas" | "Synthesis";
 const PlotSpecsContext = createContext<{ specs: Record<string, PlotSpec>; error: boolean; retry: () => void }>({ specs: {}, error: false, retry: () => undefined });
 
@@ -47,7 +48,7 @@ const chartCards: Array<{
   { file: "08_demographics.png", number: "08", group: "Demographics", title: "Context, not destiny", kicker: "Age × occupation × country", takeaway: "Younger and student pockets are often elevated, but small cells and uneven country sample sizes make these descriptive signals rather than rankings.", significance: "The figure helps identify contexts for tailored messaging, while small and uneven groups make cultural or demographic ranking inappropriate." },
   { file: "10_exceptions.png", number: "09", group: "Exceptions", title: "What separates resilient heavy scrollers?", kicker: "The counter-narrative", takeaway: "Only 11 of 204 heavy scrollers report good sleep. They realize more sleep and less debt or latency, with restorative routines appearing more often.", significance: "Exceptions reveal possible protective mechanisms, but n=11 is too small for stable effect estimates or prescriptive conclusions." },
   { file: "11_personas.png", number: "10", group: "Personas", title: "Three patterns, three intervention needs", kicker: "Transparent personas", takeaway: "The Night Scroller is exposure-heavy, the Anxious News Seeker is emotion-heavy, and the Disciplined Sleeper is routine-protected.", significance: "The personas translate evidence into different intervention levers without claiming that rule-based segments are diagnoses." },
-  { file: "12_correlation_heatmap.png", number: "11", group: "Synthesis", title: "A coherent bedtime-disruption chain", kicker: "Correlation structure", takeaway: "Bedtime exposure connects to doomscroll sessions and latency; wakeups and short sleep accumulate into debt and fatigue.", significance: "The correlation structure supports a coherent system-level story, while strong engineered relationships reinforce the synthetic-data caveat." },
+  { file: "12_correlation_heatmap.png", number: "11", group: "Synthesis", title: "A coherent bedtime-disruption chain", kicker: "Correlation structure", takeaway: "Bedtime exposure connects to doomscroll sessions and latency; wakeups and short sleep accumulate into debt and fatigue.", significance: "The correlation structure supports a coherent system-level story, while strong correlations reinforce the provenance caveat: a self-reported survey with unverified sampling, so effect sizes stay inside the dataset." },
   { file: "13_model_comparison.png", number: "12", group: "Synthesis", title: "Which model predicts sleep quality best?", kicker: "Multi-model comparison", takeaway: "Tree ensembles, kernel models, boosting, and a linear baseline are evaluated under the same leakage-safe protocol.", significance: "Nested cross-validation measures the whole tuning process and prevents the model leaderboard from being chosen on one favorable split." },
   { file: "14_feature_importance.png", number: "13", group: "Synthesis", title: "What drove the secondary three-class model?", kicker: "Secondary model · Random Forest", takeaway: "Doomscrolling, wakeups, latency, and sleep duration lead held-out permutation importance for the retained Good/Fair/Poor benchmark.", significance: "This chart does not explain the primary pre-outcome model. Importance identifies predictive signals, not causes; correlated variables can share or mask contribution." },
   { file: "15_production_risk_model.png", number: "14", group: "Synthesis", title: "How well does the pre-outcome model generalize?", kicker: "Primary model · version 2.0", takeaway: "A calibrated, tuned Logistic Regression reaches 73.7% nested-CV balanced accuracy on development data and 77.5% on a 250-row holdout that remained untouched until final evaluation.", significance: "This is a pre-outcome screening demonstration: sleep duration, latency, wakeups, fatigue, debt, and quality score are excluded. The 67% majority baseline and uncertainty interval remain visible." },
@@ -56,6 +57,7 @@ const chartCards: Array<{
 const nav: Array<{ id: Route; label: string }> = [
   { id: "overview", label: "Overview" },
   { id: "problem", label: "Problem statement" },
+  { id: "evidence", label: "Evidence synthesis" },
   { id: "analysis", label: "All analysis" },
   { id: "modeling", label: "Modelling" },
   { id: "exceptions", label: "The Exceptions" },
@@ -67,6 +69,7 @@ function NavIcon({ route }: { route: Route }) {
   const common = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
   if (route === "overview") return <svg {...common}><path d="M4 12a8 8 0 1 0 16 0 8 8 0 1 0-16 0" /><path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none" opacity=".36" /></svg>;
   if (route === "problem") return <svg {...common}><path d="M5 4h14v16H5z" /><path d="M8 8h8M8 12h8M8 16h5" /><path d="M9 4V2h6v2" /></svg>;
+  if (route === "evidence") return <svg {...common}><path d="M4 17 9 7l5 6 6-9" /><path d="M4 17h16" /><path d="M7 17v3M14 17v3M20 17v3" opacity=".5" /></svg>;
   if (route === "analysis") return <svg {...common}><path d="M4 17V9" /><path d="M10 17V5" /><path d="M16 17v-6" /><path d="M22 17V7" /><path d="M3 20h20" /></svg>;
   if (route === "modeling") return <svg {...common}><path d="M4 18V6" /><path d="m4 12 5-4 4 3 7-6" /><path d="M16 5h4v4" /><path d="M3 20h18" /></svg>;
   if (route === "exceptions") return <svg {...common}><path d="M5 19 19 5" /><path d="M10 5h9v9" /><path d="M5 7v12h12" opacity=".45" /></svg>;
@@ -98,10 +101,10 @@ function Sidebar({ route, onRoute }: { route: Route; onRoute: (route: Route) => 
       </a>)}
     </nav>
     <div className="sidebar-status">
-      <i /><div><b>Dataset audited</b><small>Synthetic · 1,000 rows</small></div>
+      <i /><div><b>Dataset audited</b><small>Self-reported survey · 1,000 rows</small></div>
     </div>
     <div className="sidebar-foot">
-      <span>SYNTHETIC DATA</span>
+      <span>SURVEY DATA</span>
       <p>Descriptive patterns, not medical advice or causal estimates.</p>
     </div>
   </aside>;
@@ -141,13 +144,14 @@ function ChartCard({ chart, featured = false }: { chart: typeof chartCards[numbe
     </div>
     <div className="chart-image plot-frame" style={{ "--plot-height": `${plotHeights[chart.file] ?? 520}px` } as CSSProperties}><InteractiveChart file={chart.file} title={chart.title} /></div>
     <div className="chart-insight"><div><span>Interpretation</span><p>{chart.takeaway}</p></div><div><span>Practical relevance</span><p>{chart.significance}</p></div></div>
-    <div className={`chart-takeaway ${open ? "open" : ""}`}><span>Analytical boundary</span><p>{chart.file === "15_production_risk_model.png" ? "Bootstrap confidence intervals are reported for the untouched holdout. External validation remains incomplete." : "Descriptive synthetic-data estimate; inferential confidence intervals are not shown. Use hover for sample values and do not read the pattern as causal or population-representative."}</p></div>
+    <div className={`chart-takeaway ${open ? "open" : ""}`}><span>Analytical boundary</span><p>{chart.file === "15_production_risk_model.png" ? "Bootstrap confidence intervals are reported for the untouched holdout. External validation remains incomplete." : "Descriptive survey-based estimate; inferential confidence intervals are not shown. Use hover for sample values and do not read the pattern as causal or population-representative."}</p></div>
   </article>;
 }
 
 const landingLinks: Array<{ label: string; route: Route }> = [
   { label: "Overview", route: "overview" },
   { label: "Problem", route: "problem" },
+  { label: "Evidence", route: "evidence" },
   { label: "Analysis", route: "analysis" },
   { label: "Modelling", route: "modeling" },
   { label: "Exceptions", route: "exceptions" },
@@ -198,7 +202,7 @@ function Landing({ go }: { go: (route: Route) => void }) {
         <button className="cinematic-referral" onClick={() => navigate("exceptions")}>Read the exceptions</button>
       </div>
     </div>
-    <footer className="cinematic-legal">Synthetic observational analysis. <a href="/methodology" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>Methodology</a> and <a href="/methodology#limitations" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>limitations</a>.</footer>
+    <footer className="cinematic-legal">Self-reported survey · observational analysis. <a href="/methodology" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>Methodology</a> and <a href="/methodology#limitations" onClick={(e) => { e.preventDefault(); navigate("methodology"); }}>limitations</a>.</footer>
   </section>;
 }
 
@@ -251,9 +255,27 @@ const modelRows = [
   ["Extra Trees", "72.5%", "—", "Nested CV only"],
 ];
 
+const oddsRows = [
+  ["Bedtime screen time", "1.58x", "Higher poor-sleep odds"],
+  ["Doomscroller = yes", "1.50x", "Higher poor-sleep odds"],
+  ["Phone checks per night", "1.42x", "Higher poor-sleep odds"],
+  ["Doomscroll sessions", "1.38x", "Higher poor-sleep odds"],
+  ["Primary device = TV", "0.85x", "Lower poor-sleep odds"],
+  ["Anxiety score", "1.16x", "Higher poor-sleep odds"],
+];
+
+const exceptionEffectRows = [
+  ["Sleep hours", "+0.91 h", "0.37 to 1.41", "Large"],
+  ["Weekly sleep debt", "-5.16 h", "-7.07 to -2.93", "Large"],
+  ["Sleep latency", "-6.45 min", "-11.96 to -1.12", "Moderate"],
+  ["Night wakeups", "-1.26", "-1.88 to -0.50", "Large"],
+  ["Daytime fatigue", "-1.60", "-2.53 to -0.66", "Large"],
+  ["Exercise", "+4.02 min", "-9.37 to 16.29", "Uncertain"],
+];
+
 function Modeling() {
   return <section className="page-section modeling-page">
-    <div className="page-intro split-intro"><div><span className="section-label">PRE-OUTCOME / NESTED CV / CALIBRATED</span><h1>Predictive modelling</h1><p>The primary model estimates Poor-sleep risk at bedtime using exposure and context only. Model selection happens on 750 development rows; the 250-row holdout is opened once. This remains synthetic-data research, not a clinical tool.</p></div><div className="big-ratio"><b>73.7%</b><span>nested-CV balanced accuracy</span><small>77.5% untouched holdout · 67% baseline</small></div></div>
+    <div className="page-intro split-intro"><div><span className="section-label">PRE-OUTCOME / NESTED CV / CALIBRATED</span><h1>Predictive modelling</h1><p>The primary model estimates Poor-sleep risk at bedtime using exposure and context only. Model selection happens on 750 development rows; the 250-row holdout is opened once. This remains self-reported survey research, not a clinical tool.</p></div><div className="big-ratio"><b>73.7%</b><span>nested-CV balanced accuracy</span><small>77.5% untouched holdout · 67% baseline</small></div></div>
     <ChartCard chart={chartCards[13]} featured />
     <div className="model-task-split"><article><span>Prediction moment</span><h3>Before sleep outcomes</h3><b>8 post-outcome fields excluded</b><p>No sleep duration, latency, wakeups, fatigue, debt, quality score, target, or respondent ID.</p></article><article><span>Uncertainty</span><h3>Bootstrap 95% CI</h3><b>71.8–82.8%</b><p>Balanced accuracy on the untouched holdout; ROC AUC 82.5% with a 77.0–87.6% interval.</p></article><article><span>Validation boundary</span><h3>Internal only</h3><b>External validation pending</b><p>A genuinely independent real-world dataset is required before deployment or clinical interpretation.</p></article></div>
     <div className="model-scorecard" role="table" aria-label="Model performance comparison">
@@ -261,6 +283,13 @@ function Modeling() {
       {modelRows.map(([name,cv,holdout,status]) => <div className={`model-score-row ${status.startsWith("Selected") ? "selected" : ""}`} role="row" key={name}><b>{name}</b><span>{cv}</span><span>{holdout}</span><em>{status}</em></div>)}
     </div>
     <div className="model-note"><b>Decision policy</b><p>Probabilities are sigmoid-calibrated. The 32% threshold is selected from development-only out-of-fold predictions with false negatives weighted twice as heavily as false positives. Holdout PR-AUC is 72.0%; Brier score is 0.155.</p><span>Model v2.0</span></div>
+    <section className="odds-panel" aria-labelledby="odds-title">
+      <div><span className="section-label">INTERPRETABILITY</span><h2 id="odds-title">Odds ratios for the selected Logistic Regression</h2><p>These are model-scale screening effects from the calibrated primary model, not causal effect estimates. Full table: <a href="/data/primary_model_odds_ratios.csv">primary_model_odds_ratios.csv</a>.</p></div>
+      <div className="odds-table" role="table" aria-label="Primary model odds ratios">
+        <div className="odds-row odds-head" role="row"><span>Feature</span><span>Odds ratio</span><span>Direction</span></div>
+        {oddsRows.map(([feature, odds, direction]) => <div className="odds-row" role="row" key={feature}><b>{feature}</b><span>{odds}</span><em>{direction}</em></div>)}
+      </div>
+    </section>
     <div className="model-audit-grid"><article><span>Gender sensitivity</span><b>78.9% / 76.9%</b><p>Female / male holdout groups; “prefer not to say” has only 16 rows and is too uncertain for a stable conclusion.</p></article><article><span>Weakest audited segment</span><b>Students · 54.5%</b><p>Sensitivity is lower for the 73-row student holdout subgroup. This is a deployment blocker, not a fairness certificate.</p></article><article><span>Governance artifacts</span><b>Versioned + auditable</b><p><a href="/data/model_registry.json">Model registry</a> · <a href="/data/prediction_schema.json">Input schema</a> · <a href="/data/subgroup_performance.csv">Subgroup CSV</a></p></article></div>
     <RiskDemo />
     <ChartCard chart={chartCards[11]} featured />
@@ -278,6 +307,13 @@ function Exceptions() {
       <article><span>02</span><h3>Debt stays lower</h3><p>Exposure is high, but realized weekly debt and latency are markedly better than among other heavy scrollers.</p></article>
       <article><span>03</span><h3>Routine changes the context</h3><p>Reading and meditation/journaling appear more often than the social-scrolling routine that dominates the wider heavy group.</p></article>
     </div>
+    <section className="exception-effects" aria-labelledby="exception-effects-title">
+      <div><span className="section-label">EFFECT SIZE CHECK</span><h2 id="exception-effects-title">Good-sleep heavy scrollers versus poor-sleep heavy scrollers</h2><p>Bootstrap intervals make the small-n caveat visible. Full table: <a href="/data/exception_effect_sizes.csv">exception_effect_sizes.csv</a>.</p></div>
+      <div className="effect-table" role="table" aria-label="Exception effect sizes">
+        <div className="effect-row effect-head" role="row"><span>Metric</span><span>Mean difference</span><span>95% interval</span><span>Effect</span></div>
+        {exceptionEffectRows.map(([metric, difference, interval, effect]) => <div className="effect-row" role="row" key={metric}><b>{metric}</b><span>{difference}</span><span>{interval}</span><em>{effect}</em></div>)}
+      </div>
+    </section>
     <div className="caveat-banner"><b>Small-group warning.</b> Eleven respondents are enough to reveal a counter-pattern, not enough to estimate a stable protective effect.</div>
   </section>;
 }
@@ -351,9 +387,9 @@ function Methodology() {
     ["05", "Model & compare", "Pre-outcome features, tuned candidates, nested CV, calibration, subgroup audit, and one untouched holdout."],
   ];
   return <section className="page-section methodology-page">
-    <div className="page-intro"><span className="section-label">REPRODUCIBLE / EXECUTED / AUDITABLE</span><h1>Methodology</h1><p>The analysis is shown, not hidden. Explore the workflow, synthetic-data checks, model boundary, and the executed notebook itself.</p></div>
+    <div className="page-intro"><span className="section-label">REPRODUCIBLE / EXECUTED / AUDITABLE</span><h1>Methodology</h1><p>The analysis is shown, not hidden. Explore the workflow, data-provenance checks, model boundary, and the executed notebook itself.</p></div>
     <div className="method-grid">{steps.map(([n,t,d])=><article key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p></article>)}</div>
-    <div className="sanity-panel"><div><span className="section-label">SYNTHETIC-DATA SANITY CHECK</span><h2>The data are unusually orderly.</h2><p>This does not prove how the file was produced. It does mean effect sizes should remain inside this dataset and causal language should stay out.</p></div><div className="sanity-metrics"><p><b>−0.893</b><span>sleep hours ↔ weekly debt</span></p><p><b>86%+</b><span>valid quality scores at 5/5</span></p><p><b>10</b><span>row spread across 3 target classes</span></p></div></div>
+    <div className="sanity-panel"><div><span className="section-label">DATA-PROVENANCE SANITY CHECK</span><h2>The data are unusually orderly.</h2><p>This is a self-reported survey whose sampling and collection method are not fully documented at source. The orderliness is recorded as a provenance limitation: effect sizes should remain inside this dataset and causal language should stay out.</p></div><div className="sanity-metrics"><p><b>−0.893</b><span>sleep hours ↔ weekly debt</span></p><p><b>86%+</b><span>valid quality scores at 5/5</span></p><p><b>10</b><span>row spread across 3 target classes</span></p></div></div>
     <div className="method-boundaries"><article><span>Handled</span><p>Missingness, dtypes, IDs, duplicates, range checks, age buckets, feature leakage, class balance.</p></article><article><span>Not claimed</span><p>Causality, medical advice, population prevalence, cultural ranking, stable effects for tiny groups.</p></article></div>
     <div className="section-heading"><div><span className="section-label">LIVE ARTIFACTS</span><h2>Executed notebook viewer</h2></div><a className="text-button" href="/data/sleep_doomscrolling_habits.csv" download>Dataset ↓</a></div>
     <NotebookViewer />
@@ -377,16 +413,16 @@ export default function App() {
     fetch("/data/plotly_charts.json").then((response) => { if (!response.ok) throw new Error("Charts unavailable"); return response.json(); })
       .then(setPlotSpecs).catch(() => setPlotError(true));
   }, []);
-  useEffect(() => { if (!["landing", "problem", "methodology"].includes(route) && !Object.keys(plotSpecs).length) loadPlots(); }, [route, plotSpecs, loadPlots]);
+  useEffect(() => { if (!["landing", "problem", "evidence", "methodology"].includes(route) && !Object.keys(plotSpecs).length) loadPlots(); }, [route, plotSpecs, loadPlots]);
   useEffect(() => {
     const label = route === "landing" ? "Night Signals" : `${nav.find((item) => item.id === route)?.label} · Night Signals`;
     document.title = label;
-    const description = route === "modeling" ? "Leakage-safe pre-outcome sleep-risk modelling with nested validation, calibration, uncertainty and subgroup audits." : route === "problem" ? "A detailed problem statement for studying how doomscrolling, negative news, and bedtime routines relate to sleep." : "Evidence-led analysis of doomscrolling, sleep, mental wellbeing and protective routines.";
+    const description = route === "modeling" ? "Leakage-safe pre-outcome sleep-risk modelling with nested validation, calibration, uncertainty and subgroup audits." : route === "problem" ? "A detailed problem statement for studying how doomscrolling, negative news, and bedtime routines relate to sleep." : route === "evidence" ? "A multi-dataset evidence synthesis roadmap connecting digital behaviour, sleep, wearable physiology, and health context." : "Evidence-led analysis of doomscrolling, sleep, mental wellbeing and protective routines.";
     document.querySelector('meta[name="description"]')?.setAttribute("content", description);
     if (route !== "landing") mainRef.current?.focus();
   }, [route]);
   const go = (next: Route) => { history.pushState({}, "", pathFor(next)); setRoute(next); setMenu(false); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const page = useMemo(() => ({ landing: <Landing go={go} />, overview: <Overview go={go} />, problem: <ProblemStatement />, analysis: <Analysis />, modeling: <Modeling />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
+  const page = useMemo(() => ({ landing: <Landing go={go} />, overview: <Overview go={go} />, problem: <ProblemStatement />, evidence: <EvidenceSynthesis />, analysis: <Analysis />, modeling: <Modeling />, exceptions: <Exceptions />, personas: <Personas />, methodology: <Methodology /> })[route], [route]);
   const plotContext = { specs: plotSpecs, error: plotError, retry: loadPlots };
   if (route === "landing") return <PlotSpecsContext.Provider value={plotContext}>{page}</PlotSpecsContext.Provider>;
   return <PlotSpecsContext.Provider value={plotContext}><div className={`app-shell ${menu ? "menu-open" : ""}`}>
@@ -397,6 +433,6 @@ export default function App() {
     <div className="ambient ambient-a" /><div className="ambient ambient-b" /><div className="grid-overlay" />
     <Sidebar route={route} onRoute={go} />
     <button className="mobile-menu" onClick={() => setMenu(!menu)} aria-label="Toggle navigation">{menu ? "×" : "☰"}</button>
-    <main ref={mainRef} tabIndex={-1}><Topbar route={route} /><div className="content">{page}</div><footer><Logo /><p>Observational synthetic-data analysis · 2026</p><div>{nav.map((n)=><a key={n.id} href={pathFor(n.id)} onClick={(e)=>{e.preventDefault();go(n.id)}}>{n.label}</a>)}</div></footer></main>
+    <main ref={mainRef} tabIndex={-1}><Topbar route={route} /><div className="content">{page}</div><footer><Logo /><p>Observational self-reported survey analysis · 2026</p><div>{nav.map((n)=><a key={n.id} href={pathFor(n.id)} onClick={(e)=>{e.preventDefault();go(n.id)}}>{n.label}</a>)}</div></footer></main>
   </div></PlotSpecsContext.Provider>;
 }

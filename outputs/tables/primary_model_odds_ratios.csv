@@ -1,0 +1,49 @@
+feature,log_odds,log_odds_sd,odds_ratio,direction,feature_label,abs_log_odds
+numeric__bedtime_screen_time_minutes,0.4570494298502113,0.03678341920563878,1.5794069521690506,Higher poor-sleep odds,Bedtime Screen Time Minutes,0.4570494298502113
+categorical__doomscroller_No,-0.4045362888869762,0.041587655639379974,0.6672861671382277,Lower poor-sleep odds,Doomscroller No,0.4045362888869762
+categorical__doomscroller_Yes,0.4041000844235363,0.04169062833915511,1.4979538613046608,Higher poor-sleep odds,Doomscroller Yes,0.4041000844235363
+numeric__phone_checks_per_night,0.35061726902957246,0.05347433403435503,1.4199437654448166,Higher poor-sleep odds,Phone Checks per Night,0.35061726902957246
+numeric__doomscroll_sessions_per_night,0.3230881151821763,0.03383278214639937,1.3813870667160855,Higher poor-sleep odds,Doomscroll Sessions per Night,0.3230881151821763
+categorical__primary_device_used_at_night_TV,-0.1608466280249147,0.030249126318943394,0.8514226454664391,Lower poor-sleep odds,Primary Device Used At Night Tv,0.1608466280249147
+categorical__occupation_status_Employed Full-time,0.14749587409629292,0.05057420379192512,1.1589285031924792,Higher poor-sleep odds,Occupation Status Employed Full-Time,0.14749587409629292
+numeric__anxiety_score,0.14436181381005858,0.07530391755211358,1.1553020371460092,Higher poor-sleep odds,Anxiety Score,0.14436181381005858
+categorical__gender_Male,0.13995420263502156,0.059418771005446736,1.1502211205545088,Higher poor-sleep odds,Gender Male,0.13995420263502156
+categorical__occupation_status_Unemployed,-0.13458613121444837,0.02770444941997152,0.8740775902698971,Lower poor-sleep odds,Occupation Status Unemployed,0.13458613121444837
+categorical__bedtime_routine_type_Reading,0.10568179193693572,0.049042420347243494,1.1114681421042896,Higher poor-sleep odds,Bedtime Routine Type Reading,0.10568179193693572
+categorical__bedtime_routine_type_No Fixed Routine,-0.10392224995143436,0.08006508887047695,0.9012953704559035,Lower poor-sleep odds,Bedtime Routine Type No Fixed Routine,0.10392224995143436
+categorical__keeps_phone_in_bedroom_No,-0.0917637046053585,0.02896790031161789,0.9123207012572923,Lower poor-sleep odds,Keeps Phone In Bedroom No,0.0917637046053585
+categorical__keeps_phone_in_bedroom_Yes,0.09132750014191839,0.029029042524910162,1.0956277647568131,Higher poor-sleep odds,Keeps Phone In Bedroom Yes,0.09132750014191839
+categorical__primary_device_used_at_night_Laptop,0.09129670425015142,0.045401885051870164,1.095594024442287,Higher poor-sleep odds,Primary Device Used At Night Laptop,0.09129670425015142
+categorical__gender_Prefer not to say,-0.08003346569500747,0.05744967909648233,0.9230854541734488,Lower poor-sleep odds,Gender Prefer Not To Say,0.08003346569500747
+categorical__country_region_India,0.07811834349625753,0.04432849609167976,1.0812506100763524,Higher poor-sleep odds,Country Region India,0.07811834349625753
+numeric__number_of_news_apps_used,0.07516592666116804,0.01903489917731419,1.0780630154417028,Higher poor-sleep odds,Number Of News Apps Used,0.07516592666116804
+categorical__country_region_Germany,-0.07289351045561301,0.02677014978418456,0.9296998280656784,Lower poor-sleep odds,Country Region Germany,0.07289351045561301
+numeric__caffeine_intake_mg_per_day,0.06752769544809265,0.06255608302126038,1.0698598894366287,Higher poor-sleep odds,Caffeine Intake mg per Day,0.06752769544809265
+categorical__gender_Female,-0.06035694140345419,0.04767447643704005,0.9414284388165453,Lower poor-sleep odds,Gender Female,0.06035694140345419
+categorical__country_region_Brazil,0.05802581504196348,0.04107011288235526,1.05974235265048,Higher poor-sleep odds,Country Region Brazil,0.05802581504196348
+numeric__avg_doomscroll_session_minutes,-0.055176695272860544,0.05896468205063025,0.9463179232763478,Lower poor-sleep odds,Avg Doomscroll Session Minutes,0.055176695272860544
+categorical__country_region_Philippines,-0.04841213736726772,0.01796218282071777,0.9527410459650479,Lower poor-sleep odds,Country Region Philippines,0.04841213736726772
+numeric__days_since_last_digital_detox,0.04419552672046005,0.05629275000357928,1.0451866968377383,Higher poor-sleep odds,Days Since Last Digital Detox,0.04419552672046005
+categorical__consumes_negative_news_content_Yes,-0.039323969352790075,0.0452379553519115,0.9614391818569511,Lower poor-sleep odds,Consumes Negative News Content Yes,0.039323969352790075
+categorical__consumes_negative_news_content_No,0.03888776488934993,0.04540075125169212,1.0396537914434785,Higher poor-sleep odds,Consumes Negative News Content No,0.03888776488934993
+categorical__country_region_Canada,0.03870879148154714,0.056112150772463,1.0394677377113206,Higher poor-sleep odds,Country Region Canada,0.03870879148154714
+numeric__total_daily_screen_time_hours,0.03567332100047769,0.04079649263581573,1.0363172481056453,Higher poor-sleep odds,Total Daily Screen Time Hours,0.03567332100047769
+categorical__primary_device_used_at_night_Smartphone,0.0350807583160371,0.050814216414244544,1.0357033470805586,Higher poor-sleep odds,Primary Device Used At Night Smartphone,0.0350807583160371
+categorical__uses_sleep_tracking_app_No,-0.03441759710305039,0.03946905837049908,0.9661679514444657,Lower poor-sleep odds,Uses Sleep Tracking App No,0.03441759710305039
+categorical__primary_device_used_at_night_Tablet,0.034032960995286105,0.05834411536503256,1.03461870822847,Higher poor-sleep odds,Primary Device Used At Night Tablet,0.034032960995286105
+categorical__uses_sleep_tracking_app_Yes,0.03398139263961038,0.03933072364469881,1.03456535601859,Higher poor-sleep odds,Uses Sleep Tracking App Yes,0.03398139263961038
+numeric__age,-0.026847751754896503,0.04049568419525757,0.9735094453468103,Lower poor-sleep odds,Age,0.026847751754896503
+numeric__stress_score,-0.025558634802700635,0.06538268620494524,0.9747652221235887,Lower poor-sleep odds,Stress Score,0.025558634802700635
+numeric__exercise_minutes_per_day,0.02484112746436148,0.06586002584618454,1.0251522390504415,Higher poor-sleep odds,Exercise Minutes per Day,0.02484112746436148
+categorical__uses_night_mode_Yes,-0.02414600396866478,0.028722362123661516,0.9761431785750463,Lower poor-sleep odds,Uses Night Mode Yes,0.02414600396866478
+categorical__uses_night_mode_No,0.02370979950522471,0.02884137622307321,1.0239931114603884,Higher poor-sleep odds,Uses Night Mode No,0.02370979950522471
+categorical__country_region_Nigeria,-0.023491306536809232,0.05492866644287108,0.9767824662543488,Lower poor-sleep odds,Country Region Nigeria,0.023491306536809232
+categorical__country_region_United Kingdom,-0.022736160628234414,0.04284463817308567,0.9775203581102515,Lower poor-sleep odds,Country Region United Kingdom,0.022736160628234414
+categorical__bedtime_routine_type_Scrolling Social Media,0.020447909751716946,0.0532617150853683,1.0206584005089507,Higher poor-sleep odds,Bedtime Routine Type Scrolling Social Media,0.020447909751716946
+categorical__bedtime_routine_type_Watching Videos,-0.016331131564295727,0.0227583452565346,0.983801498384226,Lower poor-sleep odds,Bedtime Routine Type Watching Videos,0.016331131564295727
+categorical__occupation_status_Employed Part-time,-0.012632233013459662,0.037906657508903895,0.987447218739096,Lower poor-sleep odds,Occupation Status Employed Part-Time,0.012632233013459662
+categorical__bedtime_routine_type_Meditation/Journaling,-0.00631252463636277,0.03894805265416449,0.9937073574898111,Lower poor-sleep odds,Bedtime Routine Type Meditation/Journaling,0.00631252463636277
+categorical__country_region_UAE,-0.004620267726570484,0.08199366235974094,0.9953903892912862,Lower poor-sleep odds,Country Region Uae,0.004620267726570484
+categorical__country_region_United States,-0.001653435429251529,0.058910915087957746,0.9983479307420454,Lower poor-sleep odds,Country Region United States,0.001653435429251529
+categorical__country_region_Australia,-0.0014823363394618368,0.025051617209355996,0.9985187617783895,Lower poor-sleep odds,Country Region Australia,0.0014823363394618368
+categorical__occupation_status_Student,-0.0007137143318249204,0.048344585881552216,0.9992865403016666,Lower poor-sleep odds,Occupation Status Student,0.0007137143318249204

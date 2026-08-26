@@ -1,0 +1,6 @@
+stage_name,subjects,mean_hr,mean_hr_variability
+Wake,31,67.8,8.0
+N1 (light),31,66.5,7.66
+N2,31,63.8,4.26
+N3 (deep),30,66.0,2.66
+REM,30,66.7,5.1

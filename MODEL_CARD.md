@@ -2,13 +2,13 @@
 
 ## Intended use
 
-Educational demonstration of a pre-outcome risk model evaluated on a synthetic survey. The prediction moment is bedtime, after exposure/context variables are known and before sleep duration, latency, wakeups, fatigue, sleep debt, or sleep-quality outcomes occur.
+Educational demonstration of a pre-outcome risk model evaluated on a self-reported survey. The prediction moment is bedtime, after exposure/context variables are known and before sleep duration, latency, wakeups, fatigue, sleep debt, or sleep-quality outcomes occur.
 
 This model is not medical advice, is not externally validated, and must not be used for diagnosis, treatment, employment, insurance, or automated decisions about people.
 
 ## Evaluation design
 
-- 1,000 synthetic rows; 750 development and 250 final holdout rows.
+- 1,000 self-reported survey rows; 750 development and 250 final holdout rows.
 - The holdout was created before model comparison and opened once.
 - Candidate families were tuned inside five-fold nested cross-validation on development data.
 - The selected Logistic Regression was sigmoid-calibrated.
@@ -25,7 +25,7 @@ This model is not medical advice, is not externally validated, and must not be u
 
 ## Known limitations
 
-- Synthetic data may encode generator rules and is not representative of a population.
+- This self-reported survey has partially documented provenance and unverified sampling, so it is not representative of any specific population.
 - No independent, temporal, prospective, geographic, or clinical validation has been performed.
 - Self-reported exposures may be measured with error.
 - Subgroup results are diagnostic only because the final holdout is small.

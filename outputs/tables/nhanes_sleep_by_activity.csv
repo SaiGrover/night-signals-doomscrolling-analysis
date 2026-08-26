@@ -1,0 +1,3 @@
+activity_group,n,mean_sleep_hours
+Below activity floor (<30 min/day),2250,7.901
+Meets activity (>=30 min/day),5790,7.68
