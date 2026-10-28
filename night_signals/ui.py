@@ -42,6 +42,7 @@ def inject_brand_surface() -> None:
         .ns-sidebar-foot-rule { height: 1px; margin: .9rem 0 .8rem; background: rgba(177,153,255,.14); }
         [data-testid="stMetric"] { background: linear-gradient(145deg,rgba(19,34,53,.88),rgba(10,22,36,.9)); border: 1px solid rgba(125,211,252,.14); border-radius: 16px; padding: 1rem 1.1rem; min-height: 112px; }
         [data-testid="stMetricLabel"] { color: #93a4b8; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; }
+        [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] p { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; line-height: 1.25 !important; }
         [data-testid="stMetricValue"] { color: #f4f8fb; font-family: 'IBM Plex Mono', monospace; }
         [data-testid="stVerticalBlockBorderWrapper"] { border-color: rgba(125,211,252,.13); background: rgba(11,24,40,.56); border-radius: 18px; }
         [data-testid="stPlotlyChart"] { border-radius: 14px; overflow: hidden; }
