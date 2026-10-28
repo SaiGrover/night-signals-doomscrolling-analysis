@@ -65,9 +65,16 @@ def association_matrix(df: pd.DataFrame) -> pd.DataFrame:
 
 def exposure_gradient(df: pd.DataFrame) -> pd.DataFrame:
     rows = []
+    trend = {}
+    for outcome in OUTCOME_COLUMNS:
+        pair = df[["exposure_quartile", outcome]].dropna().copy()
+        pair["quartile_rank"] = pair["exposure_quartile"].cat.codes + 1
+        rho, p_value = stats.spearmanr(pair["quartile_rank"], pair[outcome]) if len(pair) >= 3 else (np.nan, np.nan)
+        trend[outcome] = (float(rho), float(p_value))
     for level, group in df.groupby("exposure_quartile", observed=True):
         for outcome in OUTCOME_COLUMNS:
             mean, low, high = mean_ci(group[outcome])
+            rho, p_value = trend[outcome]
             rows.append(
                 {
                     "exposure_quartile": str(level),
@@ -76,6 +83,8 @@ def exposure_gradient(df: pd.DataFrame) -> pd.DataFrame:
                     "mean": mean,
                     "ci_low": low,
                     "ci_high": high,
+                    "ordered_trend_rho": rho,
+                    "ordered_trend_p": p_value,
                 }
             )
     return pd.DataFrame(rows)

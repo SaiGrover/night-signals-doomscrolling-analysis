@@ -41,6 +41,18 @@ with st.container(border=True):
     subgroup = read_csv_artifact("subgroup_performance.csv")
     st.dataframe(subgroup[["attribute", "group", "n", "balanced_accuracy", "sensitivity", "specificity"]], hide_index=True, alt="Holdout performance by subgroup")
 
+with st.container(border=True):
+    st.subheader("Holdout decision audit", icon=":material/table_chart:")
+    holdout = read_csv_artifact("production_holdout_predictions.csv")
+    confusion = holdout.groupby(["y_true", "prediction"]).size().unstack(fill_value=0)
+    confusion = confusion.reindex(index=[0, 1], columns=[0, 1], fill_value=0)
+    confusion.index = ["Actual good", "Actual poor"]
+    confusion.columns = ["Predicted good", "Predicted poor"]
+    st.dataframe(confusion, alt="Confusion matrix for the untouched holdout")
+    odds = read_csv_artifact("primary_model_odds_ratios.csv")
+    st.caption("Logistic-model odds ratios are descriptive feature associations within the fitted model; they are not causal effects.")
+    st.dataframe(odds[["feature_label", "odds_ratio", "direction"]].head(12), hide_index=True, alt="Primary logistic model odds ratios")
+
 st.subheader("Transparent risk demo", icon=":material/insights:")
 st.caption("This is a model output, not a diagnosis or a recommendation. Inputs are collected before the modeled sleep outcome.")
 model = load_portable_model()

@@ -33,6 +33,9 @@ with right.container(border=True, height="stretch"):
     st.write("Each point is a group mean; whiskers are 95% confidence intervals. This is an association display, not a causal dose-response estimate.")
     st.metric("Rows in view", f"{len(df):,}", border=True)
     st.metric("Quartiles represented", f"{df['exposure_quartile'].nunique():,}", border=True)
+    trend = gradient[gradient["outcome"] == outcome].iloc[0]
+    st.metric("Ordered trend Spearman rho", f"{trend['ordered_trend_rho']:.2f}", border=True)
+    st.caption(f"Unadjusted ordered-trend p-value: {trend['ordered_trend_p']:.3g}. This is descriptive and not a causal test.")
 
 associations = association_matrix(df)
 st.subheader("Spearman association map", icon=":material/grid_on:")
