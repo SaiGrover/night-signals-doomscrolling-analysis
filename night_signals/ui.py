@@ -167,10 +167,11 @@ def inject_brand_surface() -> None:
         [data-testid="stSidebar"] { padding-top: 58px !important; }
         [data-testid="stMainBlockContainer"] { padding-top: 5.1rem !important; }
         .ns-section-kicker { color: #31dfe0; }
-        .ns-overview-hero { min-height: 395px; padding: 2.45rem 2.85rem; border-color: rgba(42,191,241,.32); background: linear-gradient(112deg, rgba(5,22,39,.98) 0%, rgba(5,18,32,.9) 52%, rgba(8,24,42,.45) 100%); }
+        .ns-overview-hero { min-height: 342px; padding: 1.95rem 2.7rem; border-color: rgba(42,191,241,.32); background: linear-gradient(112deg, rgba(5,22,39,.98) 0%, rgba(5,18,32,.9) 52%, rgba(8,24,42,.45) 100%); }
         .ns-overview-hero .ns-hero-art { width: 58%; opacity: .74; mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.48) 20%, #000 60%); }
         .ns-overview-hero .ns-hero-content { max-width: 61%; }
-        .ns-overview-hero .ns-hero h1 { font-size: clamp(3.45rem, 6.2vw, 5.8rem); line-height: .91; }
+        .ns-overview-hero .ns-hero h1 { font-size: clamp(3.05rem, 5.3vw, 4.8rem); line-height: .91; margin-bottom: .65rem; }
+        .ns-overview-hero .ns-hero p { max-width: 680px; font-size: .96rem; line-height: 1.48; }
         .ns-overview-hero .ns-hero-accent { color: #61ead4; }
         .ns-overview-hero .ns-chip { border-color: rgba(45,212,191,.5); background: rgba(5,40,54,.7); }
         .ns-explore-bar { margin-top: .9rem; }

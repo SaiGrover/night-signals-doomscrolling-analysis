@@ -20,6 +20,21 @@ df = apply_filters(
     st.session_state.get("global_occupation"),
     st.session_state.get("global_exposure"),
 )
+
+quartile_counts = df.groupby("exposure_quartile", observed=True).size().tolist()
+quartile_sleep = (
+    df.groupby("exposure_quartile", observed=True)["poor_sleep"].mean().mul(100).round(1).tolist()
+)
+quartile_exposure = (
+    df.groupby("exposure_quartile", observed=True)["bedtime_screen_time_minutes"].median().round(0).tolist()
+)
+exception_counts = (
+    df.loc[df["high_exposure"] & df["favorable_sleep"]]
+    .groupby("exposure_quartile", observed=True)
+    .size()
+    .reindex(df["exposure_quartile"].cat.categories, fill_value=0)
+    .tolist()
+)
 st.html('<div class="ns-section-kicker ns-explore-bar">Explore the data</div>')
 
 with st.container(horizontal=True, gap="small"):
@@ -27,11 +42,11 @@ with st.container(horizontal=True, gap="small"):
         "Respondents in view",
         f"{len(df):,}",
         border=True,
-        chart_data=df.groupby("exposure_quartile", observed=True).size().tolist(),
+        chart_data=quartile_counts,
     )
-    st.metric("Poor-sleep prevalence", f"{df['poor_sleep'].mean():.1%}", border=True)
-    st.metric("Median bedtime exposure", f"{df['bedtime_screen_time_minutes'].median():.0f} min", border=True)
-    st.metric("High-exposure exceptions", f"{int((df['high_exposure'] & df['favorable_sleep']).sum())}", border=True)
+    st.metric("Poor-sleep prevalence", f"{df['poor_sleep'].mean():.1%}", border=True, chart_data=quartile_sleep)
+    st.metric("Median bedtime exposure", f"{df['bedtime_screen_time_minutes'].median():.0f} min", border=True, chart_data=quartile_exposure)
+    st.metric("High-exposure exceptions", f"{int((df['high_exposure'] & df['favorable_sleep']).sum())}", border=True, chart_data=exception_counts)
 
 left, middle, right = st.columns([1.08, 1.08, 0.82], gap="small")
 
