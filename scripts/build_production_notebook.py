@@ -22,6 +22,5 @@ nb.cells = [
 nb.metadata.kernelspec = {"display_name": "Python 3", "language": "python", "name": "python3"}
 processor = ExecutePreprocessor(timeout=120, kernel_name="python3")
 processor.preprocess(nb, {"metadata": {"path": str(root)}})
-for target in [root/'notebooks/sleep_doomscrolling_predictive_modeling.ipynb', root/'public/methodology/sleep_doomscrolling_predictive_modeling.ipynb']:
-    nbformat.write(nb, target)
+nbformat.write(nb, root/'notebooks/sleep_doomscrolling_predictive_modeling.ipynb')
 print("production notebook written")

@@ -6,7 +6,7 @@ carry pre-computed stream text and the generated matplotlib figures as embedded
 image outputs (same output shapes the other executed notebooks use, so no live
 kernel is required to view it).
 
-Writes:  notebooks/external_evidence.ipynb  and  public/methodology/external_evidence.ipynb
+Writes: notebooks/external_evidence.ipynb
 """
 from __future__ import annotations
 
@@ -123,10 +123,9 @@ def build() -> None:
                        "language_info": {"name": "python", "version": "3.x"}},
           "nbformat": 4, "nbformat_minor": 5}
 
-    for dest in (ROOT / "notebooks" / "external_evidence.ipynb",
-                 ROOT / "public" / "methodology" / "external_evidence.ipynb"):
-        dest.write_text(json.dumps(nb, ensure_ascii=False, indent=1), encoding="utf-8")
-        print("wrote", dest.relative_to(ROOT))
+    target = ROOT / "notebooks" / "external_evidence.ipynb"
+    target.write_text(json.dumps(nb, ensure_ascii=False, indent=1), encoding="utf-8")
+    print("wrote", target.relative_to(ROOT))
 
 
 if __name__ == "__main__":

@@ -26,7 +26,6 @@ REPLACEMENTS = [
 
 TARGETS = [
     Path("notebooks/sleep_doomscrolling_analysis.ipynb"),
-    Path("public/methodology/sleep_doomscrolling_analysis.ipynb"),
     Path("../sleep_doomscrolling_analysis.ipynb"),  # root repo copy (best-effort)
 ]
 

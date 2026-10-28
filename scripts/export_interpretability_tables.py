@@ -8,14 +8,12 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "public/data/sleep_doomscrolling_habits.csv"
+DATA = ROOT / "data/sleep_doomscrolling_habits.csv"
 TABLES = ROOT / "outputs/tables"
-PUBLIC = ROOT / "public/data"
 MODEL = ROOT / "outputs/models/poor_sleep_preoutcome_model.joblib"
 RANDOM_STATE = 42
 
 TABLES.mkdir(parents=True, exist_ok=True)
-PUBLIC.mkdir(parents=True, exist_ok=True)
 
 
 def clean_feature_name(name: str) -> str:
@@ -45,7 +43,6 @@ def export_odds_ratios() -> pd.DataFrame:
     summary["abs_log_odds"] = summary["log_odds"].abs()
     summary = summary.sort_values("abs_log_odds", ascending=False)
     summary.to_csv(TABLES / "primary_model_odds_ratios.csv", index=False)
-    summary.to_csv(PUBLIC / "primary_model_odds_ratios.csv", index=False)
     return summary
 
 
@@ -97,7 +94,6 @@ def export_exception_effects() -> pd.DataFrame:
         })
     effects = pd.DataFrame(rows)
     effects.to_csv(TABLES / "exception_effect_sizes.csv", index=False)
-    effects.to_csv(PUBLIC / "exception_effect_sizes.csv", index=False)
     return effects
 
 

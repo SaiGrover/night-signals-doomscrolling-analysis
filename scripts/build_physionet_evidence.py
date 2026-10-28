@@ -10,7 +10,7 @@ doomscrolling changes heart rate.
 Run from the repository root:  python scripts/build_physionet_evidence.py
 
 Outputs (consumed by the Research Atlas Evidence Synthesis page):
-  public/data/physionet_summary.json
+  outputs/tables/physionet_summary.json
   outputs/tables/physionet_*.csv
   outputs/figures/17_physionet_evidence.png (embedded into the external-evidence notebook)
 
@@ -30,9 +30,8 @@ ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "external" / "physionet"
 TABLES = ROOT / "outputs" / "tables"
 FIGS = ROOT / "outputs" / "figures"
-PUBLIC = ROOT / "public" / "data"
-ASSETS = ROOT / "public" / "assets"
-for d in (RAW / "heart_rate", RAW / "labels", TABLES, FIGS, PUBLIC, ASSETS):
+PUBLIC = TABLES
+for d in (RAW / "heart_rate", RAW / "labels", TABLES, FIGS):
     d.mkdir(parents=True, exist_ok=True)
 
 BASE = "https://physionet.org/files/sleep-accel/1.0.0"
@@ -138,7 +137,7 @@ def build() -> dict:
 
 def _chart_specs(by_stage, comp, subj) -> dict:
     """Interactive Plotly specs ({data, layout}) rendered by the Research Atlas,
-    matching public/data/plotly_charts.json; PlotRenderer applies shared styling."""
+    matching Streamlit chart; saved tables remain the source of truth."""
     stages = by_stage["stage_name"].tolist()
     comp_means = [round(float(comp[s].mean()), 2) for s in stages]
     return {

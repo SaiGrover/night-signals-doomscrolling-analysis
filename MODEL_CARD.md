@@ -11,6 +11,7 @@ This model is not medical advice, is not externally validated, and must not be u
 - 1,000 self-reported survey rows; 750 development and 250 final holdout rows.
 - The holdout was created before model comparison and opened once.
 - Candidate families were tuned inside five-fold nested cross-validation on development data.
+- Candidate comparison includes Logistic Regression, Random Forest, Extra Trees, Gradient Boosting, and RBF SVM.
 - The selected Logistic Regression was sigmoid-calibrated.
 - The decision threshold was selected from development-only out-of-fold predictions, with false negatives assigned twice the cost of false positives.
 
@@ -33,4 +34,4 @@ This model is not medical advice, is not externally validated, and must not be u
 
 ## Artifacts
 
-The registry, schema, summary, subgroup audit, comparison table, and artifact SHA-256 are versioned in `public/data` and `outputs/tables`. Joblib is retained only as a trusted reproducibility artifact; the inference API serves an equivalent portable JSON representation whose predictions are regression-tested against scikit-learn.
+The registry, schema, summary, subgroup audit, comparison table, and artifact SHA-256 are versioned in `outputs/tables`. Joblib is retained as the trusted reproducibility artifact and the portable JSON bundle is regression-tested against scikit-learn.

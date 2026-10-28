@@ -17,13 +17,13 @@ import pandas as pd
 from sklearn.base import clone
 from sklearn.calibration import CalibratedClassifierCV, calibration_curve
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
+from sklearn.ensemble import ExtraTreesClassifier, GradientBoostingClassifier, RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.inspection import permutation_importance
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (accuracy_score, average_precision_score, balanced_accuracy_score,
                              brier_score_loss, confusion_matrix, f1_score, precision_score,
-                             recall_score, roc_auc_score)
+                             recall_score, roc_auc_score, roc_curve, precision_recall_curve)
 from sklearn.model_selection import (RandomizedSearchCV, StratifiedKFold, cross_val_predict,
                                      cross_validate, train_test_split)
 from sklearn.pipeline import Pipeline
@@ -31,7 +31,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.svm import SVC
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "public/data/sleep_doomscrolling_habits.csv"
+DATA = ROOT / "data/sleep_doomscrolling_habits.csv"
 OUT = ROOT / "outputs"
 TABLES, FIGURES, MODELS = OUT / "tables", OUT / "figures", OUT / "models"
 for path in (TABLES, FIGURES, MODELS): path.mkdir(parents=True, exist_ok=True)
@@ -74,6 +74,18 @@ def bootstrap_ci(y_true, probability, threshold, repeats=1000):
             for name in ["balanced_accuracy", "roc_auc", "pr_auc", "brier", "sensitivity", "specificity"]}
 
 
+def nested_oof_probability(search, X, y, outer):
+    """Generate honest development OOF probabilities for threshold selection."""
+    result = np.full(len(y), np.nan, dtype=float)
+    for train_idx, valid_idx in outer.split(X, y):
+        fold_search = clone(search)
+        fold_search.fit(X.iloc[train_idx], y.iloc[train_idx])
+        fold_calibrated = CalibratedClassifierCV(fold_search.best_estimator_, method="sigmoid", cv=5)
+        fold_calibrated.fit(X.iloc[train_idx], y.iloc[train_idx])
+        result[valid_idx] = fold_calibrated.predict_proba(X.iloc[valid_idx])[:, 1]
+    return result
+
+
 def main():
     df = pd.read_csv(DATA)
     features = [column for column in df.columns if column not in OUTCOME_OR_POST_SLEEP]
@@ -97,6 +109,9 @@ def main():
         "Extra Trees": (ExtraTreesClassifier(class_weight="balanced", random_state=RANDOM_STATE, n_jobs=1),
                         {"model__n_estimators": [300, 500, 800], "model__max_depth": [None, 6, 10, 14],
                          "model__min_samples_leaf": [1, 2, 4, 8], "model__max_features": ["sqrt", "log2", .7]}),
+        "Gradient Boosting": (GradientBoostingClassifier(random_state=RANDOM_STATE),
+                              {"model__n_estimators": [50, 100, 200], "model__learning_rate": [.02, .05, .1],
+                               "model__max_depth": [1, 2, 3], "model__min_samples_leaf": [2, 5, 10]}),
         "RBF SVM": (SVC(class_weight="balanced", probability=True, random_state=RANDOM_STATE),
                     {"model__C": [.1, .5, 1, 2, 5, 10], "model__gamma": ["scale", "auto", .01, .03, .1]}),
     }
@@ -124,8 +139,17 @@ def main():
                                       scoring="balanced_accuracy", cv=StratifiedKFold(5, shuffle=True, random_state=44),
                                       n_jobs=-1, random_state=45, refit=True).fit(X_dev, y_dev)
     calibrated_template = CalibratedClassifierCV(final_search.best_estimator_, method="sigmoid", cv=5)
-    oof_probability = cross_val_predict(calibrated_template, X_dev, y_dev, cv=outer,
-                                        method="predict_proba", n_jobs=1)[:, 1]
+    threshold_search = RandomizedSearchCV(
+        selected_pipeline,
+        selected_params,
+        n_iter=min(20, int(np.prod([len(v) for v in selected_params.values()]))),
+        scoring="balanced_accuracy",
+        cv=inner,
+        n_jobs=-1,
+        random_state=45,
+        refit=True,
+    )
+    oof_probability = nested_oof_probability(threshold_search, X_dev, y_dev, outer)
     thresholds = np.linspace(.15, .75, 121)
     costs = []
     for threshold in thresholds:
@@ -153,12 +177,22 @@ def main():
                                     n_repeats=30, random_state=RANDOM_STATE, n_jobs=-1)
     importance = pd.DataFrame({"feature": features, "importance": result.importances_mean,
                                "sd": result.importances_std}).sort_values("importance", ascending=False)
+    pd.DataFrame({
+        "y_true": y_holdout.to_numpy(),
+        "probability": holdout_probability,
+        "prediction": (holdout_probability >= threshold).astype(int),
+    }).to_csv(TABLES / "production_holdout_predictions.csv", index=False)
+    observed, predicted = calibration_curve(y_holdout, holdout_probability, n_bins=7, strategy="quantile")
+    pd.DataFrame({"predicted_risk": predicted, "observed_rate": observed}).to_csv(TABLES / "production_calibration.csv", index=False)
+    fpr, tpr, _ = roc_curve(y_holdout, holdout_probability)
+    pd.DataFrame({"false_positive_rate": fpr, "true_positive_rate": tpr}).to_csv(TABLES / "production_roc_curve.csv", index=False)
+    precision, recall, _ = precision_recall_curve(y_holdout, holdout_probability)
+    pd.DataFrame({"recall": recall, "precision": precision}).to_csv(TABLES / "production_pr_curve.csv", index=False)
     comparison.to_csv(TABLES / "production_model_comparison.csv", index=False)
     fairness.to_csv(TABLES / "subgroup_performance.csv", index=False)
-    fairness.to_csv(ROOT / "public/data/subgroup_performance.csv", index=False)
     importance.to_csv(TABLES / "production_feature_importance.csv", index=False)
 
-    fig, axes = plt.subplots(1, 3, figsize=(16, 5.2))
+    fig, axes = plt.subplots(1, 5, figsize=(24, 5.2))
     axes[0].barh(comparison.model[::-1], comparison.balanced_accuracy[::-1], color="#8d7baa")
     axes[0].axvline(.5, color="#776f83", ls="--"); axes[0].set(xlim=(0, 1), title="Nested CV on development data", xlabel="Balanced accuracy")
     observed, predicted = calibration_curve(y_holdout, holdout_probability, n_bins=7, strategy="quantile")
@@ -167,8 +201,18 @@ def main():
     top = importance.head(10).sort_values("importance")
     axes[2].barh(top.feature, top.importance, xerr=top.sd, color="#74a08f")
     axes[2].set_title("Primary-model permutation importance")
+    fpr, tpr, _ = roc_curve(y_holdout, holdout_probability)
+    axes[3].plot(fpr, tpr, color="#5eead4", label=f"AUC {holdout['roc_auc']:.3f}")
+    axes[3].plot([0, 1], [0, 1], "--", color="#776f83")
+    axes[3].set(xlim=(0, 1), ylim=(0, 1), title="Untouched-holdout ROC", xlabel="False-positive rate", ylabel="True-positive rate")
+    axes[3].legend(frameon=False)
+    precision, recall, _ = precision_recall_curve(y_holdout, holdout_probability)
+    axes[4].plot(recall, precision, color="#f6c177", label=f"AP {holdout['pr_auc']:.3f}")
+    axes[4].axhline(y_holdout.mean(), ls="--", color="#776f83", label="Prevalence")
+    axes[4].set(xlim=(0, 1), ylim=(0, 1), title="Untouched-holdout precision-recall", xlabel="Recall", ylabel="Precision")
+    axes[4].legend(frameon=False)
     fig.tight_layout(); fig.savefig(FIGURES / "15_production_risk_model.png", dpi=170, bbox_inches="tight"); plt.close(fig)
-    plot_path = ROOT / "public/data/plotly_charts.json"
+    plot_path = ROOT / "outputs/tables/plotly_charts.json"
     plot_specs = json.loads(plot_path.read_text(encoding="utf-8-sig"))
     plot_specs["15_production_risk_model.png"] = {
         "data": [
@@ -208,10 +252,10 @@ def main():
                "excluded_post_outcome_features": sorted(OUTCOME_OR_POST_SLEEP),
                "artifact_sha256": digest}
     (TABLES / "production_model_summary.json").write_text(json.dumps(summary, indent=2, default=float), encoding="utf-8")
-    (ROOT / "public/data/model_registry.json").write_text(json.dumps({"active": version, "models": [{"version": version,
+    (ROOT / "outputs/tables/model_registry.json").write_text(json.dumps({"active": version, "models": [{"version": version,
         "status": "internal-validation-only", "artifact_sha256": digest, "metrics": holdout,
-        "trained_on": "synthetic survey; n=750 development", "external_validation": False}]}, indent=2), encoding="utf-8")
-    (ROOT / "public/data/prediction_schema.json").write_text(json.dumps({"version": version, "features": features,
+        "trained_on": "self-reported primary survey; provenance unresolved; n=750 development", "external_validation": False}]}, indent=2), encoding="utf-8")
+    (ROOT / "outputs/tables/prediction_schema.json").write_text(json.dumps({"version": version, "features": features,
         "defaults": defaults, "ranges": ranges, "categories": categories,
         "drift_baseline": drift_baseline}, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2, default=float))

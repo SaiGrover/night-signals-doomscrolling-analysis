@@ -8,7 +8,7 @@ an INDEPENDENT evidence layer only - never row-merged with the primary survey.
 Run from the repository root:  python scripts/build_nhanes_evidence.py
 
 Outputs (consumed by the Research Atlas Evidence Synthesis page):
-  public/data/nhanes_summary.json
+  outputs/tables/nhanes_summary.json
   outputs/tables/nhanes_*.csv
   outputs/figures/16_nhanes_evidence.png (embedded into the external-evidence notebook)
 
@@ -34,9 +34,8 @@ ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "external" / "nhanes"
 TABLES = ROOT / "outputs" / "tables"
 FIGS = ROOT / "outputs" / "figures"
-PUBLIC = ROOT / "public" / "data"
-ASSETS = ROOT / "public" / "assets"
-for d in (RAW, TABLES, FIGS, PUBLIC, ASSETS):
+PUBLIC = TABLES
+for d in (RAW, TABLES, FIGS):
     d.mkdir(parents=True, exist_ok=True)
 
 BASE = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles"
@@ -155,8 +154,7 @@ def build() -> dict:
 def _chart_specs(bp_tbl, bmi_tbl, sed_tbl) -> dict:
     """Interactive Plotly specs ({data, layout}) rendered by the Research Atlas.
 
-    Matches the convention in public/data/plotly_charts.json; PlotRenderer applies
-    the shared colorway, fonts, hover styling, and axis defaults on top.
+    Streamlit consumes the saved table and applies the shared chart theme.
     """
     groups = bp_tbl["sleep_group"].tolist()
     bmi_min = float(bmi_tbl["mean_sleep_hours"].min()) - 0.35
