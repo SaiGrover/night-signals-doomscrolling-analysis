@@ -18,7 +18,7 @@ def inject_brand_surface() -> None:
     st.html(
         """
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Outfit:wght@500;600;700&display=swap');
         :root { color-scheme: dark; }
         [data-testid="stAppViewContainer"] { background: #07101c; }
         [data-testid="stHeader"] { background: rgba(7,16,28,.82); }
@@ -40,7 +40,9 @@ def inject_brand_surface() -> None:
         .ns-sidebar-footer b { color: #eee8fa; font: 600 .68rem 'IBM Plex Mono', monospace; letter-spacing: .04em; }
         .ns-sidebar-status { display: flex; align-items: center; gap: .48rem; margin-bottom: .2rem; }
         .ns-sidebar-foot-rule { height: 1px; margin: .9rem 0 .8rem; background: rgba(177,153,255,.14); }
-        [data-testid="stMetric"] { background: linear-gradient(145deg,rgba(19,34,53,.88),rgba(10,22,36,.9)); border: 1px solid rgba(125,211,252,.14); border-radius: 16px; padding: 1rem 1.1rem; min-height: 112px; }
+        [data-testid="stMetric"] { position: relative; overflow: hidden; background: linear-gradient(160deg,rgba(19,34,53,.94),rgba(10,22,36,.9)); border: 1px solid rgba(125,211,252,.14); border-radius: 16px; padding: 1rem 1.1rem; min-height: 112px; transition: border-color .16s ease, transform .16s ease, box-shadow .16s ease; }
+        [data-testid="stMetric"]:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #5eead4, transparent 76%); opacity: .9; }
+        [data-testid="stMetric"]:hover { border-color: rgba(94,234,212,.38); transform: translateY(-2px); box-shadow: 0 18px 32px rgba(0,0,0,.18); }
         [data-testid="stMetricLabel"] { color: #93a4b8; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; }
         [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] p { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; line-height: 1.25 !important; }
         [data-testid="stMetricValue"] { color: #f4f8fb; font-family: 'IBM Plex Mono', monospace; }
@@ -48,7 +50,7 @@ def inject_brand_surface() -> None:
         [data-testid="stPlotlyChart"] { border-radius: 14px; overflow: hidden; }
         [data-testid="stImage"] img { border: 1px solid rgba(125,211,252,.2); border-radius: 24px; box-shadow: 0 24px 70px rgba(0,0,0,.3); }
         button[data-testid="baseButton-secondary"] { border-color: rgba(125,211,252,.18); }
-        h1, h2, h3 { letter-spacing: -.035em; }
+        h1, h2, h3 { letter-spacing: -.035em; font-family: 'Outfit', 'IBM Plex Sans', sans-serif; }
         h2 { margin-top: 2rem; }
         .ns-hero {
           position: relative; overflow: hidden; min-height: 330px; padding: 2.6rem 2.8rem;
@@ -154,14 +156,16 @@ def inject_brand_surface() -> None:
         [data-testid="stMainBlockContainer"] { max-width: 1540px; padding-top: 4.15rem !important; }
         [data-testid="stMainBlockContainer"] h1 { margin-top: .15rem !important; }
         .ns-topbar { position: fixed; z-index: 10000; top: 0; left: 0; right: 0; height: 58px; display: flex; align-items: center; justify-content: space-between; padding: 0 1.35rem 0 1.55rem; background: rgba(5,13,24,.98); border-bottom: 1px solid rgba(91,177,227,.14); box-shadow: 0 10px 30px rgba(0,0,0,.16); }
-        .ns-topbar-brand { display: flex; align-items: center; gap: .72rem; color: #f5fbff; font: 700 .98rem/1 'IBM Plex Mono', monospace; letter-spacing: .12em; }
+        .ns-topbar-brand { display: flex; align-items: center; gap: .72rem; color: #f5fbff; font: 700 .98rem/1 'Outfit', 'Inter', sans-serif; letter-spacing: .1em; }
         .ns-topbar-brand small { display: block; margin-top: .24rem; color: #27d9e0; font: 500 .56rem 'IBM Plex Mono', monospace; letter-spacing: .15em; }
-        .ns-topbar-mark { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; color: #5eead4; background: #0b3344; font-size: 1.55rem; line-height: 1; box-shadow: 0 0 22px rgba(45,212,191,.28); }
+        .ns-topbar-mark { position: relative; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 15px; color: #5eead4; background: radial-gradient(circle at 32% 26%, rgba(127,181,130,.3), rgba(94,163,143,.1) 58%, transparent 74%), #0b1d2a; border: 1px solid rgba(94,234,212,.35); font-size: 1.35rem; line-height: 1; box-shadow: 0 0 28px -8px rgba(94,234,212,.8), inset 0 1px rgba(255,255,255,.08); }
+        .ns-topbar-mark:before { content: ''; position: absolute; inset: -4px; z-index: -1; border-radius: 19px; background: conic-gradient(#5eead4, #8b9cff, #f6c177, #5eead4); filter: blur(8px); opacity: .25; animation: ns-ring-spin 10s linear infinite; }
+        @keyframes ns-ring-spin { to { transform: rotate(360deg); } }
         .ns-topbar-actions { display: flex; align-items: center; gap: 1.05rem; color: #dbe9f2; font: 500 .78rem 'IBM Plex Sans', sans-serif; }
         .ns-topbar-actions span:first-child { padding: .48rem .72rem; border: 1px solid rgba(148,163,184,.2); border-radius: 8px; white-space: nowrap; }
         .ns-topbar-icon { font-size: 1.15rem; color: #f5fbff; }
         .ns-sidebar-brand { position: fixed; z-index: 10001; top: 0; left: 0; width: 224px; height: 58px; display: flex; align-items: center; gap: .68rem; padding: 0 1.1rem; box-sizing: border-box; background: rgba(5,13,24,.98); border-right: 1px solid rgba(91,177,227,.14); border-bottom: 1px solid rgba(91,177,227,.14); color: #f5fbff; }
-        .ns-sidebar-brand b { display: block; font: 700 .88rem/1 'IBM Plex Mono', monospace; letter-spacing: .11em; }
+        .ns-sidebar-brand b { display: block; font: 700 .88rem/1 'Outfit', 'Inter', sans-serif; letter-spacing: .1em; }
         .ns-sidebar-brand small { display: block; margin-top: .24rem; color: #27d9e0; font: 500 .5rem 'IBM Plex Mono', monospace; letter-spacing: .13em; }
         [data-testid="stHeader"] { background: transparent !important; z-index: 1001; }
         [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .stDeployButton, #MainMenu { display: none !important; }
@@ -176,7 +180,7 @@ def inject_brand_surface() -> None:
         .ns-overview-hero .ns-hero-accent { color: #61ead4; }
         .ns-overview-hero .ns-chip { border-color: rgba(45,212,191,.5); background: rgba(5,40,54,.7); }
         .ns-explore-bar { margin-top: .9rem; }
-        .ns-panel-label { color: #d8edf5; font: 600 .72rem 'IBM Plex Mono', monospace; letter-spacing: .13em; text-transform: uppercase; }
+        .ns-panel-label { color: #d8edf5; font: 600 .72rem 'Inter', sans-serif; letter-spacing: .13em; text-transform: uppercase; }
         .ns-takeaway { min-height: 290px; border: 1px solid rgba(45,212,191,.22); border-radius: 14px; padding: 1.25rem; background: linear-gradient(150deg, rgba(11,33,50,.88), rgba(7,20,32,.92)); }
         .ns-takeaway p { color: #c5d7e3; line-height: 1.55; }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
