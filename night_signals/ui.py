@@ -157,12 +157,13 @@ def inject_brand_surface() -> None:
         .ns-topbar-brand small { display: block; margin-top: .24rem; color: #27d9e0; font: 500 .56rem 'IBM Plex Mono', monospace; letter-spacing: .15em; }
         .ns-topbar-mark { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; color: #5eead4; background: #0b3344; font-size: 1.55rem; line-height: 1; box-shadow: 0 0 22px rgba(45,212,191,.28); }
         .ns-topbar-actions { display: flex; align-items: center; gap: 1.05rem; color: #dbe9f2; font: 500 .78rem 'IBM Plex Sans', sans-serif; }
-        .ns-topbar-actions span:first-child { padding: .48rem .72rem; border: 1px solid rgba(148,163,184,.2); border-radius: 8px; }
+        .ns-topbar-actions span:first-child { padding: .48rem .72rem; border: 1px solid rgba(148,163,184,.2); border-radius: 8px; white-space: nowrap; }
         .ns-topbar-icon { font-size: 1.15rem; color: #f5fbff; }
         .ns-sidebar-brand { position: fixed; z-index: 10001; top: 0; left: 0; width: 224px; height: 58px; display: flex; align-items: center; gap: .68rem; padding: 0 1.1rem; box-sizing: border-box; background: rgba(5,13,24,.98); border-right: 1px solid rgba(91,177,227,.14); border-bottom: 1px solid rgba(91,177,227,.14); color: #f5fbff; }
         .ns-sidebar-brand b { display: block; font: 700 .88rem/1 'IBM Plex Mono', monospace; letter-spacing: .11em; }
         .ns-sidebar-brand small { display: block; margin-top: .24rem; color: #27d9e0; font: 500 .5rem 'IBM Plex Mono', monospace; letter-spacing: .13em; }
         [data-testid="stHeader"] { background: transparent !important; z-index: 1001; }
+        [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .stDeployButton, #MainMenu { display: none !important; }
         [data-testid="stSidebar"] { padding-top: 58px !important; }
         [data-testid="stMainBlockContainer"] { padding-top: 5.1rem !important; }
         .ns-section-kicker { color: #31dfe0; }
