@@ -150,7 +150,7 @@ def inject_brand_surface() -> None:
         [data-testid="stSidebarNav"] a { min-height: 2.08rem; padding: .43rem .58rem; font-size: .76rem; }
         .ns-sidebar-rule { margin: .72rem .12rem .18rem; }
         .ns-sidebar-footer { margin-top: .78rem; padding-top: .65rem; font-size: .62rem; }
-        [data-testid="stMainBlockContainer"] { max-width: 1540px; padding-top: .45rem !important; }
+        [data-testid="stMainBlockContainer"] { max-width: 1540px; padding-top: 4.15rem !important; }
         [data-testid="stMainBlockContainer"] h1 { margin-top: .15rem !important; }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
         @media (max-width: 680px) { .ns-hero { padding: 1.5rem; min-height: 320px; } .ns-hero-content { max-width: 100%; } .ns-hero-art { width: 100%; opacity: .24; mask-image: linear-gradient(180deg, rgba(0,0,0,.8), transparent 92%); } }
