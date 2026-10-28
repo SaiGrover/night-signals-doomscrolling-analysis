@@ -7,11 +7,19 @@ from night_signals.ui import footer, page_intro
 
 page_intro("NHANES independent evidence", "A separately analysed population-health layer. It is not linked or row-merged with the primary survey.", ":material/public:")
 summary = read_json_artifact(OUTPUT_DIR / "tables" / "nhanes_summary.json")
+design_bp = summary["B1_sleep_blood_pressure"].get("design_aware", {})
 with st.container(horizontal=True):
     st.metric("Analytic adults", f"{summary['analytic_adults']:,}", border=True)
-    st.metric("Short-sleep systolic difference", f"{summary['B1_sleep_blood_pressure']['systolic_diff_short_minus_adequate']:.1f} mmHg", border=True)
-    st.metric("Short-sleep diastolic difference", f"{summary['B1_sleep_blood_pressure']['diastolic_diff_short_minus_adequate']:.2f} mmHg", border=True)
+    st.metric("Short-sleep systolic difference", f"{design_bp.get('systolic', {}).get('short_sleep_coefficient', summary['B1_sleep_blood_pressure']['systolic_diff_short_minus_adequate']):.1f} mmHg", border=True)
+    st.metric("Short-sleep diastolic difference", f"{design_bp.get('diastolic', {}).get('short_sleep_coefficient', summary['B1_sleep_blood_pressure']['diastolic_diff_short_minus_adequate']):.2f} mmHg", border=True)
     st.metric("BMI–sleep Spearman rho", f"{summary['B2_sleep_by_bmi']['spearman_bmi_vs_sleep']:.2f}", border=True)
+
+st.caption(
+    "NHANES estimates use MEC weights, stratum fixed effects, and stratum–PSU clustered covariance. "
+    f"Design-aware p-values: systolic {design_bp.get('systolic', {}).get('short_sleep_p', float('nan')):.3g}; "
+    f"diastolic {design_bp.get('diastolic', {}).get('short_sleep_p', float('nan')):.3g}.",
+    help="These are weighted associations, not causal or clinical estimates.",
+)
 
 left, right = st.columns(2)
 with left.container(border=True):

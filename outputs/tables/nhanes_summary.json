@@ -3,13 +3,33 @@
   "cycle": "August 2021-2023 (NHANES L cycle)",
   "role": "Secondary, independent population-health evidence (not linked to primary respondents)",
   "analytic_adults": 8040,
+  "survey_design": {
+    "weight": "WTMEC2YR (fallback WTINT2YR)",
+    "strata": "SDMVSTRA",
+    "psu": "SDMVPSU",
+    "estimation": "weight-adjusted means and WLS regression with PSU-clustered covariance and stratum fixed effects"
+  },
   "note": "Cross-sectional survey; associations only, no causal or clinical claims.",
   "B1_sleep_blood_pressure": {
     "systolic_diff_short_minus_adequate": 1.2,
     "systolic_p": 0.03616377181267482,
     "systolic_cohens_d": 0.067,
     "diastolic_diff_short_minus_adequate": 1.75,
-    "diastolic_p": 1.4203356517518845e-06
+    "diastolic_p": 1.4203356517518845e-06,
+    "design_aware": {
+      "systolic": {
+        "short_sleep_coefficient": 1.3327892458535744,
+        "short_sleep_p": 0.0742775149284554,
+        "stratum_psu_clusters": 30,
+        "strata": 15
+      },
+      "diastolic": {
+        "short_sleep_coefficient": 2.0684461943512176,
+        "short_sleep_p": 0.00024191086665794365,
+        "stratum_psu_clusters": 30,
+        "strata": 15
+      }
+    }
   },
   "B2_sleep_by_bmi": {
     "spearman_bmi_vs_sleep": -0.05,

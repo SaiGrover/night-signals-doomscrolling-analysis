@@ -1,0 +1,20 @@
+{
+  "dataset": "A Multi-Night Instantaneous Heart Rate and Accelerometry Dataset with EEG Sleep Stage Labels",
+  "physionet_url": "https://physionet.org/content/bidsleep-dataset/1.0.0/",
+  "download_url": "https://physionet.org/files/bidsleep-dataset/1.0.0/",
+  "version": "1.0.0",
+  "doi": "10.13026/a0sy-7t69",
+  "license": "Open Data Commons Attribution License v1.0",
+  "expected_subjects": 47,
+  "expected_nights": 253,
+  "files_per_night": [
+    "motion.csv",
+    "hr.csv",
+    "labels.mat"
+  ],
+  "analysis_role": "Independent physiological evidence; never merged with Night Signals respondents and not external validation of the classifier.",
+  "raw_data_policy": "Not committed to Git; download locally because the source reports approximately 27.9 GB uncompressed.",
+  "local_status": "manifest-only",
+  "local_root": "C:\\Users\\Saanvi\\Downloads\\Projects\\Doom Scrolling\\platform\\external\\physionet\\bidsleep-dataset\\1.0.0",
+  "next_step": "Download the PhysioNet dataset into C:\\Users\\Saanvi\\Downloads\\Projects\\Doom Scrolling\\platform\\external\\physionet\\bidsleep-dataset\\1.0.0 and rerun this script."
+}

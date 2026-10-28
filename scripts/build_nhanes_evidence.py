@@ -23,6 +23,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import statsmodels.formula.api as smf
 
 try:
     from scipy import stats as _stats
@@ -78,7 +79,7 @@ def build() -> dict:
     bpx = load("BPXO_L", ["SEQN", "BPXOSY1", "BPXOSY2", "BPXOSY3", "BPXODI1", "BPXODI2", "BPXODI3"])
     bmx = load("BMX_L", ["SEQN", "BMXBMI"])
     paq = load("PAQ_L", ["SEQN", "PAD680", "PAD800", "PAD820"])
-    demo = load("DEMO_L", ["SEQN", "RIDAGEYR", "RIAGENDR"])
+    demo = load("DEMO_L", ["SEQN", "RIDAGEYR", "RIAGENDR", "WTINT2YR", "WTMEC2YR", "SDMVPSU", "SDMVSTRA"])
 
     df = demo.merge(slq, on="SEQN", how="left").merge(bmx, on="SEQN", how="left")
     df = df.merge(bpx, on="SEQN", how="left").merge(paq, on="SEQN", how="left")
@@ -97,12 +98,17 @@ def build() -> dict:
     df["activity_group"] = np.where(df["activity_min"] >= 30, "Meets activity (>=30 min/day)",
                                     "Below activity floor (<30 min/day)")
     df["short_sleep"] = np.where(df["sleep_hours"] < 7, "Short (<7h)", "Adequate (>=7h)")
+    df["survey_weight"] = pd.to_numeric(df["WTMEC2YR"], errors="coerce").fillna(pd.to_numeric(df["WTINT2YR"], errors="coerce"))
+    df["psu"] = pd.to_numeric(df["SDMVPSU"], errors="coerce")
+    df["stratum"] = pd.to_numeric(df["SDMVSTRA"], errors="coerce")
     df["bmi_category"] = pd.cut(df["bmi"], [0, 18.5, 25, 30, 100],
                                 labels=["Underweight", "Normal", "Overweight", "Obese"])
 
     summary: dict = {"dataset": "NHANES", "cycle": CYCLE,
                      "role": "Secondary, independent population-health evidence (not linked to primary respondents)",
                      "analytic_adults": int(len(df)),
+                     "survey_design": {"weight": "WTMEC2YR (fallback WTINT2YR)", "strata": "SDMVSTRA", "psu": "SDMVPSU",
+                                       "estimation": "weight-adjusted means and WLS regression with PSU-clustered covariance and stratum fixed effects"},
                      "note": "Cross-sectional survey; associations only, no causal or clinical claims."}
 
     bp = df.dropna(subset=["systolic", "diastolic"])
@@ -120,6 +126,28 @@ def build() -> dict:
         "diastolic_diff_short_minus_adequate": round(short["diastolic"].mean() - adeq["diastolic"].mean(), 2),
         "diastolic_p": welch(short["diastolic"].to_numpy(), adeq["diastolic"].to_numpy()),
     }
+    def weighted_mean(values: pd.Series, weights: pd.Series) -> float:
+        valid = values.notna() & weights.notna() & weights.gt(0)
+        return float(np.average(values[valid], weights=weights[valid])) if valid.any() else float("nan")
+
+    weighted_rows = []
+    for group, part in bp.groupby("short_sleep"):
+        weighted_rows.append({"sleep_group": group, "weighted_n": float(part["survey_weight"].sum()),
+                              "weighted_mean_systolic": weighted_mean(part["systolic"], part["survey_weight"]),
+                              "weighted_mean_diastolic": weighted_mean(part["diastolic"], part["survey_weight"])})
+    pd.DataFrame(weighted_rows).to_csv(TABLES / "nhanes_weighted_sleep_blood_pressure.csv", index=False)
+    design_bp = bp.dropna(subset=["survey_weight", "psu", "stratum"]).copy()
+    design_bp["stratum_psu"] = design_bp["stratum"].astype(str) + ":" + design_bp["psu"].astype(str)
+    design_models = {}
+    for outcome in ["systolic", "diastolic"]:
+        fit = smf.wls(f"{outcome} ~ C(short_sleep) + C(stratum)", data=design_bp,
+                      weights=design_bp["survey_weight"]).fit(cov_type="cluster", cov_kwds={"groups": design_bp["stratum_psu"]})
+        term = "C(short_sleep)[T.Short (<7h)]"
+        design_models[outcome] = {"short_sleep_coefficient": float(fit.params.get(term, np.nan)),
+                                  "short_sleep_p": float(fit.pvalues.get(term, np.nan)),
+                                  "stratum_psu_clusters": int(design_bp["stratum_psu"].nunique()),
+                                  "strata": int(design_bp["stratum"].nunique())}
+    summary["B1_sleep_blood_pressure"]["design_aware"] = design_models
 
     bmi_sub = df.dropna(subset=["bmi_category"])
     cats = [{"bmi_category": c, "n": int(len(s)), "mean_sleep_hours": round(s.mean(), 3),

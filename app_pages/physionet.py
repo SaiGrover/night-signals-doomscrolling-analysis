@@ -22,4 +22,14 @@ with right.container(border=True):
     fig = px.bar(composition, x="stage", y="share", labels={"stage": "Sleep stage", "share": "Scored epochs (%)"})
     st.plotly_chart(fig, alt="Mean composition of scored sleep stages", config={"displaylogo": False})
 st.warning(summary["note"], title="Interpretation boundary", icon=":material/warning:")
+multi = summary.get("multi_night_dataset", {})
+with st.container(border=True):
+    st.subheader("Multi-night evidence layer", icon=":material/timeline:")
+    st.write(
+        f"{multi.get('name', 'Specified multi-night PhysioNet dataset')} is registered as an independent source "
+        f"({multi.get('expected_subjects', 47)} adults / {multi.get('expected_nights', 253)} nights). "
+        "Raw files are intentionally not bundled because the source is multi-gigabyte; the local reproducible "
+        "pipeline is available in `scripts/build_bidsleep_evidence.py`."
+    )
+    st.link_button("Open PhysioNet source", multi.get("physionet_url", "https://physionet.org/content/bidsleep-dataset/1.0.0/"), icon=":material/open_in_new:")
 footer()

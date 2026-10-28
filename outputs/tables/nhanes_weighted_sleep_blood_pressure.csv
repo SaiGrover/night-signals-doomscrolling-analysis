@@ -1,0 +1,3 @@
+sleep_group,weighted_n,weighted_mean_systolic,weighted_mean_diastolic
+Adequate (>=7h),193288425.23183,120.51565008264492,74.02833337080476
+Short (<7h),49878350.290421,121.90411373025594,76.13509930002274

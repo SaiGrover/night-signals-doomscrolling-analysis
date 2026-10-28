@@ -128,6 +128,15 @@ def build() -> dict:
                "note": "Objective physiology, associations only; no causal or clinical claims; "
                        "tri-axial acceleration is available in the source and summarised here via "
                        "wearable heart-rate dynamics to keep the analytical footprint light."}
+    summary["multi_night_dataset"] = {
+        "name": "A Multi-Night Instantaneous Heart Rate and Accelerometry Dataset with EEG Sleep Stage Labels",
+        "physionet_url": "https://physionet.org/content/bidsleep-dataset/1.0.0/",
+        "doi": "10.13026/a0sy-7t69",
+        "license": "Open Data Commons Attribution License v1.0",
+        "expected_subjects": 47,
+        "expected_nights": 253,
+        "local_analysis": "Run scripts/build_bidsleep_evidence.py after downloading the raw dataset locally; raw data are not committed because the source reports approximately 27.9 GB uncompressed.",
+    }
     summary["charts"] = _chart_specs(by_stage, comp, subj)
     for target in (PUBLIC / "physionet_summary.json", TABLES / "physionet_summary.json"):
         target.write_text(json.dumps(summary, indent=2), encoding="utf-8")
