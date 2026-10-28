@@ -187,7 +187,7 @@ def inject_brand_surface() -> None:
     )
 
 
-def hero(kicker: str, title: str, body: str, class_name: str = "") -> None:
+def hero(kicker: str, title: str, body: str, class_name: str = "ns-overview-hero") -> None:
     st.html(
         f'<section class="ns-hero {class_name}"><img class="ns-hero-art" src="{_hero_art_uri()}" alt="Nighttime phone use and signal network visual"><div class="ns-hero-content"><div class="ns-kicker">{kicker}</div><h1>{title}</h1><p>{body}</p><div class="ns-hero-meta"><span class="ns-chip">1,000 respondents</span><span class="ns-chip">3 evidence layers</span><span class="ns-chip">Internal validation</span></div></div></section>'
     )

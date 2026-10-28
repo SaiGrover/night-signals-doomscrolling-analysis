@@ -10,7 +10,6 @@ hero(
     "Night Signals  ·  Research atlas",
     'What happens after<br>the screen should<br><span class="ns-hero-accent">have gone dark?</span>',
     "A multi-dataset investigation of nighttime digital behaviour, sleep outcomes, resilient exceptions, and objective health signals. The atlas separates observed association, prediction, and external evidence by design.",
-    class_name="ns-overview-hero",
 )
 
 cohort_filter_bar()
