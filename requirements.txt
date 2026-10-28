@@ -1,0 +1,8 @@
+# Streamlit Cloud entrypoint dependencies.
+# Keep this file in the repository root because Streamlit Cloud discovers it automatically.
+streamlit>=1.66.1
+pandas>=2.2
+numpy>=2.0
+scipy>=1.13
+statsmodels>=0.14
+plotly>=6.0
