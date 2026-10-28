@@ -186,6 +186,18 @@ def inject_brand_surface() -> None:
         </div>
         """
     )
+    hero_uri = _hero_art_uri()
+    st.html(
+        "<style>"
+        "[data-testid='stAppViewContainer']{background:linear-gradient(180deg,rgba(5,13,24,.91),rgba(4,11,19,.98)),url('"
+        + hero_uri
+        + "') center/cover fixed no-repeat;}"
+        "[data-testid='stMainBlockContainer']{max-width:1540px;padding-left:1.25rem;padding-right:1.25rem;}"
+        "[data-testid='stVerticalBlockBorderWrapper']{background:rgba(6,18,30,.72);backdrop-filter:blur(14px) saturate(1.08);border-radius:16px;}"
+        "[data-testid='stMetric']{background:linear-gradient(145deg,rgba(15,33,48,.94),rgba(7,21,34,.88));box-shadow:inset 0 1px rgba(255,255,255,.035),0 12px 30px rgba(0,0,0,.12);}\n"
+        ".ns-topbar,.ns-sidebar-brand{backdrop-filter:blur(14px) saturate(1.1);}\n"
+        "</style>"
+    )
 
 
 def hero(kicker: str, title: str, body: str, class_name: str = "ns-overview-hero") -> None:
