@@ -16,11 +16,13 @@ st.session_state.setdefault("selected_outcome", "sleep_latency_minutes")
 inject_brand_surface()
 
 pages = {
+    "": [
+        st.Page("app_pages/overview.py", title="Overview", icon=":material/bedtime:", default=True),
+    ],
     "Start here": [
-        st.Page("app_pages/landing.py", title="Landing page", icon=":material/auto_awesome:", default=True),
+        st.Page("app_pages/landing.py", title="Landing page", icon=":material/auto_awesome:"),
     ],
     "Research atlas": [
-        st.Page("app_pages/overview.py", title="Overview", icon=":material/bedtime:"),
         st.Page("app_pages/data_audit.py", title="Data audit", icon=":material/fact_check:"),
         st.Page("app_pages/associations.py", title="Associations & gradients", icon=":material/query_stats:"),
         st.Page("app_pages/resilience.py", title="Resilience", icon=":material/health_and_safety:"),
@@ -38,7 +40,10 @@ pages = {
 }
 
 with st.sidebar:
-    st.html('<div class="ns-brand"><span class="ns-brand-mark"></span><span>Night Signals<small>SLEEP × DOOMSCROLLING</small></span></div><div class="ns-sidebar-rule"></div>')
+    st.html(
+        '<div class="ns-sidebar-brand"><span class="ns-topbar-mark">◔</span><span><b>NIGHT SIGNALS</b><small>RESEARCH ATLAS</small></span></div>'
+    )
+    st.html('<div class="ns-sidebar-rule"></div>')
 
 navigation = st.navigation(pages, position="sidebar")
 navigation.run()

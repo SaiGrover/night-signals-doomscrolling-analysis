@@ -152,16 +152,44 @@ def inject_brand_surface() -> None:
         .ns-sidebar-footer { margin-top: .78rem; padding-top: .65rem; font-size: .62rem; }
         [data-testid="stMainBlockContainer"] { max-width: 1540px; padding-top: 4.15rem !important; }
         [data-testid="stMainBlockContainer"] h1 { margin-top: .15rem !important; }
+        .ns-topbar { position: fixed; z-index: 10000; top: 0; left: 0; right: 0; height: 58px; display: flex; align-items: center; justify-content: space-between; padding: 0 1.35rem 0 1.55rem; background: rgba(5,13,24,.98); border-bottom: 1px solid rgba(91,177,227,.14); box-shadow: 0 10px 30px rgba(0,0,0,.16); }
+        .ns-topbar-brand { display: flex; align-items: center; gap: .72rem; color: #f5fbff; font: 700 .98rem/1 'IBM Plex Mono', monospace; letter-spacing: .12em; }
+        .ns-topbar-brand small { display: block; margin-top: .24rem; color: #27d9e0; font: 500 .56rem 'IBM Plex Mono', monospace; letter-spacing: .15em; }
+        .ns-topbar-mark { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; color: #5eead4; background: #0b3344; font-size: 1.55rem; line-height: 1; box-shadow: 0 0 22px rgba(45,212,191,.28); }
+        .ns-topbar-actions { display: flex; align-items: center; gap: 1.05rem; color: #dbe9f2; font: 500 .78rem 'IBM Plex Sans', sans-serif; }
+        .ns-topbar-actions span:first-child { padding: .48rem .72rem; border: 1px solid rgba(148,163,184,.2); border-radius: 8px; }
+        .ns-topbar-icon { font-size: 1.15rem; color: #f5fbff; }
+        .ns-sidebar-brand { position: fixed; z-index: 10001; top: 0; left: 0; width: 224px; height: 58px; display: flex; align-items: center; gap: .68rem; padding: 0 1.1rem; box-sizing: border-box; background: rgba(5,13,24,.98); border-right: 1px solid rgba(91,177,227,.14); border-bottom: 1px solid rgba(91,177,227,.14); color: #f5fbff; }
+        .ns-sidebar-brand b { display: block; font: 700 .88rem/1 'IBM Plex Mono', monospace; letter-spacing: .11em; }
+        .ns-sidebar-brand small { display: block; margin-top: .24rem; color: #27d9e0; font: 500 .5rem 'IBM Plex Mono', monospace; letter-spacing: .13em; }
+        [data-testid="stHeader"] { background: transparent !important; z-index: 1001; }
+        [data-testid="stSidebar"] { padding-top: 58px !important; }
+        [data-testid="stMainBlockContainer"] { padding-top: 5.1rem !important; }
+        .ns-section-kicker { color: #31dfe0; }
+        .ns-overview-hero { min-height: 395px; padding: 2.45rem 2.85rem; border-color: rgba(42,191,241,.32); background: linear-gradient(112deg, rgba(5,22,39,.98) 0%, rgba(5,18,32,.9) 52%, rgba(8,24,42,.45) 100%); }
+        .ns-overview-hero .ns-hero-art { width: 58%; opacity: .74; mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.48) 20%, #000 60%); }
+        .ns-overview-hero .ns-hero-content { max-width: 61%; }
+        .ns-overview-hero .ns-hero h1 { font-size: clamp(3.45rem, 6.2vw, 5.8rem); line-height: .91; }
+        .ns-overview-hero .ns-hero-accent { color: #61ead4; }
+        .ns-overview-hero .ns-chip { border-color: rgba(45,212,191,.5); background: rgba(5,40,54,.7); }
+        .ns-explore-bar { margin-top: .9rem; }
+        .ns-panel-label { color: #d8edf5; font: 600 .72rem 'IBM Plex Mono', monospace; letter-spacing: .13em; text-transform: uppercase; }
+        .ns-takeaway { min-height: 290px; border: 1px solid rgba(45,212,191,.22); border-radius: 14px; padding: 1.25rem; background: linear-gradient(150deg, rgba(11,33,50,.88), rgba(7,20,32,.92)); }
+        .ns-takeaway p { color: #c5d7e3; line-height: 1.55; }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
         @media (max-width: 680px) { .ns-hero { padding: 1.5rem; min-height: 320px; } .ns-hero-content { max-width: 100%; } .ns-hero-art { width: 100%; opacity: .24; mask-image: linear-gradient(180deg, rgba(0,0,0,.8), transparent 92%); } }
         </style>
+        <div class="ns-topbar">
+          <div class="ns-topbar-brand"><span class="ns-topbar-mark">◔</span><span><b>NIGHT SIGNALS</b><small>RESEARCH ATLAS</small></span></div>
+          <div class="ns-topbar-actions"><span>↗&nbsp; Share</span><span class="ns-topbar-icon">◉</span><span class="ns-topbar-icon">☼</span></div>
+        </div>
         """
     )
 
 
-def hero(kicker: str, title: str, body: str) -> None:
+def hero(kicker: str, title: str, body: str, class_name: str = "") -> None:
     st.html(
-        f'<section class="ns-hero"><img class="ns-hero-art" src="{_hero_art_uri()}" alt="Nighttime phone use and signal network visual"><div class="ns-hero-content"><div class="ns-kicker">{kicker}</div><h1>{title}</h1><p>{body}</p><div class="ns-hero-meta"><span class="ns-chip">1,000 respondents</span><span class="ns-chip">3 evidence layers</span><span class="ns-chip">Internal validation</span></div></div></section>'
+        f'<section class="ns-hero {class_name}"><img class="ns-hero-art" src="{_hero_art_uri()}" alt="Nighttime phone use and signal network visual"><div class="ns-hero-content"><div class="ns-kicker">{kicker}</div><h1>{title}</h1><p>{body}</p><div class="ns-hero-meta"><span class="ns-chip">1,000 respondents</span><span class="ns-chip">3 evidence layers</span><span class="ns-chip">Internal validation</span></div></div></section>'
     )
 
 
