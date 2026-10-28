@@ -2,7 +2,7 @@ import plotly.express as px
 import streamlit as st
 
 from night_signals.data import apply_filters, load_survey
-from night_signals.ui import cohort_filter_bar, footer, hero
+from night_signals.ui import cohort_filter_bar, footer, hero, kpi_tiles
 from night_signals.viz import COLORS, finish
 
 
@@ -35,18 +35,17 @@ exception_counts = (
     .reindex(df["exposure_quartile"].cat.categories, fill_value=0)
     .tolist()
 )
-st.html('<div class="ns-section-kicker ns-explore-bar">Explore the data</div>')
+st.html('<div class="ns-section-kicker ns-explore-bar">Signal summary</div>')
+kpi_tiles(
+    [
+        ("Respondents in view", f"{len(df):,}", "selected cohort", quartile_counts, "#5eead4"),
+        ("Poor-sleep prevalence", f"{df['poor_sleep'].mean():.1%}", "across the selected cohort", quartile_sleep, "#8b9cff"),
+        ("Median bedtime exposure", f"{df['bedtime_screen_time_minutes'].median():.0f} min", "nightly screen exposure", quartile_exposure, "#f6c177"),
+        ("High-exposure exceptions", f"{int((df['high_exposure'] & df['favorable_sleep']).sum())}", "favorable sleep profiles", exception_counts, "#e78284"),
+    ]
+)
 
-with st.container(horizontal=True, gap="small"):
-    st.metric(
-        "Respondents in view",
-        f"{len(df):,}",
-        border=True,
-        chart_data=quartile_counts,
-    )
-    st.metric("Poor-sleep prevalence", f"{df['poor_sleep'].mean():.1%}", border=True, chart_data=quartile_sleep)
-    st.metric("Median bedtime exposure", f"{df['bedtime_screen_time_minutes'].median():.0f} min", border=True, chart_data=quartile_exposure)
-    st.metric("High-exposure exceptions", f"{int((df['high_exposure'] & df['favorable_sleep']).sum())}", border=True, chart_data=exception_counts)
+st.html('<div class="ns-section-kicker ns-explore-bar">Explore the data</div>')
 
 left, middle, right = st.columns([1.08, 1.08, 0.82], gap="small")
 

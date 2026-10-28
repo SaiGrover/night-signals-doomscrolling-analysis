@@ -46,6 +46,15 @@ def inject_brand_surface() -> None:
         [data-testid="stMetricLabel"] { color: #93a4b8; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; }
         [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] p { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; line-height: 1.25 !important; }
         [data-testid="stMetricValue"] { color: #f4f8fb; font-family: 'IBM Plex Mono', monospace; }
+        .ns-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .78rem; margin: .35rem 0 .95rem; }
+        .ns-kpi-tile { position: relative; min-height: 126px; overflow: hidden; padding: .92rem 1rem .78rem; border: 1px solid rgba(190,210,192,.15); border-radius: 15px; background: linear-gradient(160deg, rgba(255,255,255,.055), rgba(255,255,255,.014)), rgba(11,24,40,.75); box-shadow: inset 0 1px rgba(255,255,255,.035); transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
+        .ns-kpi-tile:before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, var(--tile-accent), transparent 78%); }
+        .ns-kpi-tile:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--tile-accent) 60%, transparent); box-shadow: 0 16px 30px rgba(0,0,0,.18); }
+        .ns-kpi-label { color: #9bb0c0; font: 600 .66rem 'Inter', sans-serif; letter-spacing: .13em; text-transform: uppercase; white-space: normal; }
+        .ns-kpi-value { margin: .28rem 0 .12rem; color: var(--tile-accent); font: 700 1.82rem/1.05 'Outfit', 'Inter', sans-serif; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+        .ns-kpi-note { color: #718596; font: 400 .72rem/1.35 'Inter', sans-serif; }
+        .ns-kpi-chart { position: absolute; right: .78rem; bottom: .72rem; width: 31%; height: 34px; color: var(--tile-accent); opacity: .9; }
+        .ns-kpi-spark { display: block; width: 100%; height: 100%; overflow: visible; }
         [data-testid="stVerticalBlockBorderWrapper"] { border-color: rgba(125,211,252,.13); background: rgba(11,24,40,.56); border-radius: 18px; }
         [data-testid="stPlotlyChart"] { border-radius: 14px; overflow: hidden; }
         [data-testid="stImage"] img { border: 1px solid rgba(125,211,252,.2); border-radius: 24px; box-shadow: 0 24px 70px rgba(0,0,0,.3); }
@@ -127,6 +136,10 @@ def inject_brand_surface() -> None:
         div[data-testid="stCaptionContainer"] p { color: #7f92a3 !important; }
         button[data-testid="baseButton-primary"] { background: #2dd4bf; border-color: #2dd4bf; color: #071315; }
         button[data-testid="baseButton-primary"] p { color: #071315 !important; }
+        button[data-testid="baseButton-primary"] { box-shadow: 0 10px 28px -14px rgba(45,212,191,.9), inset 0 1px rgba(255,255,255,.22); font-weight: 700; transition: transform .16s ease, filter .16s ease, box-shadow .16s ease; }
+        button[data-testid="baseButton-primary"] p, button[data-testid="baseButton-primary"] span { color: #05201f !important; font-weight: 700 !important; }
+        button[data-testid="baseButton-primary"]:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 14px 34px -12px rgba(45,212,191,.95), inset 0 1px rgba(255,255,255,.25); }
+        [data-testid="stAlert"] { background: rgba(217,178,106,.08) !important; border: 1px solid rgba(217,178,106,.32) !important; border-radius: 12px !important; color: #c6d2cf !important; }
         button[data-testid="baseButton-secondary"] { background: #141e28; border-color: rgba(148,163,184,.23); color: #d3e0e8; }
         [data-testid="stDataFrame"] { border: 1px solid rgba(148,163,184,.14); border-radius: 12px; overflow: hidden; }
         /* Keep the normal font change scoped to the left navigation only. */
@@ -184,7 +197,8 @@ def inject_brand_surface() -> None:
         .ns-takeaway { min-height: 290px; border: 1px solid rgba(45,212,191,.22); border-radius: 14px; padding: 1.25rem; background: linear-gradient(150deg, rgba(11,33,50,.88), rgba(7,20,32,.92)); }
         .ns-takeaway p { color: #c5d7e3; line-height: 1.55; }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
-        @media (max-width: 680px) { .ns-hero { padding: 1.5rem; min-height: 320px; } .ns-hero-content { max-width: 100%; } .ns-hero-art { width: 100%; opacity: .24; mask-image: linear-gradient(180deg, rgba(0,0,0,.8), transparent 92%); } }
+        @media (max-width: 980px) { .ns-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ns-overview-hero .ns-hero-content { max-width: 68%; } }
+        @media (max-width: 680px) { .ns-kpi-grid { grid-template-columns: 1fr; } .ns-hero { padding: 1.5rem; min-height: 320px; } .ns-hero-content { max-width: 100%; } .ns-hero-art { width: 100%; opacity: .24; mask-image: linear-gradient(180deg, rgba(0,0,0,.8), transparent 92%); } .ns-overview-hero .ns-hero-content { max-width: 100%; } .ns-topbar-actions span:not(:first-child) { display:none; } }
         </style>
         <div class="ns-topbar">
           <div class="ns-topbar-brand"><span class="ns-topbar-mark">◔</span><span><b>NIGHT SIGNALS</b><small>RESEARCH ATLAS</small></span></div>
@@ -210,6 +224,37 @@ def hero(kicker: str, title: str, body: str, class_name: str = "ns-overview-hero
     st.html(
         f'<section class="ns-hero {class_name}"><img class="ns-hero-art" src="{_hero_art_uri()}" alt="Nighttime phone use and signal network visual"><div class="ns-hero-content"><div class="ns-kicker">{kicker}</div><h1>{title}</h1><p>{body}</p><div class="ns-hero-meta"><span class="ns-chip">1,000 respondents</span><span class="ns-chip">3 evidence layers</span><span class="ns-chip">Internal validation</span></div></div></section>'
     )
+
+
+def _sparkline(values: list[float]) -> str:
+    if not values:
+        return ""
+    lo, hi = min(values), max(values)
+    span = hi - lo or 1
+    points = " ".join(
+        f"{index * 100 / max(len(values) - 1, 1):.1f},{34 - ((value - lo) / span) * 26:.1f}"
+        for index, value in enumerate(values)
+    )
+    return (
+        '<svg class="ns-kpi-spark" viewBox="0 0 100 36" preserveAspectRatio="none" aria-hidden="true">'
+        f'<polyline points="{points}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+        "</svg>"
+    )
+
+
+def kpi_tiles(items: list[tuple[str, str, str, list[float], str]]) -> None:
+    """Render the authored metric tiles used by the atlas overview."""
+    cards = []
+    for label, value, note, trend, accent in items:
+        cards.append(
+            f'<article class="ns-kpi-tile" style="--tile-accent:{accent}">'
+            f'<div class="ns-kpi-label">{label}</div>'
+            f'<div class="ns-kpi-value">{value}</div>'
+            f'<div class="ns-kpi-note">{note}</div>'
+            f'<div class="ns-kpi-chart">{_sparkline(trend)}</div>'
+            "</article>"
+        )
+    st.html(f'<section class="ns-kpi-grid">{"".join(cards)}</section>')
 
 
 def cinematic_media(large: bool = False) -> None:
