@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import json
+import subprocess
 import shutil
 import urllib.request
 from pathlib import Path
@@ -18,19 +19,47 @@ def download_part(args: tuple[int, int, int, Path]) -> tuple[int, int]:
     expected = end - start + 1
     if target.exists() and target.stat().st_size == expected:
         return index, target.stat().st_size
-    request = urllib.request.Request(URL, headers={"Range": f"bytes={start}-{end}", "Accept-Encoding": "identity"})
-    with urllib.request.urlopen(request, timeout=180) as response, target.open("wb") as handle:
-        shutil.copyfileobj(response, handle, length=1024 * 1024)
-    if target.stat().st_size != expected:
-        raise RuntimeError(f"part {index} expected {expected} bytes, got {target.stat().st_size}")
+    temporary = target.with_suffix(".download")
+    temporary.unlink(missing_ok=True)
+    curl = shutil.which("curl") or shutil.which("curl.exe")
+    if curl:
+        command = [
+            curl,
+            "--fail",
+            "--location",
+            "--silent",
+            "--show-error",
+            "--retry",
+            "6",
+            "--retry-delay",
+            "3",
+            "--connect-timeout",
+            "30",
+            "--max-time",
+            "900",
+            "--range",
+            f"{start}-{end}",
+            "--output",
+            str(temporary),
+            URL,
+        ]
+        subprocess.run(command, check=True)
+    else:
+        request = urllib.request.Request(URL, headers={"Range": f"bytes={start}-{end}", "Accept-Encoding": "identity"})
+        with urllib.request.urlopen(request, timeout=180) as response, temporary.open("wb") as handle:
+            shutil.copyfileobj(response, handle, length=1024 * 1024)
+    if temporary.stat().st_size != expected:
+        temporary.unlink(missing_ok=True)
+        raise RuntimeError(f"part {index} expected {expected} bytes, got {temporary.stat().st_size}")
+    temporary.replace(target)
     return index, expected
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=Path("external/physionet/bidsleep-dataset-1.0.0.zip"))
-    parser.add_argument("--workers", type=int, default=8)
-    parser.add_argument("--part-mib", type=int, default=128)
+    parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--part-mib", type=int, default=8)
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     parts = args.output.with_suffix(args.output.suffix + ".parts")
