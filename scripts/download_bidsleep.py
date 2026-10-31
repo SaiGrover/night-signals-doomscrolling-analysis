@@ -6,6 +6,7 @@ import concurrent.futures
 import json
 import subprocess
 import shutil
+import time
 import urllib.request
 from pathlib import Path
 
@@ -20,39 +21,38 @@ def download_part(args: tuple[int, int, int, Path]) -> tuple[int, int]:
     if target.exists() and target.stat().st_size == expected:
         return index, target.stat().st_size
     temporary = target.with_suffix(".download")
-    temporary.unlink(missing_ok=True)
     curl = shutil.which("curl") or shutil.which("curl.exe")
-    if curl:
-        command = [
-            curl,
-            "--fail",
-            "--location",
-            "--silent",
-            "--show-error",
-            "--retry",
-            "6",
-            "--retry-delay",
-            "3",
-            "--connect-timeout",
-            "30",
-            "--max-time",
-            "900",
-            "--range",
-            f"{start}-{end}",
-            "--output",
-            str(temporary),
-            URL,
-        ]
-        subprocess.run(command, check=True)
-    else:
-        request = urllib.request.Request(URL, headers={"Range": f"bytes={start}-{end}", "Accept-Encoding": "identity"})
-        with urllib.request.urlopen(request, timeout=180) as response, temporary.open("wb") as handle:
-            shutil.copyfileobj(response, handle, length=1024 * 1024)
-    if temporary.stat().st_size != expected:
+    last_error: Exception | None = None
+    # PhysioNet occasionally resets long-running ranged responses. Retry the
+    # individual chunk so one transient connection error cannot kill the job.
+    for attempt in range(1, 21):
         temporary.unlink(missing_ok=True)
-        raise RuntimeError(f"part {index} expected {expected} bytes, got {temporary.stat().st_size}")
-    temporary.replace(target)
-    return index, expected
+        try:
+            if curl:
+                command = [
+                    curl, "--fail", "--location", "--silent", "--show-error",
+                    "--retry", "5", "--retry-all-errors", "--retry-delay", "4",
+                    "--connect-timeout", "30", "--max-time", "600", "--http1.1",
+                    "--range", f"{start}-{end}", "--output", str(temporary), URL,
+                ]
+                subprocess.run(command, check=True)
+            else:
+                request = urllib.request.Request(
+                    URL, headers={"Range": f"bytes={start}-{end}", "Accept-Encoding": "identity"}
+                )
+                with urllib.request.urlopen(request, timeout=180) as response, temporary.open("wb") as handle:
+                    shutil.copyfileobj(response, handle, length=1024 * 1024)
+            actual = temporary.stat().st_size if temporary.exists() else 0
+            if actual != expected:
+                raise RuntimeError(f"part {index} expected {expected} bytes, got {actual}")
+            temporary.replace(target)
+            return index, expected
+        except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+            last_error = error
+            temporary.unlink(missing_ok=True)
+            if attempt < 20:
+                time.sleep(min(30, 2 + attempt * 2))
+    raise RuntimeError(f"part {index} failed after 20 attempts: {last_error}") from last_error
 
 
 def main() -> None:
