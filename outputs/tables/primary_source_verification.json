@@ -1,0 +1,8 @@
+{
+  "source": "https://www.kaggle.com/api/v1/datasets/download/harpartapsingh13/sleep-and-doomscrolling-habits-dataset?datasetVersionNumber=1",
+  "file": "sleep_doomscrolling_habits.csv",
+  "local_sha256": "e441b468e480f913e99a0666e0efe472fe8c1b6660ee96f3cf59982c5773c007",
+  "kaggle_version_1_sha256": "e441b468e480f913e99a0666e0efe472fe8c1b6660ee96f3cf59982c5773c007",
+  "byte_identical": true,
+  "scope": "File identity only; does not verify the synthetic generator, category rule, or predictor timing."
+}

@@ -14,7 +14,13 @@
   ],
   "analysis_role": "Independent physiological evidence; never merged with Night Signals respondents and not external validation of the classifier.",
   "raw_data_policy": "Not committed to Git; download locally because the source reports approximately 27.9 GB uncompressed.",
-  "local_status": "manifest-only",
-  "local_root": "C:\\Users\\Saanvi\\Downloads\\Projects\\Doom Scrolling\\platform\\external\\physionet\\bidsleep-dataset\\1.0.0",
-  "next_step": "Download the PhysioNet dataset into C:\\Users\\Saanvi\\Downloads\\Projects\\Doom Scrolling\\platform\\external\\physionet\\bidsleep-dataset\\1.0.0 and rerun this script."
+  "local_status": "analysed_hr_labels_motion_pending",
+  "subjects_analysed": 47,
+  "nights_analysed": 253,
+  "subject_night_table": "outputs/tables/bidsleep_subject_night_summary.csv",
+  "modalities_analysed": [
+    "EEG-derived stage labels",
+    "Apple Watch heart rate"
+  ],
+  "motion_status": "Accelerometry is pending the full archive download; motion statistics are unavailable."
 }

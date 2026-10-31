@@ -37,6 +37,8 @@ Recent checks: `python scripts/analyze_label_and_habits.py` writes a target-labe
 
 The optional 5.92 GiB PhysioNet BIDSleep archive is resumed with `python scripts/download_bidsleep.py --workers 6`. After the complete ZIP is present, run `python scripts/finalize_bidsleep_download.py` to extract the subject/night files, verify the expected 47 subjects and 253 nights, and write aggregate outputs. Raw files stay under ignored `external/`; a manifest alone is not an analysis result.
 
+For the compact multi-night layer, `python scripts/download_bidsleep_compact.py` verifies all 253 heart-rate files and 253 EEG-derived stage-label files against PhysioNet's SHA-256 manifest, then writes subject/night summaries. This layer excludes accelerometry until the full archive is finalized. `outputs/tables/bidsleep_manifest.json` records the exact analysis status.
+
 The poor-sleep model excludes measured sleep outcomes and uses nested development validation, calibration, threshold selection, bootstrap intervals, and subgroup diagnostics. The one-record-per-row file cannot prove a real bedtime prediction moment; earlier experiments may have accessed overlapping holdout rows. The model is an educational label-recovery exercise and must not be used for individual decisions.
 
 ## Repository map

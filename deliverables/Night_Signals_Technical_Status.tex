@@ -35,7 +35,7 @@ NHANES & MEC-weighted age/sex-adjusted WLS now uses stratum-centered masked-PSU 
 \item The source does not provide item wording, within-night timestamps, a sampling frame, or label-generation rules. A real bedtime prediction moment and target construct validity cannot be established from this file.
 \item Earlier experiments may have inspected rows in the current 250-row holdout. The score is a historical internal benchmark, not a prospectively untouched evaluation.
 \item NHANES and PhysioNet are separate context datasets, not external validation of the Kaggle classifier. NHANES masked-PSU Taylor variance accounts for strata and clusters, but adult complete-case domain handling and descriptive charts remain limited.
-\item The optional multi-night PhysioNet dataset is still being downloaded locally. No result from that dataset is claimed until its raw files, checksums, and output tables are available.
+\item The compact multi-night PhysioNet layer now has checksum-verified heart-rate and stage-label files for 47 subjects and 253 nights, with a generated subject/night table. Accelerometry remains pending the full 5.92 GiB archive; no motion result is claimed.
 \item Older figures and the historical three-class notebook remain as an audit trail. They should not be cited as results of the current binary classifier.
 \item The saved joblib artifact requires its scikit-learn 1.5.2 training environment. The portable JSON bundle supports application inference; cross-version unpickling was observed to fail in a newer local virtual environment.
 \end{enumerate}

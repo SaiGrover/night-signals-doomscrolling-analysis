@@ -2,7 +2,7 @@ import plotly.express as px
 import streamlit as st
 
 from night_signals.config import OUTPUT_DIR
-from night_signals.data import read_json_artifact
+from night_signals.data import read_csv_artifact, read_json_artifact
 from night_signals.ui import footer, page_intro
 
 page_intro("PhysioNet physiological evidence", "Wearable heart-rate dynamics across PSG-scored sleep stages, analysed as an independent evidence layer.", ":material/ecg_heart:")
@@ -23,13 +23,29 @@ with right.container(border=True):
     st.plotly_chart(fig, alt="Mean composition of scored sleep stages", config={"displaylogo": False})
 st.warning(summary["note"], title="Interpretation boundary", icon=":material/warning:")
 multi = summary.get("multi_night_dataset", {})
+manifest = read_json_artifact(OUTPUT_DIR / "tables" / "bidsleep_manifest.json")
 with st.container(border=True):
     st.subheader("Multi-night evidence layer", icon=":material/timeline:")
     st.write(
         f"{multi.get('name', 'Specified multi-night PhysioNet dataset')} is registered as an independent source "
         f"({multi.get('expected_subjects', 47)} adults / {multi.get('expected_nights', 253)} nights). "
-        "Raw files are intentionally not bundled because the source is multi-gigabyte; the local reproducible "
-        "pipeline is available in `scripts/build_bidsleep_evidence.py`."
+        "Raw files are intentionally not bundled because the source is multi-gigabyte."
     )
     st.link_button("Open PhysioNet source", multi.get("physionet_url", "https://physionet.org/content/bidsleep-dataset/1.0.0/"), icon=":material/open_in_new:")
+    if manifest.get("local_status", "").startswith("analysed"):
+        st.caption(
+            f"Verified source files cover {manifest['subjects_analysed']} subjects and "
+            f"{manifest['nights_analysed']} nights. {manifest.get('motion_status', 'All listed modalities were processed.')} "
+            "These people are unrelated to the synthetic model records."
+        )
+        nights = read_csv_artifact("bidsleep_subject_night_summary.csv")
+        a, b = st.columns(2)
+        with a:
+            fig = px.histogram(nights, x="mean_hr", nbins=18, labels={"mean_hr": "Night mean heart rate (bpm)", "count": "Nights"})
+            st.plotly_chart(fig, alt="Distribution of average heart rate across BIDSleep nights", config={"displaylogo": False})
+        with b:
+            fig = px.box(nights, y=["wake_share", "deep_share", "rem_share"], labels={"value": "Share of scored epochs", "variable": "Sleep stage"})
+            st.plotly_chart(fig, alt="Distribution of wake, deep, and REM stage shares across BIDSleep nights", config={"displaylogo": False})
+    else:
+        st.caption("The multi-night dataset has a source manifest only; no multi-night results are claimed yet.")
 footer()

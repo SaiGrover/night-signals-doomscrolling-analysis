@@ -51,8 +51,9 @@ def summarize_local(root: Path) -> dict:
         stage_values = stage_values[stage_values.isin(STAGES)]
         hr_path = night_dir / "hr.csv"
         motion_path = night_dir / "motion.csv"
-        hr = pd.read_csv(hr_path) if hr_path.exists() else pd.DataFrame()
-        motion = pd.read_csv(motion_path) if motion_path.exists() else pd.DataFrame()
+        # PhysioNet v1.0.0 CSV rows are headerless: timestamp, value(s).
+        hr = pd.read_csv(hr_path, header=None) if hr_path.exists() else pd.DataFrame()
+        motion = pd.read_csv(motion_path, header=None) if motion_path.exists() else pd.DataFrame()
         hr_numeric = hr.select_dtypes(include=[np.number])
         hr_values = hr_numeric.iloc[:, -1] if not hr_numeric.empty else pd.Series(dtype=float)
         hr_values = pd.to_numeric(hr_values, errors="coerce")

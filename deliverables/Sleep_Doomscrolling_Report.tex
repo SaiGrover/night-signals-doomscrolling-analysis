@@ -24,6 +24,8 @@
 \reportsection{Source and scope}
 The primary file contains 1,000 public Kaggle records that its uploader describes as synthetic. This project did not design or conduct a survey. No sampling frame, original item wording, generation algorithm, or within-night timestamps are provided. Results describe this file, not a sampled population. Source: \url{https://www.kaggle.com/datasets/harpartapsingh13/sleep-and-doomscrolling-habits-dataset}. Local source checksum and field caveats appear in \texttt{data/PROVENANCE.md} and \texttt{DATA\_DICTIONARY.md}.
 
+The local CSV was compared byte for byte with Kaggle version 1 and has the same SHA-256 hash. The uploader describes roughly balanced target categories but does not publish their generation rule.
+
 \reportsection{Target validity}
 A category-by-score check finds that 213 of 330 records labeled Poor have \texttt{sleep\_quality\_score}=5/5. The label derivation is undocumented. The classifier recovers a synthetic-file label; it is not evidence of detecting a sleep disorder in people.
 
@@ -91,6 +93,8 @@ On identical development rows at the same threshold, full untuned logistic minus
 
 \reportsection{Independent context and limitations}
 NHANES includes 8,040 analytic adults. MEC-weighted, age/sex-adjusted WLS with stratum-centered masked-PSU Taylor variance gives adjusted short-sleep systolic difference 0.82 mmHg (95\% CI $-0.86$ to 2.50; $p=0.316$) and diastolic difference 1.93 mmHg (95\% CI 0.67 to 3.19; $p=0.005$). Adult complete-case domain analysis remains approximate. PAD800/PAD820 are minutes per occasion; the activity comparison does not support a protective claim. PhysioNet subjects are unrelated to the Kaggle file. Neither dataset validates the classifier. High-exposure favorable-sleep cases are few; outcome contrasts are partly circular. External real-world model validation has not been performed.
+
+The compact multi-night PhysioNet layer verifies heart-rate and EEG-derived stage files for 47 subjects and 253 nights against source checksums. Median nightly mean heart rate is 65.14 bpm; mean wake, deep, and REM shares are 0.110, 0.181, and 0.246. Accelerometry remains pending the full archive. These descriptive physiology values do not validate the classifier.
 
 \vfill\small
 Recompute the inputs with the scripts documented in \texttt{README.md}. This TeX file is the editable report source. Older figures remain historical.
