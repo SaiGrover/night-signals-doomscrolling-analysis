@@ -100,7 +100,8 @@ def build() -> dict:
                                     np.where(df["activity_min"] >= 30, "Reported >=30 min per occasion",
                                              "Reported <30 min per occasion"))
     df["short_sleep"] = np.where(df["sleep_hours"] < 7, "Short (<7h)", "Adequate (>=7h)")
-    df["survey_weight"] = pd.to_numeric(df["WTMEC2YR"], errors="coerce").fillna(pd.to_numeric(df["WTINT2YR"], errors="coerce"))
+    # BP and BMI are MEC examination measurements; interview weights are not interchangeable.
+    df["survey_weight"] = pd.to_numeric(df["WTMEC2YR"], errors="coerce")
     df["psu"] = pd.to_numeric(df["SDMVPSU"], errors="coerce")
     df["stratum"] = pd.to_numeric(df["SDMVSTRA"], errors="coerce")
     df["bmi_category"] = pd.cut(df["bmi"], [0, 18.5, 25, 30, 100],
@@ -109,8 +110,8 @@ def build() -> dict:
     summary: dict = {"dataset": "NHANES", "cycle": CYCLE,
                      "role": "Secondary, independent population-health evidence (not linked to primary respondents)",
                      "analytic_adults": int(len(df)),
-                     "survey_design": {"weight": "WTMEC2YR (fallback WTINT2YR)", "strata": "SDMVSTRA", "psu": "SDMVPSU",
-                                       "estimation": "weight-adjusted means and age/sex-adjusted WLS regression with PSU-clustered covariance and stratum fixed effects; approximate, not full complex-survey variance"},
+                     "survey_design": {"weight": "WTMEC2YR only for MEC outcomes", "strata": "SDMVSTRA", "psu": "SDMVPSU",
+                                       "estimation": "MEC-weighted age/sex-adjusted WLS with stratum fixed effects and stratum-centered PSU Taylor sandwich variance; adult complete-case domain approximation"},
                      "note": "Cross-sectional survey. PAD800/PAD820 are per-occasion duration; their sum is not daily activity or guideline adherence. Associations only."}
 
     bp = df.dropna(subset=["systolic", "diastolic"])
@@ -138,18 +139,50 @@ def build() -> dict:
                               "weighted_mean_systolic": weighted_mean(part["systolic"], part["survey_weight"]),
                               "weighted_mean_diastolic": weighted_mean(part["diastolic"], part["survey_weight"])})
     pd.DataFrame(weighted_rows).to_csv(TABLES / "nhanes_weighted_sleep_blood_pressure.csv", index=False)
-    design_bp = bp.dropna(subset=["survey_weight", "psu", "stratum"]).copy()
+    design_bp = bp.dropna(subset=["survey_weight", "psu", "stratum", "RIDAGEYR", "RIAGENDR"]).copy()
+    design_bp = design_bp[design_bp["survey_weight"] > 0].copy()
     design_bp["stratum_psu"] = design_bp["stratum"].astype(str) + ":" + design_bp["psu"].astype(str)
     design_models = {}
     for outcome in ["systolic", "diastolic"]:
         fit = smf.wls(f"{outcome} ~ C(short_sleep) + RIDAGEYR + C(RIAGENDR) + C(stratum)", data=design_bp,
-                      weights=design_bp["survey_weight"]).fit(cov_type="cluster", cov_kwds={"groups": design_bp["stratum_psu"]})
+                      weights=design_bp["survey_weight"]).fit()
+        # Taylor linearization of weighted regression estimating equations.
+        # Within each masked stratum, center the two PSU score totals.
+        used = design_bp.loc[fit.model.data.row_labels]
+        x = np.asarray(fit.model.exog)
+        residual = np.asarray(fit.resid)
+        weights = used["survey_weight"].to_numpy()
+        score = (weights * residual)[:, None] * x
+        scores = pd.DataFrame(score)
+        scores["stratum"] = used["stratum"].to_numpy()
+        scores["psu"] = used["psu"].to_numpy()
+        totals = scores.groupby(["stratum", "psu"], sort=False).sum()
+        meat = np.zeros((x.shape[1], x.shape[1]))
+        valid_strata = 0
+        for _, psus in totals.groupby(level=0):
+            values = psus.to_numpy()
+            if len(values) < 2:
+                continue
+            centered = values - values.mean(axis=0)
+            meat += len(values) / (len(values) - 1) * centered.T @ centered
+            valid_strata += 1
+        bread = np.linalg.pinv(x.T @ (weights[:, None] * x))
+        variance = bread @ meat @ bread
         term = "C(short_sleep)[T.Short (<7h)]"
+        index = fit.model.exog_names.index(term)
+        coefficient = float(fit.params[term])
+        se = float(np.sqrt(max(variance[index, index], 0)))
+        design_df = int(totals.shape[0] - valid_strata)
+        p = float(2 * _stats.t.sf(abs(coefficient / se), design_df)) if se > 0 and design_df > 0 else float("nan")
+        critical = float(_stats.t.ppf(0.975, design_df)) if design_df > 0 else float("nan")
         design_models[outcome] = {"short_sleep_coefficient": float(fit.params.get(term, np.nan)),
-                                  "short_sleep_p": float(fit.pvalues.get(term, np.nan)),
+                                  "short_sleep_p": p,
+                                  "short_sleep_se": se,
+                                  "short_sleep_95_ci": [coefficient-critical*se, coefficient+critical*se],
+                                  "design_degrees_of_freedom": design_df,
                                   "stratum_psu_clusters": int(design_bp["stratum_psu"].nunique()),
                                   "strata": int(design_bp["stratum"].nunique()),
-                                  "adjusted_for": "age and recorded sex; PSU-clustered WLS approximation"}
+                                  "adjusted_for": "age and recorded sex; stratum-centered PSU Taylor variance; adult complete-case domain approximation"}
     summary["B1_sleep_blood_pressure"]["design_aware"] = design_models
 
     bmi_sub = df.dropna(subset=["bmi_category"])

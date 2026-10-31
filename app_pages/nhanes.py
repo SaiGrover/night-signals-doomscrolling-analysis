@@ -5,7 +5,7 @@ from night_signals.config import OUTPUT_DIR
 from night_signals.data import read_json_artifact
 from night_signals.ui import footer, page_intro
 
-page_intro("NHANES independent evidence", "A separately analysed population-health layer. It is not linked or row-merged with the primary survey.", ":material/public:")
+page_intro("NHANES independent evidence", "A separately analysed population-health layer. It is not linked or row-merged with the synthetic primary file.", ":material/public:")
 summary = read_json_artifact(OUTPUT_DIR / "tables" / "nhanes_summary.json")
 design_bp = summary["B1_sleep_blood_pressure"].get("design_aware", {})
 with st.container(horizontal=True):
@@ -15,7 +15,7 @@ with st.container(horizontal=True):
     st.metric("BMI–sleep Spearman rho", f"{summary['B2_sleep_by_bmi']['spearman_bmi_vs_sleep']:.2f}", border=True)
 
 st.caption(
-    "NHANES estimates use MEC weights, age and sex adjustment, stratum fixed effects, and stratum–PSU clustered covariance (survey-design approximation). "
+    "NHANES blood-pressure regression uses MEC weights, age and sex adjustment, stratum fixed effects, and stratum-centered PSU Taylor variance (adult complete-case domain approximation). "
     f"Design-aware p-values: systolic {design_bp.get('systolic', {}).get('short_sleep_p', float('nan')):.3g}; "
     f"diastolic {design_bp.get('diastolic', {}).get('short_sleep_p', float('nan')):.3g}.",
     help="These are weighted associations, not causal or clinical estimates.",

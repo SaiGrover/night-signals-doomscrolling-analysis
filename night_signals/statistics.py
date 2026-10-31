@@ -103,7 +103,7 @@ def resilience_effects(df: pd.DataFrame) -> pd.DataFrame:
         "consumes_negative_news_content",
         "anxiety_score",
         "stress_score",
-        "protective_habit_count",
+        "habit_indicator_count",
         "phone_checks_per_night",
     ]
     rows = []

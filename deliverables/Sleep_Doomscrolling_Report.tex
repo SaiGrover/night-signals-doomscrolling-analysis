@@ -27,6 +27,8 @@ The primary file contains 1,000 public Kaggle records that its uploader describe
 \reportsection{Target validity}
 A category-by-score check finds that 213 of 330 records labeled Poor have \texttt{sleep\_quality\_score}=5/5. The label derivation is undocumented. The classifier recovers a synthetic-file label; it is not evidence of detecting a sleep disorder in people.
 
+An arbitrary sensitivity label, score $<5$, agrees with the Poor label in 75.5\% of 960 complete records (Cohen's $\kappa=0.355$). This exposes label dependence; neither label is clinically validated.
+
 \reportsection{Exploratory association checks}
 Five checks were specified after earlier dataset inspection; they are not preregistered. Pearson chi-square uses complete cases; Benjamini--Hochberg FDR adjusts the five comparisons. Cramer's V is descriptive. Significance alone cannot establish a protective effect.
 
@@ -45,6 +47,8 @@ doomscroller label & 1000 & 0.457 & $2.35\times10^{-45}$ \\
 
 \reportsection{Routines and negative news}
 The unadjusted routine association is small. Reading does not stand out as protective: its Good share is below the 34\% file-wide rate. The no-fixed-routine group has the highest Good share. Negative-news exposure has a weak association with sleep category ($p\approx0.742$). These are descriptive contrasts.
+
+An exploratory complete-case logistic adjustment ($n=953$) included age, gender, occupation, bedtime exposure, doomscroller label, negative-news exposure, night mode, and phone location. No routine term survives seven-term FDR adjustment. These contrasts cannot identify protective habits.
 
 \rowcolors{2}{pale}{white}
 \begin{tabularx}{\linewidth}{Xrrr}
@@ -83,8 +87,10 @@ full candidate features & 22 & 0.694 & 0.775 \\
 
 The fixed-threshold logistic comparisons are diagnostic and are not directly equivalent to the tuned and calibrated nested-CV production estimate.
 
+On identical development rows at the same threshold, full untuned logistic minus the simple doomscroller rule has balanced-accuracy difference $-0.019$ (stratified paired bootstrap 95\% CI $-0.052$ to $+0.014$). The full model's ROC AUC is 0.062 higher (95\% CI $+0.035$ to $+0.091$), but the binary rule offers limited ranking resolution. Incremental classification benefit is unestablished.
+
 \reportsection{Independent context and limitations}
-NHANES includes 8,040 analytic adults. Age/sex-adjusted weighted WLS with stratum fixed effects and PSU-clustered covariance is an approximation, not full complex-survey inference. PAD800/PAD820 are minutes per occasion; the observed activity comparison does not support a protective claim. PhysioNet subjects are unrelated to the Kaggle file. Neither dataset validates the classifier or its doomscrolling association. High-exposure favorable-sleep cases are few; sleep-duration, debt, and fatigue contrasts are circular because those quantities track the outcome. External real-world model validation has not been performed.
+NHANES includes 8,040 analytic adults. MEC-weighted, age/sex-adjusted WLS with stratum-centered masked-PSU Taylor variance gives adjusted short-sleep systolic difference 0.82 mmHg (95\% CI $-0.86$ to 2.50; $p=0.316$) and diastolic difference 1.93 mmHg (95\% CI 0.67 to 3.19; $p=0.005$). Adult complete-case domain analysis remains approximate. PAD800/PAD820 are minutes per occasion; the activity comparison does not support a protective claim. PhysioNet subjects are unrelated to the Kaggle file. Neither dataset validates the classifier. High-exposure favorable-sleep cases are few; outcome contrasts are partly circular. External real-world model validation has not been performed.
 
 \vfill\small
 Recompute the inputs with the scripts documented in \texttt{README.md}. This TeX file is the editable report source. Older figures remain historical.

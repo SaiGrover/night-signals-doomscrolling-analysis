@@ -19,7 +19,7 @@ from .config import (
 
 @st.cache_data(max_entries=8, show_spinner=False)
 def load_survey(path: str | Path = PRIMARY_DATA) -> pd.DataFrame:
-    """Load and deterministically enrich the primary survey without mutating raw data."""
+    """Load and deterministically enrich the public synthetic records."""
     df = pd.read_csv(path)
     out = df.copy()
     out["doomscroll_load_minutes"] = (
@@ -33,7 +33,7 @@ def load_survey(path: str | Path = PRIMARY_DATA) -> pd.DataFrame:
         labels=["Q1 · lowest", "Q2", "Q3", "Q4 · highest"],
         duplicates="drop",
     )
-    protective = pd.DataFrame(
+    habit_indicators = pd.DataFrame(
         {
             "active": out["exercise_minutes_per_day"].fillna(0).ge(30),
             "restorative_routine": out["bedtime_routine_type"].isin(
@@ -44,7 +44,7 @@ def load_survey(path: str | Path = PRIMARY_DATA) -> pd.DataFrame:
             "recent_detox": out["days_since_last_digital_detox"].fillna(np.inf).le(30),
         }
     )
-    out["protective_habit_count"] = protective.sum(axis=1)
+    out["habit_indicator_count"] = habit_indicators.sum(axis=1)
     out["high_exposure"] = (
         out["bedtime_screen_time_minutes"].ge(HIGH_EXPOSURE_SCREEN_MINUTES)
         & out["doomscroller"].eq(HIGH_EXPOSURE_DOOMSCROLLER)

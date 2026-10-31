@@ -2,7 +2,8 @@ import plotly.express as px
 import streamlit as st
 
 from night_signals.config import POST_OUTCOME_COLUMNS
-from night_signals.data import audit_table, load_survey, range_audit
+from night_signals.config import TABLE_DIR
+from night_signals.data import audit_table, load_survey, range_audit, read_json_artifact
 from night_signals.ui import footer, page_intro
 from night_signals.viz import COLORS, finish
 
@@ -13,7 +14,7 @@ page_intro(
 )
 
 df = load_survey()
-raw_columns = [column for column in df.columns if column not in {"doomscroll_load_minutes", "poor_sleep", "favorable_sleep", "exposure_quartile", "protective_habit_count", "high_exposure", "resilience_group"}]
+raw_columns = [column for column in df.columns if column not in {"doomscroll_load_minutes", "poor_sleep", "favorable_sleep", "exposure_quartile", "habit_indicator_count", "high_exposure", "resilience_group"}]
 raw = df[raw_columns]
 audit = audit_table(raw)
 
@@ -49,7 +50,7 @@ st.subheader("Variable audit", icon=":material/table_chart:")
 st.dataframe(
     audit,
     hide_index=True,
-    alt="Variable types, missingness, and unique-value counts for the primary survey",
+    alt="Variable types, missingness, and unique-value counts for the primary synthetic file",
     column_config={
         "missing_pct": st.column_config.ProgressColumn("Missing", min_value=0, max_value=100, format="%.1f%%"),
         "missing_n": st.column_config.NumberColumn("Missing n", format="%d"),
@@ -69,6 +70,12 @@ st.dataframe(leakage, hide_index=True, alt="Variable-level leakage audit for poo
 st.subheader("Range and outlier audit", icon=":material/rule:")
 st.caption("Bounds are semantic plausibility checks. Out-of-range values are reported for investigation and are not silently removed.")
 st.dataframe(range_audit(raw), hide_index=True, alt="Semantic range checks for numeric survey variables")
+
+target_check = read_json_artifact(TABLE_DIR / "target_sensitivity.json")
+with st.container(border=True):
+    st.subheader("Target validity sensitivity", icon=":material/fact_check:")
+    st.metric("Label versus score-proxy agreement", f"{target_check['agreement']:.1%}", border=True)
+    st.caption(f"{target_check['n_complete_score']} records have a numeric score. {target_check['note']} The category-generation rule is unavailable; this check cannot decide which field is correct.")
 
 with st.container(border=True):
     st.subheader("Provenance statement", icon=":material/source:")

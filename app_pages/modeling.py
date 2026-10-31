@@ -11,7 +11,7 @@ summary = read_json_artifact(MODEL_SUMMARY)
 with st.container(horizontal=True):
     st.metric("Nested-CV balanced accuracy", f"{summary['nested_cv']['balanced_accuracy']:.1%}", border=True)
     st.metric("Historical holdout ROC AUC", f"{summary['holdout']['roc_auc']:.3f}", border=True)
-    st.metric("Holdout balanced accuracy", f"{summary['holdout']['balanced_accuracy']:.1%}", border=True)
+    st.metric("Historical holdout balanced accuracy", f"{summary['holdout']['balanced_accuracy']:.1%}", border=True)
     st.metric("Decision threshold", f"{summary['decision_threshold']:.2f}", border=True)
 
 comparison = read_csv_artifact("production_model_comparison.csv")
@@ -19,6 +19,16 @@ st.plotly_chart(model_comparison_chart(comparison), alt="Nested cross-validation
 st.subheader("Simple baselines and feature ablations", icon=":material/compare:")
 st.caption("Development rows only. Five-fold out-of-fold logistic comparisons use a fixed 0.5 threshold without tuning or calibration; they are diagnostic and not directly equivalent to the production nested-CV score.")
 st.dataframe(read_csv_artifact("development_baselines_ablations.csv"), hide_index=True, alt="Majority and doomscroller-rule baselines compared with reduced and full logistic feature sets")
+paired = read_json_artifact(MODEL_SUMMARY.parent / "development_paired_comparison.json")
+st.caption(
+    f"Paired full-minus-rule difference on the same development rows: balanced accuracy "
+    f"{paired['balanced_accuracy_difference_full_minus_rule']:+.3f} "
+    f"(95% bootstrap CI {paired['balanced_accuracy_difference_95_ci'][0]:+.3f} to "
+    f"{paired['balanced_accuracy_difference_95_ci'][1]:+.3f}); ROC AUC "
+    f"{paired['roc_auc_difference_full_minus_rule']:+.3f} "
+    f"(95% CI {paired['roc_auc_difference_95_ci'][0]:+.3f} to "
+    f"{paired['roc_auc_difference_95_ci'][1]:+.3f}). No demonstrated balanced-accuracy gain."
+)
 
 st.subheader("Interactive holdout diagnostics", icon=":material/insights:")
 calibration = read_csv_artifact("production_calibration.csv")
@@ -52,18 +62,18 @@ with st.container(border=True):
     st.dataframe(subgroup[["attribute", "group", "n", "balanced_accuracy", "sensitivity", "specificity"]], hide_index=True, alt="Holdout performance by subgroup")
 
 with st.container(border=True):
-    st.subheader("Holdout decision audit", icon=":material/table_chart:")
+    st.subheader("Historical holdout decision audit", icon=":material/table_chart:")
     holdout = read_csv_artifact("production_holdout_predictions.csv")
     confusion = holdout.groupby(["y_true", "prediction"]).size().unstack(fill_value=0)
     confusion = confusion.reindex(index=[0, 1], columns=[0, 1], fill_value=0)
     confusion.index = ["Actual good", "Actual poor"]
     confusion.columns = ["Predicted good", "Predicted poor"]
-    st.dataframe(confusion, alt="Confusion matrix for the untouched holdout")
+    st.dataframe(confusion, alt="Confusion matrix for the historical holdout")
     odds = read_csv_artifact("primary_model_odds_ratios.csv")
     st.caption("Logistic-model odds ratios are descriptive feature associations within the fitted model; they are not causal effects.")
     st.dataframe(odds[["feature_label", "odds_ratio", "direction"]].head(12), hide_index=True, alt="Primary logistic model odds ratios")
 
-st.subheader("Transparent risk demo", icon=":material/insights:")
+st.subheader("Synthetic label score demo", icon=":material/insights:")
 st.caption("This is recovery of a synthetic-file label, not a diagnosis or recommendation. The source does not establish when inputs were observed.")
 model = load_portable_model()
 defaults = model["defaults"]
@@ -81,12 +91,12 @@ with st.form("risk_demo", border=True):
     for index, name in enumerate(categories):
         with cols[index % 2]:
             categorical[name] = st.selectbox(name.replace("_", " ").capitalize(), categories[name], index=categories[name].index(defaults[name]))
-    submitted = st.form_submit_button("Estimate model risk", type="primary", icon=":material/analytics:")
+    submitted = st.form_submit_button("Estimate Poor-label score", type="primary", icon=":material/analytics:")
 
 if submitted:
     probability, warnings = predict_probability({**numeric, **categorical}, model)
     with st.container(border=True):
-        st.metric("Estimated probability", f"{probability:.1%}", border=True)
+        st.metric("Estimated Poor-label probability", f"{probability:.1%}", border=True)
         st.write(risk_band(probability))
         st.caption(f"Threshold used for the published classifier: {model['threshold']:.2f}")
         for warning in warnings:

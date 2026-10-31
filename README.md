@@ -33,6 +33,10 @@ Run `python scripts/check_holdout_calibration.py` for retrospective calibration 
 
 The primary file is a public Kaggle dataset described by its uploader as synthetic; we did not collect a survey. Its item-generation process and observation times are undocumented. Results describe this file and an internally validated label-recovery exercise, not population effects or clinical risk. NHANES and PhysioNet are separate context layers, never validation of the classifier. See `data/PROVENANCE.md`, `DATA_DICTIONARY.md`, and `RESEARCH_INTEGRITY.md`.
 
+Recent checks: `python scripts/analyze_label_and_habits.py` writes a target-label sensitivity audit and adjusted exploratory habit contrasts. `python scripts/compare_simple_baselines.py` writes a paired, development-only simple-rule comparison. Neither establishes a real-world target or an incremental clinical benefit; see `RESEARCH_INTEGRITY.md` and `MODEL_CARD.md`.
+
+The optional 5.92 GiB PhysioNet BIDSleep archive is resumed with `python scripts/download_bidsleep.py --workers 6`. After the complete ZIP is present, run `python scripts/finalize_bidsleep_download.py` to extract the subject/night files, verify the expected 47 subjects and 253 nights, and write aggregate outputs. Raw files stay under ignored `external/`; a manifest alone is not an analysis result.
+
 The poor-sleep model excludes measured sleep outcomes and uses nested development validation, calibration, threshold selection, bootstrap intervals, and subgroup diagnostics. The one-record-per-row file cannot prove a real bedtime prediction moment; earlier experiments may have accessed overlapping holdout rows. The model is an educational label-recovery exercise and must not be used for individual decisions.
 
 ## Repository map

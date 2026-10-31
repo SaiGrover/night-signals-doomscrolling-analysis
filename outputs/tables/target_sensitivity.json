@@ -1,0 +1,9 @@
+{
+  "n_complete_score": 960,
+  "poor_label_share": 0.334375,
+  "score_below_five_share": 0.13541666666666666,
+  "agreement": 0.7552083333333334,
+  "balanced_accuracy_label_vs_score_proxy": 0.7870713623725671,
+  "cohen_kappa": 0.3545064377682403,
+  "note": "Score <5 is an arbitrary alternative label sensitivity check, not a validated clinical threshold. The score is ceiling-compressed."
+}

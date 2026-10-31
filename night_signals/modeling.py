@@ -51,7 +51,7 @@ def predict_probability(payload: dict, model: dict | None = None) -> tuple[float
 
 def risk_band(probability: float) -> str:
     if probability < 0.25:
-        return "Lower model-estimated risk"
+        return "Lower estimated Poor-label probability in this synthetic file"
     if probability < 0.50:
-        return "Moderate model-estimated risk"
-    return "Higher model-estimated risk"
+        return "Intermediate estimated Poor-label probability in this synthetic file"
+    return "Higher estimated Poor-label probability in this synthetic file"

@@ -1,4 +1,4 @@
-"""Train and audit the pre-outcome poor-sleep risk model.
+"""Train and audit the synthetic sleep-category label model.
 
 The final holdout is split before model comparison. Candidate selection and
 hyperparameter tuning happen only inside the development partition.

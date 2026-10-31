@@ -4,32 +4,44 @@
   "role": "Secondary, independent population-health evidence (not linked to primary respondents)",
   "analytic_adults": 8040,
   "survey_design": {
-    "weight": "WTMEC2YR (fallback WTINT2YR)",
+    "weight": "WTMEC2YR only for MEC outcomes",
     "strata": "SDMVSTRA",
     "psu": "SDMVPSU",
-    "estimation": "weight-adjusted means and age/sex-adjusted WLS regression with PSU-clustered covariance and stratum fixed effects; approximate, not full complex-survey variance"
+    "estimation": "MEC-weighted age/sex-adjusted WLS with stratum fixed effects and stratum-centered PSU Taylor sandwich variance; adult complete-case domain approximation"
   },
   "note": "Cross-sectional survey. PAD800/PAD820 are per-occasion duration; their sum is not daily activity or guideline adherence. Associations only.",
   "B1_sleep_blood_pressure": {
     "systolic_diff_short_minus_adequate": 1.2,
-    "systolic_p": 0.036163771812674834,
+    "systolic_p": 0.03616377181267482,
     "systolic_cohens_d": 0.067,
     "diastolic_diff_short_minus_adequate": 1.75,
-    "diastolic_p": 1.420335651751885e-06,
+    "diastolic_p": 1.4203356517518845e-06,
     "design_aware": {
       "systolic": {
-        "short_sleep_coefficient": 0.818437949387453,
-        "short_sleep_p": 0.2885595811900721,
+        "short_sleep_coefficient": 0.8184379493875148,
+        "short_sleep_p": 0.316135848995831,
+        "short_sleep_se": 0.7891872607125784,
+        "short_sleep_95_ci": [
+          -0.8636748788195173,
+          2.500550777594547
+        ],
+        "design_degrees_of_freedom": 15,
         "stratum_psu_clusters": 30,
         "strata": 15,
-        "adjusted_for": "age and recorded sex; PSU-clustered WLS approximation"
+        "adjusted_for": "age and recorded sex; stratum-centered PSU Taylor variance; adult complete-case domain approximation"
       },
       "diastolic": {
-        "short_sleep_coefficient": 1.9315756255545986,
-        "short_sleep_p": 0.0005011532265042378,
+        "short_sleep_coefficient": 1.9315756255546364,
+        "short_sleep_p": 0.005179650863880344,
+        "short_sleep_se": 0.590909494235306,
+        "short_sleep_95_ci": [
+          0.672081852600104,
+          3.1910693985091685
+        ],
+        "design_degrees_of_freedom": 15,
         "stratum_psu_clusters": 30,
         "strata": 15,
-        "adjusted_for": "age and recorded sex; PSU-clustered WLS approximation"
+        "adjusted_for": "age and recorded sex; stratum-centered PSU Taylor variance; adult complete-case domain approximation"
       }
     }
   },

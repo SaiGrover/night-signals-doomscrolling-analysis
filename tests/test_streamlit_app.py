@@ -37,4 +37,4 @@ def test_modeling_form_produces_a_probability():
     app.switch_page("app_pages/modeling.py").run()
     app.form_submit_button[0].click().run()
     assert not app.exception
-    assert any("Estimated probability" in metric.label for metric in app.metric)
+    assert any("Estimated Poor-label probability" in metric.label for metric in app.metric)

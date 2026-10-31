@@ -5,6 +5,6 @@ The primary classification target is the dataset's existing `sleep_quality_categ
 - `Poor` = 1 (positive class)
 - `Good` or `Fair` = 0
 
-The prediction moment is bedtime, after behavioral/context variables are available and before the sleep outcome occurs. The model excludes respondent ID, sleep quality, duration, latency, awakenings, sleep debt, daytime fatigue, and the categorical target itself.
+The model excludes respondent ID, sleep quality, duration, latency, awakenings, sleep debt, daytime fatigue, and the categorical target itself. The file is cross-sectional and contains no observation timestamps or original item wording, so actual availability at bedtime cannot be established. Nighttime phone checks may occur after sleep onset.
 
-This definition is fixed before model comparison. The decision threshold is selected only from development-set out-of-fold probabilities using a documented false-negative cost of 2 and false-positive cost of 1. The untouched holdout is opened only for final evaluation.
+The current script fixes this target before model comparison. Its decision threshold is selected from development-set out-of-fold probabilities using a false-negative cost of 2 and false-positive cost of 1. Earlier experiments may have accessed overlapping rows in the 250-row historical holdout; prospective independence cannot be claimed.

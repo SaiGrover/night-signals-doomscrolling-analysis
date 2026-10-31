@@ -22,4 +22,4 @@ The tests use Streamlit's in-process `AppTest` API to cover entrypoint rendering
 
 ## Research boundary
 
-The primary survey is self-reported and cross-sectional. NHANES and PhysioNet are independent evidence layers, not respondent-level validation. Model results are internally validated only and are not diagnostic or clinical advice.
+The primary Kaggle file is described by its uploader as synthetic; its item timing and label rule are undocumented. NHANES and PhysioNet are separate context layers, not classifier validation. Model results are internal label-recovery diagnostics and are not clinical advice.

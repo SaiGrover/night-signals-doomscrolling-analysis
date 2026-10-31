@@ -26,7 +26,14 @@ def download_part(args: tuple[int, int, int, Path]) -> tuple[int, int]:
     # PhysioNet occasionally resets long-running ranged responses. Retry the
     # individual chunk so one transient connection error cannot kill the job.
     for attempt in range(1, 21):
-        temporary.unlink(missing_ok=True)
+        for lock_retry in range(20):
+            try:
+                temporary.unlink(missing_ok=True)
+                break
+            except PermissionError:
+                if lock_retry == 19:
+                    raise
+                time.sleep(1)
         try:
             if curl:
                 command = [
@@ -49,7 +56,10 @@ def download_part(args: tuple[int, int, int, Path]) -> tuple[int, int]:
             return index, expected
         except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
             last_error = error
-            temporary.unlink(missing_ok=True)
+            try:
+                temporary.unlink(missing_ok=True)
+            except PermissionError:
+                pass
             if attempt < 20:
                 time.sleep(min(30, 2 + attempt * 2))
     raise RuntimeError(f"part {index} failed after 20 attempts: {last_error}") from last_error

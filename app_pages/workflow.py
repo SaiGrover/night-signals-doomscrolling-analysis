@@ -6,9 +6,9 @@ from night_signals.ui import footer, page_intro
 page_intro("Research workflow", "The dashboard is a read-only presentation layer over validated, versioned analytical artifacts.", ":material/account_tree:")
 steps = [
     ("01", "Acquire and audit", "Preserve source files, provenance notes, IDs, missingness, ranges, and data-quality flags."),
-    ("02", "Prepare features", "Create exposure measures, protective counts, age groups, and prediction-time eligibility without mutating raw data."),
+    ("02", "Prepare features", "Create exposure measures, neutral habit counts, and age groups without mutating raw data; actual predictor timing is unknown."),
     ("03", "Describe and test", "Use EDA, confidence intervals, Spearman associations, effect sizes, bootstrap intervals, and FDR correction."),
-    ("04", "Validate models", "Keep pre-outcome inputs separate, tune within folds, use nested CV, calibrate, optimize thresholds, and audit subgroups."),
+    ("04", "Validate models", "Exclude measured sleep outcomes, tune within folds, use nested CV, calibrate, optimize thresholds, and audit subgroups. Retain the historical holdout limitation."),
     ("05", "Synthesize evidence", "Keep NHANES and PhysioNet independent; combine interpretation, not respondent rows."),
 ]
 for code, title, body in steps:

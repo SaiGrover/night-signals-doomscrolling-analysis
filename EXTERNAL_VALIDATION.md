@@ -4,8 +4,8 @@ External validation is intentionally marked incomplete until a genuinely indepen
 
 An acceptable validation dataset must:
 
-1. Come from a different collection process or time period than the self-reported survey development data.
-2. Contain the documented pre-outcome input fields and a clearly defined Poor-sleep outcome.
+1. Come from a different collection process or time period than the public synthetic development file, preferably a documented real cohort.
+2. Contain independently timed predictors measured before a clearly defined sleep outcome. The current file cannot establish this timing or outcome definition.
 3. Be frozen before model scoring; no retuning or threshold changes may use it.
 4. Report missingness, cohort selection, outcome prevalence, and subgroup sample sizes.
 5. Evaluate calibration intercept/slope, Brier score, ROC AUC, PR AUC, sensitivity, specificity, and bootstrap confidence intervals.
@@ -18,8 +18,8 @@ Passing internal validation does not satisfy this contract.
 
 The project analyses two independent public datasets — **NHANES 2021-2023** (population
 health) and **PhysioNet Sleep-Accel** (objective wearable physiology) — as separate
-evidence layers (see the Evidence Synthesis page and `build_nhanes.py` /
-`build_physionet.py`). These strengthen the surrounding scientific context, but they do
+evidence layers (see the NHANES and PhysioNet pages and `scripts/build_nhanes_evidence.py` /
+`scripts/build_physionet_evidence.py`). These provide separate scientific context, but they do
 **not** by themselves satisfy the contract above: they use different populations,
 variables, and outcome definitions, so they cannot serve as a frozen, matched external
 test set for the poor-sleep classifier. Model external validation therefore remains

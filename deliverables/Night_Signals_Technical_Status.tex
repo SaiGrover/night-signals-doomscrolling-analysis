@@ -18,12 +18,15 @@ This status report supersedes the dated technical audit for the items listed bel
 \midrule
 Provenance & Source, checksum, synthetic description, and absent item timing are documented in \texttt{data/PROVENANCE.md} and \texttt{DATA\_DICTIONARY.md}. Portfolio collection claims and its broken repository link were corrected. \\
 Target validity & The category/score crosstab finds 213 of 330 Poor records with score 5/5. This is explicitly disclosed. \\
+Sensitivity & An arbitrary score $<5$ label agrees with Poor in 75.5\% of 960 complete records; Cohen's $\kappa=0.355$. Neither label is clinically validated. \\
 Exploratory inference & Five habit-category chi-square tests, Cramer's V, and Benjamini--Hochberg adjustment are reproducible from \texttt{scripts/audit\_research\_claims.py}. Negative-news FDR $p=0.742$ is reported; the unsupported reading/meditation protective claim was retracted. \\
 Model evaluation & The current production summary gives nested-CV balanced accuracy 0.737 and historical holdout balanced accuracy 0.760 (bootstrap 95\% interval 0.704--0.816). The model card, app, and research PDF now use this score. \\
 Baselines & The 750-row development-only check gives balanced accuracy 0.500 for majority, 0.713 for the doomscroller-label rule, and 0.694 for an untuned full logistic model at threshold 0.5. Different tuning/threshold settings prevent a direct performance-gain claim. \\
+Paired comparison & On identical development rows, full-minus-rule balanced-accuracy difference is $-0.019$ (paired bootstrap 95\% CI $-0.052$ to $+0.014$). Added classification benefit is unestablished. \\
+Adjusted habits & A 953-row complete-case exploratory logistic adjustment includes exposure and demographics. No routine term survives seven-term FDR adjustment; protection is not established. \\
 Calibration & Retrospective historical-holdout slope 1.218 (95\% CI 0.889--1.546) and intercept 0.149 (95\% CI $-0.231$--0.529) are saved and displayed. \\
 Notebooks and report & Ten numbered notebooks and the production notebook were executed sequentially with saved outputs. The historical long notebook has a visible retraction notice. The research report is authored in \texttt{deliverables/Sleep\_Doomscrolling\_Report.tex} and compiled to PDF. \\
-NHANES & Age/sex-adjusted weighted WLS with stratum fixed effects and clustered PSU covariance was run as an approximate design-aware check. PAD800/PAD820 are labeled per-occasion minutes; the contrary activity direction is disclosed. \\
+NHANES & MEC-weighted age/sex-adjusted WLS now uses stratum-centered masked-PSU Taylor variance (15 design df). Adjusted systolic difference 0.82 mmHg (95\% CI $-0.86$ to 2.50); diastolic 1.93 mmHg (95\% CI 0.67 to 3.19). Adult complete-case domain analysis remains approximate. \\
 \bottomrule
 \end{tabularx}
 
@@ -31,7 +34,7 @@ NHANES & Age/sex-adjusted weighted WLS with stratum fixed effects and clustered 
 \begin{enumerate}
 \item The source does not provide item wording, within-night timestamps, a sampling frame, or label-generation rules. A real bedtime prediction moment and target construct validity cannot be established from this file.
 \item Earlier experiments may have inspected rows in the current 250-row holdout. The score is a historical internal benchmark, not a prospectively untouched evaluation.
-\item NHANES and PhysioNet are separate context datasets, not external validation of the Kaggle classifier. NHANES variance estimation is an approximation to a full complex-survey analysis.
+\item NHANES and PhysioNet are separate context datasets, not external validation of the Kaggle classifier. NHANES masked-PSU Taylor variance accounts for strata and clusters, but adult complete-case domain handling and descriptive charts remain limited.
 \item The optional multi-night PhysioNet dataset is still being downloaded locally. No result from that dataset is claimed until its raw files, checksums, and output tables are available.
 \item Older figures and the historical three-class notebook remain as an audit trail. They should not be cited as results of the current binary classifier.
 \item The saved joblib artifact requires its scikit-learn 1.5.2 training environment. The portable JSON bundle supports application inference; cross-version unpickling was observed to fail in a newer local virtual environment.

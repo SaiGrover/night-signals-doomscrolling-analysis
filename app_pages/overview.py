@@ -9,7 +9,7 @@ from night_signals.viz import COLORS, finish
 hero(
     "Night Signals  ·  Research atlas",
     'What happens after<br>the screen should<br><span class="ns-hero-accent">have gone dark?</span>',
-    "A multi-dataset investigation of nighttime digital behaviour, sleep outcomes, resilient exceptions, and objective health signals. The atlas separates observed association, prediction, and external evidence by design.",
+    "An audit of a public synthetic dataset, its sleep labels, and separate population and physiological context. The atlas separates descriptive patterns, internal model evaluation, and external evidence.",
 )
 
 cohort_filter_bar()
@@ -38,8 +38,8 @@ exception_counts = (
 st.html('<div class="ns-section-kicker ns-explore-bar">Signal summary</div>')
 kpi_tiles(
     [
-        ("Respondents in view", f"{len(df):,}", "selected cohort", quartile_counts, "#5eead4"),
-        ("Poor-sleep prevalence", f"{df['poor_sleep'].mean():.1%}", "across the selected cohort", quartile_sleep, "#8b9cff"),
+        ("Records in view", f"{len(df):,}", "selected synthetic records", quartile_counts, "#5eead4"),
+        ("Poor-label share", f"{df['poor_sleep'].mean():.1%}", "across selected synthetic records", quartile_sleep, "#8b9cff"),
         ("Median bedtime exposure", f"{df['bedtime_screen_time_minutes'].median():.0f} min", "nightly screen exposure", quartile_exposure, "#f6c177"),
         ("High-exposure exceptions", f"{int((df['high_exposure'] & df['favorable_sleep']).sum())}", "favorable sleep profiles", exception_counts, "#e78284"),
     ]
@@ -64,7 +64,7 @@ with left.container(border=True, height="stretch"):
 
 with middle.container(border=True, height="stretch"):
     st.html('<div class="ns-panel-label">◐ &nbsp; Sleep outcomes</div>')
-    st.caption("Proportion of poor sleep across exposure quartiles.")
+    st.caption("Proportion assigned the Poor label across exposure quartiles.")
     quartiles = (
         df.groupby("exposure_quartile", observed=True)["poor_sleep"]
         .mean()
@@ -77,7 +77,7 @@ with middle.container(border=True, height="stretch"):
         x="exposure_quartile",
         y="Poor sleep prevalence",
         color_discrete_sequence=[COLORS[1]],
-        labels={"exposure_quartile": "Exposure quartile", "Poor sleep prevalence": "Poor sleep (%)"},
+        labels={"exposure_quartile": "Exposure quartile", "Poor sleep prevalence": "Poor label (%)"},
     )
     fig.update_traces(marker_line_width=0, texttemplate="%{y:.1f}%", textposition="outside")
     st.plotly_chart(finish(fig, height=300), width="stretch", config={"displaylogo": False, "responsive": True})
@@ -85,13 +85,13 @@ with middle.container(border=True, height="stretch"):
 with right:
     st.html(
         '<section class="ns-takeaway"><div class="ns-panel-label">♧ &nbsp; Key takeaway</div>'
-        '<p>Higher nighttime screen exposure is associated with worse sleep outcomes, but a subset of individuals show resilience. Exploring behavioural, demographic, and physiological factors helps identify these exceptions.</p></section>'
+        '<p>In this synthetic file, higher screen exposure co-occurs with more Poor labels. A small high-exposure subgroup has favorable labels; its habit patterns are exploratory and do not identify protective factors.</p></section>'
     )
     if st.button("Explore the analysis  →", type="primary", width="stretch"):
         st.switch_page("app_pages/associations.py")
 
 st.warning(
-    "The primary survey is cross-sectional and self-reported. This atlas does not establish causality, diagnose a sleep disorder, or provide personal medical advice.",
+    "The primary file is described by its uploader as synthetic. Its sleep label conflicts with the quality score for many records. These results cannot establish causality or diagnose sleep disorders in people.",
     title="Interpretation boundary",
     icon=":material/warning:",
 )

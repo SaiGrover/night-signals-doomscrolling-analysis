@@ -18,6 +18,9 @@ def verify_snapshot(source: str) -> None:
     calibration = json.loads((TABLES / "holdout_calibration_slope.json").read_text())
     tests = pd.read_csv(TABLES / "habit_association_tests.csv")
     baseline = pd.read_csv(TABLES / "development_baselines_ablations.csv")
+    paired = json.loads((TABLES / "development_paired_comparison.json").read_text())
+    sensitivity = json.loads((TABLES / "target_sensitivity.json").read_text())
+    nhanes = json.loads((TABLES / "nhanes_summary.json").read_text())
     values = [
         f"{model['nested_cv']['balanced_accuracy']:.3f}",
         f"{model['holdout']['balanced_accuracy']:.3f}",
@@ -26,6 +29,9 @@ def verify_snapshot(source: str) -> None:
         f"{calibration['calibration_slope']:.3f}",
         f"{tests.loc[tests.variable.eq('consumes_negative_news_content'), 'p_fdr_bh'].iloc[0]:.3f}",
         f"{baseline.loc[baseline.model.eq('doomscroller label rule'), 'oof_balanced_accuracy_0_5'].iloc[0]:.3f}",
+        f"{paired['balanced_accuracy_difference_full_minus_rule']:.3f}",
+        f"{sensitivity['cohen_kappa']:.3f}",
+        f"{nhanes['B1_sleep_blood_pressure']['design_aware']['systolic']['short_sleep_p']:.3f}",
     ]
     missing = [value for value in values if value not in source]
     if missing:

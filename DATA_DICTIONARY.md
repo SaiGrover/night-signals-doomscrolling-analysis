@@ -18,3 +18,5 @@ Source: [public Kaggle dataset](https://www.kaggle.com/datasets/harpartapsingh13
 | `sleep_quality_category` | Good/Fair/Poor | Target label; derivation undocumented |
 
 Run `python scripts/audit_research_claims.py` to inspect the category/score disagreement. Missing item wording means no predictor can be asserted to be available at an actual bedtime decision point. `phone_checks_per_night` and the `doomscroller` self-label warrant ablation before any prospective interpretation.
+
+Derived `habit_indicator_count` is a count of coded routine indicators, not a validated protective score. The original file provides neither the source questionnaire nor a label-generation algorithm, so those definitions cannot be reconstructed from these values.

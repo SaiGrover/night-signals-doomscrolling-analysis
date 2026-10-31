@@ -24,6 +24,9 @@ with st.container(border=True):
 
 test = resilience_effects(df)
 st.dataframe(test, hide_index=True, alt="Behavioral contrasts with group sizes and false-discovery-rate adjusted p-values")
+st.subheader("Adjusted routine associations", icon=":material/analytics:")
+st.caption("Full synthetic file, complete cases; logistic model adjusts for bedtime screen minutes, self-label, news, age, gender and occupation. Odds ratios and intervals describe model fit only. No routine contrast survives FDR correction.")
+st.dataframe(read_csv_artifact("adjusted_habit_associations.csv"), hide_index=True, alt="Exploratory adjusted habit odds ratios, confidence intervals and FDR p-values")
 st.subheader("Exploratory factor comparison", icon=":material/science:")
 fig = px.bar(test, x="cohens_d", y="factor", orientation="h", color="p_fdr_bh", color_continuous_scale=["#f6c177", "#5eead4"], labels={"cohens_d": "Cohen's d", "factor": "Factor", "p_fdr_bh": "FDR-adjusted p"})
 st.plotly_chart(fig, alt="Exploratory standardized differences between favorable and poor high-exposure respondents", config={"displaylogo": False})

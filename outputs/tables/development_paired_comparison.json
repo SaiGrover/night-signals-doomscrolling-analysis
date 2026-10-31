@@ -1,0 +1,15 @@
+{
+  "population": "750 development records; paired stratified bootstrap of fixed 5-fold OOF predictions",
+  "settings": "Untuned logistic regression at threshold 0.5 versus deterministic doomscroller label rule",
+  "balanced_accuracy_difference_full_minus_rule": -0.018999364139052344,
+  "balanced_accuracy_difference_95_ci": [
+    -0.05213033539652766,
+    0.014385146610217269
+  ],
+  "roc_auc_difference_full_minus_rule": 0.062398886036010626,
+  "roc_auc_difference_95_ci": [
+    0.03496249225295991,
+    0.09129283006414943
+  ],
+  "boundary": "Same development rows and folds; does not establish prospective or external generalization. Compared models differ from tuned/calibrated production model."
+}

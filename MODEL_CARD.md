@@ -1,4 +1,4 @@
-# Poor-sleep pre-outcome model — v2.0.0
+# Synthetic sleep-category label model — v2.0.0
 
 ## Intended use
 
@@ -19,14 +19,16 @@ This model is not medical advice, is not externally validated, and must not be u
 
 - Majority baseline accuracy: 67.0%.
 - Nested-CV balanced accuracy: 73.7% ± 4.1 percentage points.
-- Current holdout balanced accuracy: 75.96% (bootstrap 95% CI 70.42–81.55%).
+- Historical internal holdout balanced accuracy: 75.96% (bootstrap 95% CI 70.42–81.55%).
 - Holdout ROC AUC: 82.5% (95% CI 77.0–87.6%).
 - Holdout PR AUC: 72.0%; Brier score: 0.155.
 - Sensitivity: 72.29%; specificity: 79.64% at threshold 0.335.
+- Matched 750-row development comparison at a fixed 0.5 threshold: full untuned logistic minus the doomscroller rule balanced accuracy = −0.019 (paired bootstrap 95% CI −0.052 to +0.014). Incremental classification benefit is unestablished.
 
 ## Known limitations
 
 - The uploader describes the records as synthetic; population inference is not supported. The category label conflicts with the 1–5 quality score for many rows.
+- As an alternative, arbitrary score <5 label, agreement with the original Poor label is 75.5% (Cohen's kappa 0.355); neither label has a verified clinical meaning.
 - No independent, temporal, prospective, geographic, or clinical validation has been performed.
 - Self-reported exposures may be measured with error.
 - Subgroup results are diagnostic only because the final holdout is small.
