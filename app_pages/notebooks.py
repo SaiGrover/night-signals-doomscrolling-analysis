@@ -41,7 +41,7 @@ def stage_outputs(stem: str) -> list[Path]:
         "03": ["01_", "02_", "03_", "04_", "05_", "06_", "07_", "08_", "10_", "11_", "12_"],
         "04": ["exception_effect_sizes.csv", "primary_model_odds_ratios.csv", "association"],
         "05": ["protective_habits_summary.csv", "exception_effect_sizes.csv", "06_", "07_", "10_"],
-        "06": ["production_model_comparison.csv", "nested_cv_fold_results.csv", "13_model_comparison.png"],
+        "06": ["production_model_comparison.csv", "development_baselines_ablations.csv"],
         "07": ["production_model_summary.json", "production_feature_importance.csv", "subgroup_performance.csv", "15_production_risk_model.png"],
         "08": ["nhanes_", "16_nhanes_evidence.png"],
         "09": ["physionet_", "17_physionet_evidence.png"],
@@ -68,6 +68,7 @@ def render_saved_output(path: Path) -> None:
 
 
 page_intro("Notebook studio", "Every notebook is exposed as a readable, downloadable research stage with its saved tables, figures, and model outputs alongside it.", ":material/menu_book:")
+st.warning("The ten numbered notebooks and the production modelling notebook are refreshed from current tables. The legacy sleep_doomscrolling_analysis notebook and old PDF describe earlier experiments and contain superseded claims. See RESEARCH_INTEGRITY.md before citing them.", title="Legacy evidence boundary", icon=":material/warning:")
 catalog = notebook_catalog()
 if not catalog:
     st.warning("No notebooks were found in the configured notebook directory.", title="Notebook inventory unavailable", icon=":material/warning:")

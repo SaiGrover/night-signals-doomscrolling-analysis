@@ -1,0 +1,7 @@
+model,features,n_development,oof_balanced_accuracy_0_5,oof_roc_auc
+majority class,0,750,0.5,0.5
+doomscroller label rule,1,750,0.7126109738331147,0.7126109738331147
+bedtime minutes only,1,750,0.6507030690351816,0.7551975595817807
+full minus self-label and phone checks,20,750,0.6762421422879725,0.7456153765665119
+full minus self-label,21,750,0.6823512367092989,0.7572459976980225
+full candidate features,22,750,0.6936116096940623,0.7750098598691253
