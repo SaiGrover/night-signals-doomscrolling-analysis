@@ -7,27 +7,29 @@
     "weight": "WTMEC2YR (fallback WTINT2YR)",
     "strata": "SDMVSTRA",
     "psu": "SDMVPSU",
-    "estimation": "weight-adjusted means and WLS regression with PSU-clustered covariance and stratum fixed effects"
+    "estimation": "weight-adjusted means and age/sex-adjusted WLS regression with PSU-clustered covariance and stratum fixed effects; approximate, not full complex-survey variance"
   },
-  "note": "Cross-sectional survey; associations only, no causal or clinical claims.",
+  "note": "Cross-sectional survey. PAD800/PAD820 are per-occasion duration; their sum is not daily activity or guideline adherence. Associations only.",
   "B1_sleep_blood_pressure": {
     "systolic_diff_short_minus_adequate": 1.2,
-    "systolic_p": 0.03616377181267482,
+    "systolic_p": 0.036163771812674834,
     "systolic_cohens_d": 0.067,
     "diastolic_diff_short_minus_adequate": 1.75,
-    "diastolic_p": 1.4203356517518845e-06,
+    "diastolic_p": 1.420335651751885e-06,
     "design_aware": {
       "systolic": {
-        "short_sleep_coefficient": 1.3327892458535744,
-        "short_sleep_p": 0.0742775149284554,
+        "short_sleep_coefficient": 0.818437949387453,
+        "short_sleep_p": 0.2885595811900721,
         "stratum_psu_clusters": 30,
-        "strata": 15
+        "strata": 15,
+        "adjusted_for": "age and recorded sex; PSU-clustered WLS approximation"
       },
       "diastolic": {
-        "short_sleep_coefficient": 2.0684461943512176,
-        "short_sleep_p": 0.00024191086665794365,
+        "short_sleep_coefficient": 1.9315756255545986,
+        "short_sleep_p": 0.0005011532265042378,
         "stratum_psu_clusters": 30,
-        "strata": 15
+        "strata": 15,
+        "adjusted_for": "age and recorded sex; PSU-clustered WLS approximation"
       }
     }
   },
@@ -63,12 +65,12 @@
   "B3_sleep_by_activity": {
     "active_groups": [
       {
-        "activity_group": "Below activity floor (<30 min/day)",
-        "n": 2250,
-        "mean_sleep_hours": 7.901
+        "activity_group": "Reported <30 min per occasion",
+        "n": 631,
+        "mean_sleep_hours": 7.888
       },
       {
-        "activity_group": "Meets activity (>=30 min/day)",
+        "activity_group": "Reported >=30 min per occasion",
         "n": 5790,
         "mean_sleep_hours": 7.68
       }

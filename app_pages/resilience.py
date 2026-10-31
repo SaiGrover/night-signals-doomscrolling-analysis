@@ -18,12 +18,12 @@ with st.container(horizontal=True):
     st.metric("Poor sleep", f"{len(poor):,}", border=True)
     st.metric("Favorable share", f"{len(good) / len(high):.1%}" if len(high) else "—", border=True)
 
-effects = read_csv_artifact("exception_effect_sizes.csv")
 with st.container(border=True):
-    st.subheader("High-exposure exception profile", icon=":material/compare_arrows:")
-    st.dataframe(effects, hide_index=True, alt="Effect sizes comparing favorable and poor sleepers within the high-exposure group")
+    st.subheader("Exploratory behavioral contrasts", icon=":material/compare_arrows:")
+    st.caption("Sleep duration, latency, debt and fatigue define or closely track the outcome and are excluded from protective-factor interpretation. Small favorable group; no causal inference.")
 
 test = resilience_effects(df)
+st.dataframe(test, hide_index=True, alt="Behavioral contrasts with group sizes and false-discovery-rate adjusted p-values")
 st.subheader("Exploratory factor comparison", icon=":material/science:")
 fig = px.bar(test, x="cohens_d", y="factor", orientation="h", color="p_fdr_bh", color_continuous_scale=["#f6c177", "#5eead4"], labels={"cohens_d": "Cohen's d", "factor": "Factor", "p_fdr_bh": "FDR-adjusted p"})
 st.plotly_chart(fig, alt="Exploratory standardized differences between favorable and poor high-exposure respondents", config={"displaylogo": False})

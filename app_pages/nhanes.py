@@ -15,7 +15,7 @@ with st.container(horizontal=True):
     st.metric("BMI–sleep Spearman rho", f"{summary['B2_sleep_by_bmi']['spearman_bmi_vs_sleep']:.2f}", border=True)
 
 st.caption(
-    "NHANES estimates use MEC weights, stratum fixed effects, and stratum–PSU clustered covariance. "
+    "NHANES estimates use MEC weights, age and sex adjustment, stratum fixed effects, and stratum–PSU clustered covariance (survey-design approximation). "
     f"Design-aware p-values: systolic {design_bp.get('systolic', {}).get('short_sleep_p', float('nan')):.3g}; "
     f"diastolic {design_bp.get('diastolic', {}).get('short_sleep_p', float('nan')):.3g}.",
     help="These are weighted associations, not causal or clinical estimates.",
@@ -29,4 +29,5 @@ with right.container(border=True):
     fig = px.bar(summary["B3_sleep_by_activity"]["active_groups"], x="activity_group", y="mean_sleep_hours", labels={"activity_group": "Activity group", "mean_sleep_hours": "Mean sleep (hours)"})
     st.plotly_chart(fig, alt="Mean sleep hours by activity group in NHANES", config={"displaylogo": False})
 st.warning(summary["note"], title="Interpretation boundary", icon=":material/warning:")
+st.caption("The activity comparison is descriptive; its direction does not support a claim that more activity predicts longer sleep in this sample.")
 footer()

@@ -17,13 +17,13 @@ with st.container(horizontal=True, gap="large", vertical_alignment="center"):
         st.html('<div class="ns-landing-kicker">[ evidence entry ]</div>')
         st.html('<div class="ns-landing-title">Night<br><em>Signals</em></div>')
         st.html('<div class="ns-landing-tagline">Your sleep, translated into the signal behind the scroll. An evidence-led atlas of nighttime digital behaviour, sleep quality, resilience, and independent health signals.</div>')
-        st.html('<div class="ns-landing-stat">1,000 respondents <span>/</span> 29 analytic variables</div>')
+        st.html('<div class="ns-landing-stat">1,000 synthetic records <span>/</span> 29 analytic variables</div>')
         st.html('<div class="ns-landing-rule"></div>')
         with st.container(horizontal=True, gap="small"):
             if st.button("Proceed to analysis", type="primary", icon=":material/arrow_forward:", width="stretch"):
                 st.switch_page("app_pages/overview.py")
             if st.button("Access methodology", icon=":material/menu_book:", width="stretch"):
                 st.switch_page("app_pages/workflow.py")
-        st.html('<div class="ns-landing-footnote">Self-reported survey · observational analysis · no causal or clinical claims</div>')
+        st.html('<div class="ns-landing-footnote">Public Kaggle dataset · synthetic records · no population or clinical claims</div>')
 
 footer()

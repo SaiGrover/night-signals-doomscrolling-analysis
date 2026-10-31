@@ -1,10 +1,10 @@
 # Primary dataset provenance
 
-The primary file is `sleep_doomscrolling_habits.csv`, a 1,000-row self-reported sleep and doomscrolling survey identified in the project synopsis as the Kaggle dataset attributed to Harpartap Singh.
+The primary file is `sleep_doomscrolling_habits.csv`, a 1,000-row public Kaggle dataset attributed to Harpartap Singh. The uploader describes the records as synthetic. This project did not design or conduct a survey or recruit respondents. Rows describe simulated records; estimates cannot be generalized to people.
 
-Source: <https://www.kaggle.com/datasets/harpartapsingh13/sleep-and-doomscrolling-habitsdataset> (Kaggle dataset author: Harpartap Singh). The project synopsis identifies it as a public Kaggle source for academic, non-commercial analysis with attribution. Access date for this checkout: 2026-10-28.
+Source: <https://www.kaggle.com/datasets/harpartapsingh13/sleep-and-doomscrolling-habits-dataset> (uploader: Harpartap Singh). The source description calls this 1,000 synthetic records. The exact source revision and item-generation mechanism are not recorded in the CSV.
 
-The original Kaggle revision and collection methodology are not captured in the downloaded file, and the dataset card/license should be rechecked before redistribution. The file must not be described as a survey conducted by this project. It is not labeled synthetic because the source does not establish that claim.
+The original Kaggle revision is not captured in the downloaded file. Recheck the source license before redistribution. No questionnaire wording, observation window, or within-night timestamps are supplied; bedtime availability of predictors cannot be established. See `DATA_DICTIONARY.md`.
 
 The canonical local checksum should be regenerated whenever the source file is replaced:
 

@@ -18,7 +18,7 @@
         "false_negatives": 23,
         "false_positives": 34
       },
-      "trained_on": "self-reported primary survey; provenance unresolved; n=750 development",
+      "trained_on": "public Kaggle synthetic records; n=750 development",
       "external_validation": false
     }
   ]

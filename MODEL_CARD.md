@@ -2,14 +2,14 @@
 
 ## Intended use
 
-Educational demonstration of a pre-outcome risk model evaluated on a self-reported survey. The prediction moment is bedtime, after exposure/context variables are known and before sleep duration, latency, wakeups, fatigue, sleep debt, or sleep-quality outcomes occur.
+Educational demonstration of recovering a Poor label in a public dataset described by its uploader as synthetic. Sleep outcome columns are excluded. The cross-sectional file does not establish a real bedtime prediction moment or the timing of nighttime phone checks.
 
 This model is not medical advice, is not externally validated, and must not be used for diagnosis, treatment, employment, insurance, or automated decisions about people.
 
 ## Evaluation design
 
-- 1,000 self-reported survey rows; 750 development and 250 final holdout rows.
-- The holdout was created before model comparison and opened once.
+- 1,000 synthetic records; 750 development and 250 holdout rows in the current protocol.
+- The current script splits before fitting. Earlier experiments may have inspected overlapping rows; an "opened once" claim cannot be verified.
 - Candidate families were tuned inside five-fold nested cross-validation on development data.
 - Candidate comparison includes Logistic Regression, Random Forest, Extra Trees, Gradient Boosting, and RBF SVM.
 - The selected Logistic Regression was sigmoid-calibrated.
@@ -19,14 +19,14 @@ This model is not medical advice, is not externally validated, and must not be u
 
 - Majority baseline accuracy: 67.0%.
 - Nested-CV balanced accuracy: 73.7% ± 4.1 percentage points.
-- Untouched-holdout balanced accuracy: 77.5% (bootstrap 95% CI 71.8–82.8%).
+- Current holdout balanced accuracy: 75.96% (bootstrap 95% CI 70.42–81.55%).
 - Holdout ROC AUC: 82.5% (95% CI 77.0–87.6%).
 - Holdout PR AUC: 72.0%; Brier score: 0.155.
-- Sensitivity: 75.9%; specificity: 79.0% at threshold 0.32.
+- Sensitivity: 72.29%; specificity: 79.64% at threshold 0.335.
 
 ## Known limitations
 
-- This self-reported survey has partially documented provenance and unverified sampling, so it is not representative of any specific population.
+- The uploader describes the records as synthetic; population inference is not supported. The category label conflicts with the 1–5 quality score for many rows.
 - No independent, temporal, prospective, geographic, or clinical validation has been performed.
 - Self-reported exposures may be measured with error.
 - Subgroup results are diagnostic only because the final holdout is small.

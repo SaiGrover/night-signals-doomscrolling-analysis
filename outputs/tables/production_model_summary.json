@@ -1,7 +1,7 @@
 {
   "model_version": "2.0.0",
   "selected_model": "Logistic Regression",
-  "prediction_moment": "At bedtime, before sleep outcomes occur",
+  "prediction_moment": "Hypothetical; cross-sectional source does not verify predictor timing",
   "development_rows": 750,
   "untouched_holdout_rows": 250,
   "positive_prevalence": 0.33,

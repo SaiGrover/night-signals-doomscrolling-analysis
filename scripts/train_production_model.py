@@ -243,7 +243,7 @@ def main():
     export_bundle(joblib.load(artifact), MODELS / "poor_sleep_preoutcome_model.json")
     digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
     summary = {"model_version": version, "selected_model": selected_name,
-               "prediction_moment": "At bedtime, before sleep outcomes occur",
+               "prediction_moment": "Hypothetical; cross-sectional source does not verify predictor timing",
                "development_rows": len(X_dev), "untouched_holdout_rows": len(X_holdout),
                "positive_prevalence": float(y.mean()), "majority_baseline_accuracy": float(1-y.mean()),
                "nested_cv": comparison.iloc[0].to_dict(), "decision_threshold": threshold,
@@ -254,7 +254,7 @@ def main():
     (TABLES / "production_model_summary.json").write_text(json.dumps(summary, indent=2, default=float), encoding="utf-8")
     (ROOT / "outputs/tables/model_registry.json").write_text(json.dumps({"active": version, "models": [{"version": version,
         "status": "internal-validation-only", "artifact_sha256": digest, "metrics": holdout,
-        "trained_on": "self-reported primary survey; provenance unresolved; n=750 development", "external_validation": False}]}, indent=2), encoding="utf-8")
+        "trained_on": "public Kaggle synthetic records; n=750 development", "external_validation": False}]}, indent=2), encoding="utf-8")
     (ROOT / "outputs/tables/prediction_schema.json").write_text(json.dumps({"version": version, "features": features,
         "defaults": defaults, "ranges": ranges, "categories": categories,
         "drift_baseline": drift_baseline}, indent=2), encoding="utf-8")

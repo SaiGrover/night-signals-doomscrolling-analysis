@@ -95,8 +95,10 @@ def build() -> dict:
     mod = pd.to_numeric(df["PAD800"], errors="coerce").where(lambda s: s <= 840)
     vig = pd.to_numeric(df["PAD820"], errors="coerce").where(lambda s: s <= 840)
     df["activity_min"] = mod.fillna(0) + vig.fillna(0)
-    df["activity_group"] = np.where(df["activity_min"] >= 30, "Meets activity (>=30 min/day)",
-                                    "Below activity floor (<30 min/day)")
+    df.loc[mod.isna() & vig.isna(), "activity_min"] = np.nan
+    df["activity_group"] = np.where(df["activity_min"].isna(), None,
+                                    np.where(df["activity_min"] >= 30, "Reported >=30 min per occasion",
+                                             "Reported <30 min per occasion"))
     df["short_sleep"] = np.where(df["sleep_hours"] < 7, "Short (<7h)", "Adequate (>=7h)")
     df["survey_weight"] = pd.to_numeric(df["WTMEC2YR"], errors="coerce").fillna(pd.to_numeric(df["WTINT2YR"], errors="coerce"))
     df["psu"] = pd.to_numeric(df["SDMVPSU"], errors="coerce")
@@ -108,8 +110,8 @@ def build() -> dict:
                      "role": "Secondary, independent population-health evidence (not linked to primary respondents)",
                      "analytic_adults": int(len(df)),
                      "survey_design": {"weight": "WTMEC2YR (fallback WTINT2YR)", "strata": "SDMVSTRA", "psu": "SDMVPSU",
-                                       "estimation": "weight-adjusted means and WLS regression with PSU-clustered covariance and stratum fixed effects"},
-                     "note": "Cross-sectional survey; associations only, no causal or clinical claims."}
+                                       "estimation": "weight-adjusted means and age/sex-adjusted WLS regression with PSU-clustered covariance and stratum fixed effects; approximate, not full complex-survey variance"},
+                     "note": "Cross-sectional survey. PAD800/PAD820 are per-occasion duration; their sum is not daily activity or guideline adherence. Associations only."}
 
     bp = df.dropna(subset=["systolic", "diastolic"])
     bp_tbl = pd.DataFrame([{"sleep_group": g, "n": int(len(s)),
@@ -140,13 +142,14 @@ def build() -> dict:
     design_bp["stratum_psu"] = design_bp["stratum"].astype(str) + ":" + design_bp["psu"].astype(str)
     design_models = {}
     for outcome in ["systolic", "diastolic"]:
-        fit = smf.wls(f"{outcome} ~ C(short_sleep) + C(stratum)", data=design_bp,
+        fit = smf.wls(f"{outcome} ~ C(short_sleep) + RIDAGEYR + C(RIAGENDR) + C(stratum)", data=design_bp,
                       weights=design_bp["survey_weight"]).fit(cov_type="cluster", cov_kwds={"groups": design_bp["stratum_psu"]})
         term = "C(short_sleep)[T.Short (<7h)]"
         design_models[outcome] = {"short_sleep_coefficient": float(fit.params.get(term, np.nan)),
                                   "short_sleep_p": float(fit.pvalues.get(term, np.nan)),
                                   "stratum_psu_clusters": int(design_bp["stratum_psu"].nunique()),
-                                  "strata": int(design_bp["stratum"].nunique())}
+                                  "strata": int(design_bp["stratum"].nunique()),
+                                  "adjusted_for": "age and recorded sex; PSU-clustered WLS approximation"}
     summary["B1_sleep_blood_pressure"]["design_aware"] = design_models
 
     bmi_sub = df.dropna(subset=["bmi_category"])

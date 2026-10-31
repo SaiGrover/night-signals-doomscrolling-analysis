@@ -8,7 +8,7 @@ from night_signals.viz import COLORS, finish
 
 page_intro(
     "Dataset provenance and quality audit",
-    "The raw survey is preserved unchanged; this page documents structure, missingness, ranges, duplicates, target balance, and the variable-level leakage audit.",
+    "The public synthetic dataset is preserved unchanged; this page documents structure, missingness, ranges, duplicates, target balance, and the variable-level leakage audit.",
     ":material/fact_check:",
 )
 
@@ -63,7 +63,7 @@ for column in raw.columns:
     if column in POST_OUTCOME_COLUMNS:
         leakage.append({"variable": column, "prediction use": "Excluded", "reason": "Outcome, post-outcome, identifier, or target field"})
     else:
-        leakage.append({"variable": column, "prediction use": "Candidate", "reason": "Available before the modeled sleep outcome, subject to timing audit"})
+        leakage.append({"variable": column, "prediction use": "Timing unverified", "reason": "The cross-sectional source supplies no observation timestamp or questionnaire wording"})
 st.dataframe(leakage, hide_index=True, alt="Variable-level leakage audit for poor-sleep prediction")
 
 st.subheader("Range and outlier audit", icon=":material/rule:")
@@ -75,9 +75,9 @@ with st.container(border=True):
     st.markdown(
         """
         - **Primary:** *Sleep and Doomscrolling Habits Dataset*, Kaggle, dataset author Harpartap Singh; 1,000 public rows.
-        - **Design:** treated as a self-reported, cross-sectional survey.
-        - **Unresolved:** sampling frame, respondent population, recruitment, and generation procedure are not sufficiently documented in the source metadata available to this project.
-        - **Policy:** the project does not call the data clinically representative or causal, and does not assert that it is synthetic or non-synthetic without source confirmation.
+        - **Design:** the uploader describes the records as synthetic. This project did not conduct a survey.
+        - **Unresolved:** exact generation procedure, source revision, item wording, and predictor timing.
+        - **Interpretation:** associations and model scores describe this file, not a sampled population.
         """
     )
 footer()

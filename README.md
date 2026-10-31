@@ -12,6 +12,8 @@ python -m ipykernel install --user --name python3 --display-name "Python 3 (Nigh
 streamlit run streamlit_app.py
 ```
 
+The saved joblib artifact was serialized with scikit-learn 1.5.2. Use the pinned `requirements-training.txt` for artifact tests or retraining; an existing virtual environment with a newer scikit-learn may fail to unpickle it. The portable JSON artifact supports the Streamlit inference path.
+
 The application is Streamlit-only. The canonical source tree is `data/`, `night_signals/`, `app_pages/`, `notebooks/`, `scripts/`, and `outputs/`.
 
 ## Research workflow
@@ -23,11 +25,13 @@ The application is Streamlit-only. The canonical source tree is `data/`, `night_
 5. Execute notebooks sequentially with Jupyter or `nbconvert`.
 6. Run `pytest -q` and open the Streamlit app.
 
+For reproducible claim checks, run `python scripts/audit_research_claims.py`. It writes the target-score crosstab, routine shares, and five FDR-adjusted association tests to `outputs/tables/`. Historical notebook and PDF outputs are legacy artifacts; see `RESEARCH_INTEGRITY.md` before citing them.
+
 ## Scientific boundary
 
-The primary dataset is self-reported and cross-sectional. Its acquisition and sampling provenance remain incomplete. Results are descriptive or internally validated predictive results, not causal, clinical, or externally validated claims. NHANES and PhysioNet are independent evidence layers and are never row-merged with the primary survey.
+The primary file is a public Kaggle dataset described by its uploader as synthetic; we did not collect a survey. Its item-generation process and observation times are undocumented. Results describe this file and an internally validated label-recovery exercise, not population effects or clinical risk. NHANES and PhysioNet are separate context layers, never validation of the classifier. See `data/PROVENANCE.md`, `DATA_DICTIONARY.md`, and `RESEARCH_INTEGRITY.md`.
 
-The poor-sleep model uses a fixed pre-outcome feature set, nested development validation, an untouched holdout, calibration, threshold selection, bootstrap intervals, and subgroup diagnostics. It is not a medical device and must not be used for individual decisions.
+The poor-sleep model excludes measured sleep outcomes and uses nested development validation, calibration, threshold selection, bootstrap intervals, and subgroup diagnostics. The one-record-per-row file cannot prove a real bedtime prediction moment; earlier experiments may have accessed overlapping holdout rows. The model is an educational label-recovery exercise and must not be used for individual decisions.
 
 ## Repository map
 
