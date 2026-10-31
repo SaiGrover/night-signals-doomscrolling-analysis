@@ -17,6 +17,8 @@ The current model excludes sleep outcome columns and uses nested development val
 
 `python scripts/compare_simple_baselines.py` writes `development_baselines_ablations.csv` using only the 750 development records. At a fixed 0.5 threshold, the doomscroller-label rule attains balanced accuracy 0.713, while an untuned full logistic model attains 0.694. The fixed-threshold figures are not equivalent to the tuned, calibrated nested-CV production score. The simple-rule strength materially limits claims of added complexity or prospective signal.
 
+`python scripts/check_holdout_calibration.py` fits a logistic recalibration model on the saved historical holdout probabilities. Slope 1.218 (95% CI 0.889-1.546) and intercept 0.149 (95% CI -0.231-0.529) are retrospective diagnostics only; they cannot replace external calibration.
+
 The raw quality score contradicts the Poor category for 213 of 330 Poor records (score 5/5). The target's construction is undocumented. A model trained on this label learns its encoding, not an established sleep disorder. The current holdout balanced accuracy is 0.75965 (95% bootstrap interval 0.70416–0.81551) at threshold 0.335. This supersedes the stale 77.5% text in earlier reports.
 
 NHANES has no matching doomscrolling exposure and PhysioNet participants are unrelated to the Kaggle records. Their findings are background context only. The NHANES WLS model with stratum fixed effects and clustered PSU covariance is an approximation to complex-survey inference; it is not a full design-based analysis. PAD800/PAD820 record minutes per occasion, not minutes per day. The direction of the activity association should be reported without a protective interpretation.

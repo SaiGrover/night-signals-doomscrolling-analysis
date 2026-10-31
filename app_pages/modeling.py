@@ -38,6 +38,13 @@ st.plotly_chart(
     config={"displaylogo": False, "responsive": True},
 )
 st.caption("Panels use saved historical holdout predictions. Earlier experiments may have accessed overlapping rows, so prospective holdout independence cannot be claimed.")
+calibration_fit = read_json_artifact(MODEL_SUMMARY.parent / "holdout_calibration_slope.json")
+st.caption(
+    f"Retrospective calibration: intercept {calibration_fit['calibration_intercept']:.2f} "
+    f"(95% CI {calibration_fit['calibration_intercept_95_ci'][0]:.2f} to {calibration_fit['calibration_intercept_95_ci'][1]:.2f}); "
+    f"slope {calibration_fit['calibration_slope']:.2f} "
+    f"(95% CI {calibration_fit['calibration_slope_95_ci'][0]:.2f} to {calibration_fit['calibration_slope_95_ci'][1]:.2f})."
+)
 
 with st.container(border=True):
     st.subheader("Subgroup audit", icon=":material/group:")

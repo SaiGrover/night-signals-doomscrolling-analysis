@@ -27,6 +27,7 @@ The application is Streamlit-only. The canonical source tree is `data/`, `night_
 
 For reproducible claim checks, run `python scripts/audit_research_claims.py`. It writes the target-score crosstab, routine shares, and five FDR-adjusted association tests to `outputs/tables/`. The PDF can be regenerated from the current tables with `python scripts/build_current_report.py`. The unnumbered legacy analysis notebook and some legacy figures remain historical; see `RESEARCH_INTEGRITY.md` before citing them.
 Run `python scripts/compare_simple_baselines.py` for a development-only simple-rule and feature-ablation comparison. Its fixed-threshold logistic scores are diagnostic and should not be compared directly with the tuned/calibrated model's nested-CV estimate.
+Run `python scripts/check_holdout_calibration.py` for retrospective calibration slope and intercept from saved historical predictions.
 
 ## Scientific boundary
 

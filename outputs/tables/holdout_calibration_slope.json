@@ -1,0 +1,14 @@
+{
+  "n": 250,
+  "calibration_intercept": 0.14871410188881945,
+  "calibration_intercept_95_ci": [
+    -0.2314325031850895,
+    0.5288607069627285
+  ],
+  "calibration_slope": 1.217713391737938,
+  "calibration_slope_95_ci": [
+    0.8894269251498961,
+    1.5459998583259797
+  ],
+  "interpretation": "Retrospective calibration in the saved historical holdout; earlier reuse cannot be excluded. No external calibration claim."
+}

@@ -19,6 +19,7 @@ def main() -> None:
     tests = pd.read_csv(TABLES / "habit_association_tests.csv")
     routines = pd.read_csv(TABLES / "routine_outcomes.csv")
     baseline = pd.read_csv(TABLES / "development_baselines_ablations.csv")
+    calibration = json.loads((TABLES / "holdout_calibration_slope.json").read_text())
     nhanes = json.loads((TABLES / "nhanes_summary.json").read_text())
     styles = getSampleStyleSheet()
     styles.add(ParagraphStyle(name="TitleNS", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=23, leading=27, textColor=colors.HexColor("#102a3d"), spaceAfter=16))
@@ -60,6 +61,7 @@ def main() -> None:
     h = model["holdout"]
     ci = model["holdout_95_ci"]["balanced_accuracy"]
     section("Internal evaluation", f"Selected logistic model nested-CV balanced accuracy: {model['nested_cv']['balanced_accuracy']:.3f} (fold SD {model['nested_cv']['balanced_accuracy_sd']:.3f}). Historical 250-row holdout: balanced accuracy {h['balanced_accuracy']:.3f} (bootstrap 95% interval {ci['low']:.3f}-{ci['high']:.3f}), ROC AUC {h['roc_auc']:.3f}, PR AUC {h['pr_auc']:.3f}, Brier {h['brier']:.3f}, sensitivity {h['sensitivity']:.3f}, specificity {h['specificity']:.3f}; threshold {model['decision_threshold']:.3f}. These are internal label-recovery metrics.")
+    p(f"Retrospective holdout calibration: intercept {calibration['calibration_intercept']:.3f} (95% CI {calibration['calibration_intercept_95_ci'][0]:.3f} to {calibration['calibration_intercept_95_ci'][1]:.3f}); slope {calibration['calibration_slope']:.3f} (95% CI {calibration['calibration_slope_95_ci'][0]:.3f} to {calibration['calibration_slope_95_ci'][1]:.3f}). This is not external calibration.")
     table(["Development-only comparator", "Features", "BA at 0.5", "OOF ROC AUC"], [(r.model, int(r.features), f"{r.oof_balanced_accuracy_0_5:.3f}", f"{r.oof_roc_auc:.3f}") for r in baseline.itertuples()], [225,55,90,90])
     p("The fixed-threshold logistic comparisons are diagnostic and are not directly equivalent to the tuned, calibrated nested-CV production estimate.", "SmallNS")
     section("Independent context and limitations", f"NHANES includes {nhanes['analytic_adults']:,} analytic adults. Age/sex-adjusted weighted WLS with stratum fixed effects and PSU-clustered covariance is an approximation, not full survey-design inference. PAD800/PAD820 are minutes per occasion; the observed activity comparison does not support a protective claim. PhysioNet subjects are unrelated to the Kaggle file. Neither dataset validates the classifier or its doomscrolling association. The high-exposure favorable-sleep subgroup is small, and contrasts in sleep duration, debt or fatigue are circular because those quantities track the outcome. External real-world model validation has not been performed.")
