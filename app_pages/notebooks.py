@@ -68,7 +68,7 @@ def render_saved_output(path: Path) -> None:
 
 
 page_intro("Notebook studio", "Every notebook is exposed as a readable, downloadable research stage with its saved tables, figures, and model outputs alongside it.", ":material/menu_book:")
-st.warning("The ten numbered notebooks and the production modelling notebook are refreshed from current tables. The legacy sleep_doomscrolling_analysis notebook and old PDF describe earlier experiments and contain superseded claims. See RESEARCH_INTEGRITY.md before citing them.", title="Legacy evidence boundary", icon=":material/warning:")
+st.warning("The ten numbered notebooks, production modelling notebook, and PDF are refreshed from current tables. The legacy sleep_doomscrolling_analysis notebook and some older figures describe earlier experiments. See RESEARCH_INTEGRITY.md before citing them.", title="Legacy evidence boundary", icon=":material/warning:")
 catalog = notebook_catalog()
 if not catalog:
     st.warning("No notebooks were found in the configured notebook directory.", title="Notebook inventory unavailable", icon=":material/warning:")

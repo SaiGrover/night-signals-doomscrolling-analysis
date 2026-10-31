@@ -27,6 +27,7 @@ yarn-error.log*
 # local secrets and caches
 .streamlit/secrets.toml
 .pytest_cache/
+/tmp/pdfs/
 # local build/preview logs
 *.err
 preview*.log
