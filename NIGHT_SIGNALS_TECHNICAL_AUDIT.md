@@ -1,5 +1,7 @@
 # Night Signals — End-to-End Technical Audit
 
+> Historical audit snapshot from 2026-10-28. Several findings and metrics below were superseded by later fixes. The current technical status is maintained in `deliverables/Night_Signals_Technical_Status.tex`; do not cite this file as the current project verdict.
+
 **Audit scope:** C:\Users\Saanvi\Downloads\Projects\Doom Scrolling\platform  
 **Specification:** C:\Users\Saanvi\Desktop\SEM 5 PBLs\FDS PBL SYNOPSIS.pdf  
 **Audit date:** 2026-10-28  
